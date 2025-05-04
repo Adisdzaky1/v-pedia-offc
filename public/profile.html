@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>User Profile - Rerozz Hosting</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #f5f7ff;
+      color: #212529;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    /* Scrollbar hidden for tabs */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Fade in animation for cards */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    /* Custom styles for OTP inputs */
+    .otp-input-group {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .otp-input {
+      width: 3rem;
+      height: 3rem;
+      text-align: center;
+      font-size: 1.25rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.375rem;
+      transition: all 0.2s ease;
+    }
+    .otp-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px #2563eb;
+      outline: none;
+    }
+    /* Pulse animation for OTP input */
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+      }
+      50% {
+        box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+      }
+    }
+    .pulse {
+      animation: pulse 1.5s infinite;
+    }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .profile-grid {
+      grid-template-columns: 1fr;
+    }
+    .profile-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .otp-input {
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1rem;
+    }
+    /* Disable sticky sidebar on mobile for proper scrolling */
+    aside[aria-label="User profile sidebar"] {
+      position: static !important;
+      top: auto !important;
+      width: 100% !important;
+    }
+  }
+    @media (max-width: 480px) {
+      .profile-stats {
+        grid-template-columns: 1fr;
+      }
+      .tab-buttons button {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="max-w-[1200px] mx-auto p-4 md:p-6 grid md:grid-cols-[280px_1fr] gap-6 profile-grid">
+    <!-- Sidebar -->
+    <aside aria-label="User profile sidebar" class="bg-white rounded-lg shadow-md p-6 sticky top-6 self-start fade-in">
+      <div class="relative flex flex-col items-center mb-6">
+        <img alt="User profile picture" class="w-28 h-28 rounded-full object-cover border-4 border-blue-600 transition-transform duration-300 hover:scale-105 hover:shadow-lg" height="120" id="profileImage" src="https://storage.googleapis.com/a1aa/image/eeb7a435-caa4-490b-615d-d28347e264b0.jpg" width="120"/>
+        <button aria-label="Edit profile photo" class="absolute bottom-2 right-2 bg-blue-600 hover:bg-blue-700 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-transform duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400" id="editPhotoBtn" type="button">
+          <i class="fas fa-camera"></i>
+        </button>
+        <h3 class="mt-4 text-xl font-semibold text-gray-900 truncate max-w-full" id="usernameDisplay">Loading...</h3>
+        <p class="text-sm text-gray-500 text-center break-words max-w-full" id="emailDisplay">Loading...</p>
+      </div>
+      <div class="mb-4 text-center">
+        <input accept="image/jpeg,image/png,image/gif" class="hidden" id="photoUpload" type="file"/>
+        <p class="text-xs text-gray-400 select-none">Allowed JPG, GIF or PNG. Max size of 800K</p>
+      </div>
+      <hr class="border-gray-200 my-6"/>
+      <form autocomplete="off" class="space-y-4" id="profileForm" novalidate="">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="firstName">First Name</label>
+          <input class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition" id="firstName" name="firstName" placeholder="First name" required="" type="text"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="lastName">Last Name</label>
+          <input class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition" id="lastName" name="lastName" placeholder="Last name" type="text"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="phoneNumber">Phone Number</label>
+          <input class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition" id="phoneNumber" name="phoneNumber" placeholder="Phone number" type="text"/>
+        </div>
+        <hr class="border-gray-200 my-6"/>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="username">Username</label>
+          <input class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition" id="username" name="username" placeholder="Username" required="" type="text"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="email">Email</label>
+          <input class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition" id="email" name="email" placeholder="Email" required="" type="email"/>
+        </div>
+        
+        <!-- OTP Verification Section (for email change) -->
+        <div id="emailChangeOtpSection" class="hidden bg-blue-50 rounded-lg p-4 border border-blue-200">
+          <h3 class="text-sm font-medium text-blue-800 mb-2">Email Change Verification</h3>
+          <p class="text-xs text-blue-600 mb-3">We've sent a verification OTP to your current email. Please enter it below to confirm your email change.</p>
+          <div class="otp-input-group">
+            <input type="text" maxlength="1" class="otp-input" data-index="0" autocomplete="one-time-code">
+            <input type="text" maxlength="1" class="otp-input" data-index="1">
+            <input type="text" maxlength="1" class="otp-input" data-index="2">
+            <input type="text" maxlength="1" class="otp-input" data-index="3">
+            <input type="text" maxlength="1" class="otp-input" data-index="4">
+            <input type="text" maxlength="1" class="otp-input" data-index="5">
+          </div>
+          <input type="hidden" id="emailChangeOtpField">
+          <p class="text-xs text-red-600 mt-2 hidden" id="emailChangeOtpError"></p>
+          <div class="flex justify-between mt-4">
+            <button type="button" id="cancelEmailChange" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Cancel</button>
+            <button type="button" id="resendEmailChangeOtp" class="text-xs text-blue-600 hover:text-blue-800 font-medium">Resend OTP</button>
+          </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-3 mt-6">
+          <button class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-5 py-2 text-sm font-semibold transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed" id="saveChanges" type="submit">
+            <i class="fas fa-save"></i>
+            Save changes
+          </button>
+          <button class="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-blue-400" id="cancelChanges" type="button">
+            <i class="fas fa-times"></i>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="fade-in">
+      <button aria-label="Back to Dashboard" class="inline-flex items-center gap-2 text-blue-600 font-medium mb-6 hover:text-blue-800 transition focus:outline-none focus:ring-2 focus:ring-blue-400 rounded" id="backToDashboard" type="button">
+        <i class="fas fa-arrow-left"></i>
+        Back to Dashboard
+      </button>
+
+      <nav aria-label="Profile sections" class="flex space-x-4 border-b border-gray-200 mb-6 overflow-x-auto no-scrollbar tab-buttons" role="tablist">
+        <button aria-controls="customTab" aria-selected="true" class="whitespace-nowrap py-3 px-5 text-sm font-semibold text-blue-600 border-b-2 border-blue-600 focus:outline-none" id="tabProfile" role="tab" type="button">
+          <i class="fas fa-user mr-1"></i>
+          Profile
+        </button>
+        <button aria-controls="securityTab" aria-selected="false" class="whitespace-nowrap py-3 px-5 text-sm font-semibold text-gray-500 hover:text-blue-600 border-b-2 border-transparent focus:outline-none" id="tabSecurity" role="tab" type="button">
+          <i class="fas fa-shield-alt mr-1"></i>
+          Security
+        </button>
+        <button aria-controls="apikeyTab" aria-selected="false" class="whitespace-nowrap py-3 px-5 text-sm font-semibold text-gray-500 hover:text-blue-600 border-b-2 border-transparent focus:outline-none" id="tabApiKey" role="tab" type="button">
+          <i class="fas fa-key mr-1"></i>
+          API Key
+        </button>
+      </nav>
+      <div class="hidden p-4 mb-6 rounded text-sm font-medium" id="notification"></div>
+      
+      <!-- Profile Tab -->
+      <section aria-labelledby="tabProfile" class="bg-white rounded-lg shadow-md p-6" id="customTab" role="tabpanel">
+        <h1 class="text-2xl font-semibold mb-6 flex items-center gap-3 text-gray-900">
+          <i class="fas fa-id-card text-blue-600"></i>
+          Profile Information
+        </h1>
+        <div aria-label="User statistics" class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 profile-stats">
+          <div class="bg-blue-50 rounded-lg p-5 text-center transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <p aria-live="polite" class="text-2xl font-extrabold text-blue-600 mb-1" id="balanceStat">Rp 0</p>
+            <p class="text-sm text-gray-500">Your Balance</p>
+          </div>
+          <div class="bg-blue-50 rounded-lg p-5 text-center transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <p aria-live="polite" class="text-2xl font-extrabold text-blue-600 mb-1" id="coinStat">0</p>
+            <p class="text-sm text-gray-500">Your Coins</p>
+          </div>
+          <div class="bg-blue-50 rounded-lg p-5 text-center transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <p aria-live="polite" class="text-2xl font-extrabold text-blue-600 mb-1" id="referralStat">-</p>
+            <p class="text-sm text-gray-500">Referral Code</p>
+          </div>
+        </div>
+        <h2 class="text-lg font-semibold mb-4 text-gray-900">Account Details</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <tbody>
+              <tr class="border-b border-gray-200">
+                <th class="py-3 pr-6 font-medium text-gray-700 w-1/3">Username:</th>
+                <td class="py-3 text-gray-900" id="detailUsername">Loading...</td>
+              </tr>
+              <tr class="border-b border-gray-200">
+                <th class="py-3 pr-6 font-medium text-gray-700">Full name:</th>
+                <td class="py-3 text-gray-900" id="detailFullname">Loading...</td>
+              </tr>
+              <tr class="border-b border-gray-200">
+                <th class="py-3 pr-6 font-medium text-gray-700">Phone number:</th>
+                <td class="py-3 text-gray-900" id="detailPhone">Loading...</td>
+              </tr>
+              <tr class="border-b border-gray-200">
+                <th class="py-3 pr-6 font-medium text-gray-700">Email:</th>
+                <td class="py-3 text-gray-900" id="detailEmail">Loading...</td>
+              </tr>
+              <tr class="border-b border-gray-200">
+                <th class="py-3 pr-6 font-medium text-gray-700">Account Status:</th>
+                <td class="py-3" id="detailStatus"></td>
+              </tr>
+              <tr class="border-b border-gray-200">
+                <th class="py-3 pr-6 font-medium text-gray-700">Join Date:</th>
+                <td class="py-3 text-gray-900" id="detailJoinDate">Loading...</td>
+              </tr>
+              <tr>
+                <th class="py-3 pr-6 font-medium text-gray-700">Last Login:</th>
+                <td class="py-3 text-gray-900" id="detailLastLogin">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      
+      <!-- Security Tab -->
+      <section aria-labelledby="tabSecurity" class="hidden bg-white rounded-lg shadow-md p-6" id="securityTab" role="tabpanel">
+        <h1 class="text-2xl font-semibold mb-6 flex items-center gap-3 text-gray-900">
+          <i class="fas fa-shield-alt text-blue-600"></i>
+          Security Settings
+        </h1>
+        <div aria-live="assertive" class="hidden p-4 mb-6 rounded text-sm font-medium" id="passwordNotification" role="alert"></div>
+        
+        <h2 class="text-lg font-semibold mb-2 text-gray-900">Change Password</h2>
+        <p class="text-sm text-gray-500 mb-6">Ensure your account security with a strong password</p>
+        <form autocomplete="off" id="passwordForm" novalidate="">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="currentPassword">Current Password</label>
+            <input autocomplete="current-password" class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition" id="currentPassword" name="currentPassword" placeholder="Enter current password" required="" type="password"/>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="newPassword">New Password</label>
+            <input autocomplete="new-password" class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition" id="newPassword" name="newPassword" placeholder="Enter new password" required="" type="password"/>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="confirmPassword">Confirm New Password</label>
+            <input autocomplete="new-password" class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password" required="" type="password"/>
+          </div>
+          <div aria-label="Password requirements" class="bg-gray-50 rounded-md p-4 text-xs text-gray-500 mb-6 leading-relaxed">
+            <strong>Password Requirements:</strong>
+            <ul class="list-disc list-inside mt-2 space-y-1">
+              <li>Minimum 8 characters</li>
+              <li>At least one uppercase letter</li>
+              <li>At least one number</li>
+              <li>At least one special character</li>
+            </ul>
+          </div>
+          <button class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-5 py-2 text-sm font-semibold transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed w-full sm:w-auto" id="changePasswordBtn" type="submit">
+            <i class="fas fa-key"></i>
+            Change Password
+          </button>
+        </form>
+        
+        <hr class="border-gray-200 my-8"/>
+        
+        <h2 class="text-lg font-semibold mb-2 text-gray-900">Email Verification</h2>
+        <p aria-live="polite" class="text-sm text-gray-600 mb-4" id="emailVerificationStatus">Loading verification status...</p>
+        <button class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-5 py-2 text-sm font-semibold transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400" id="verifyEmailBtn" style="display: none;" type="button">
+          <i class="fas fa-envelope"></i>
+          Verify Email
+        </button>
+        
+        <!-- Email Verification OTP Section -->
+        <form autocomplete="off" class="mt-4 space-y-4 hidden" id="otpInlineForm" novalidate="">
+          <p class="text-sm text-gray-600">We've sent a 6-digit verification code to your email. Please enter it below.</p>
+          <div class="otp-input-group">
+            <input type="text" maxlength="1" class="otp-input pulse" data-index="0" autocomplete="one-time-code">
+            <input type="text" maxlength="1" class="otp-input" data-index="1">
+            <input type="text" maxlength="1" class="otp-input" data-index="2">
+            <input type="text" maxlength="1" class="otp-input" data-index="3">
+            <input type="text" maxlength="1" class="otp-input" data-index="4">
+            <input type="text" maxlength="1" class="otp-input" data-index="5">
+          </div>
+          <input type="hidden" id="otpInlineInput">
+          <p aria-live="assertive" class="text-xs text-red-600 hidden" id="otpInlineError" role="alert">Invalid OTP. Please enter a 6-digit numeric code.</p>
+          <div class="flex justify-between mt-4">
+            <button class="text-sm text-blue-600 hover:text-blue-800 font-medium" id="resendOtpBtn" type="button">Resend OTP</button>
+            <div class="flex gap-2">
+              <button class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400" id="otpInlineCancelBtn" type="button">
+                Cancel
+              </button>
+              <button class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-5 py-2 text-sm font-semibold transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-60 disabled:cursor-not-allowed" id="otpInlineSubmitBtn" type="submit">
+                <i class="fas fa-check"></i>
+                Verify
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+      
+      <!-- API Key Tab -->
+      <section aria-labelledby="tabApiKey" class="hidden bg-white rounded-lg shadow-md p-6" id="apikeyTab" role="tabpanel">
+        <h1 class="text-2xl font-semibold mb-6 flex items-center gap-3 text-gray-900">
+          <i class="fas fa-key text-blue-600"></i>
+          API Key Management
+        </h1>
+        <p class="text-sm text-gray-600 mb-6">Secure access key for integrating with our services</p>
+        <hr class="border-gray-200 mb-6"/>
+        <h2 class="text-lg font-semibold mb-2 text-gray-900">Your Current API Key</h2>
+        <p class="text-sm text-gray-600 mb-4">Created on <span id="apiKeyDate">Loading...</span></p>
+        <div aria-label="API key value" aria-live="polite" class="relative bg-blue-50 rounded-md p-4 font-mono text-sm break-words border-l-4 border-blue-600 mb-6 select-all" id="apiKeyValue">
+          Loading API key...
+          <button aria-label="Copy API key" class="absolute top-2 right-2 bg-blue-100 text-blue-600 rounded px-2 py-1 text-xs font-semibold hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400" type="button">
+            <i class="far fa-copy"></i>
+            Copy
+          </button>
+        </div>
+        <div class="flex items-center mb-6 space-x-2">
+          <input aria-checked="true" checked="" class="accent-blue-600" id="keyActive" type="checkbox"/>
+          <label class="text-gray-700 font-medium cursor-pointer" for="keyActive">Key Active</label>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+          <button class="flex items-center justify-center gap-2 border border-gray-300 rounded-md px-5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-auto" id="refreshKey" type="button">
+            <i class="fas fa-sync-alt"></i>
+            Refresh
+          </button>
+          <button class="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white rounded-md px-5 py-2 text-sm font-semibold transition shadow-md focus:outline-none focus:ring-2 focus:ring-red-400 w-full sm:w-auto" id="regenerateKey" type="button">
+            <i class="fas fa-redo"></i>
+            Regenerate Key
+          </button>
+        </div>
+        <div class="mb-4">
+          <input aria-checked="true" checked="" class="accent-blue-600" id="securityNotice" type="checkbox"/>
+          <label class="text-gray-700 font-semibold cursor-pointer" for="securityNotice">Security Notice</label>
+        </div>
+        <p class="text-xs text-gray-500 leading-relaxed">
+          <strong>Treat your API key like a password.</strong>
+          Keep it secure and never expose it in client side code or public repositories. Regenerate your key immediately if you suspect it's been compromised.
+        </p>
+        <hr class="border-gray-200 my-8"/>
+        <h2 class="text-lg font-semibold mb-4 text-gray-900">API Documentation</h2>
+        <p class="text-sm text-gray-600 mb-6">API documentation for integrating with our services</p>
+        <div aria-label="API documentation sections" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <article class="bg-blue-50 rounded-lg p-5 cursor-pointer transition-transform duration-300 hover:-translate-y-1 hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" tabindex="0">
+            <i class="fas fa-server text-2xl mb-3"></i>
+            <h3 class="text-lg font-semibold mb-1">Services</h3>
+            <p class="text-sm">Manage your services</p>
+          </article>
+          <article class="bg-blue-50 rounded-lg p-5 cursor-pointer transition-transform duration-300 hover:-translate-y-1 hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" tabindex="0">
+            <i class="fas fa-globe text-2xl mb-3"></i>
+            <h3 class="text-lg font-semibold mb-1">Countries</h3>
+            <p class="text-sm">Available countries</p>
+          </article>
+          <article class="bg-blue-50 rounded-lg p-5 cursor-pointer transition-transform duration-300 hover:-translate-y-1 hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" tabindex="0">
+            <i class="fas fa-phone text-2xl mb-3"></i>
+            <h3 class="text-lg font-semibold mb-1">Numbers</h3>
+            <p class="text-sm">Phone numbers</p>
+          </article>
+          <article class="bg-blue-50 rounded-lg p-5 cursor-pointer transition-transform duration-300 hover:-translate-y-1 hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" tabindex="0">
+            <i class="fas fa-shopping-cart text-2xl mb-3"></i>
+            <h3 class="text-lg font-semibold mb-1">Orders</h3>
+            <p class="text-sm">Order management</p>
+          </article>
+          <article class="bg-blue-50 rounded-lg p-5 cursor-pointer transition-transform duration-300 hover:-translate-y-1 hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" tabindex="0">
+            <i class="fas fa-info-circle text-2xl mb-3"></i>
+            <h3 class="text-lg font-semibold mb-1">Order Status</h3>
+            <p class="text-sm">Check order status</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+  
+  <script>
+    // Elements 
+    const tabs = {
+      profile: document.getElementById("customTab"),
+      security: document.getElementById("securityTab"),
+      apikey: document.getElementById("apikeyTab"),
+    };
+    const tabButtons = {
+      profile: document.getElementById("tabProfile"),
+      security: document.getElementById("tabSecurity"),
+      apikey: document.getElementById("tabApiKey"),
+    };
+    const notification = document.getElementById("notification");
+    const passwordNotification = document.getElementById("passwordNotification");
+    const profileImage = document.getElementById("profileImage");
+    const photoUpload = document.getElementById("photoUpload");
+    const editPhotoBtn = document.getElementById("editPhotoBtn");
+    const saveChangesBtn = document.getElementById("saveChanges");
+    const cancelChangesBtn = document.getElementById("cancelChanges");
+    const changePasswordBtn = document.getElementById("changePasswordBtn");
+    const regenerateKeyBtn = document.getElementById("regenerateKey");
+    const refreshKeyBtn = document.getElementById("refreshKey");
+    const verifyEmailBtn = document.getElementById("verifyEmailBtn");
+    const apiKeyValue = document.getElementById("apiKeyValue");
+    const apiKeyDate = document.getElementById("apiKeyDate");
+    const emailVerificationStatus = document.getElementById("emailVerificationStatus");
+    const otpInlineForm = document.getElementById("otpInlineForm");
+    const otpInlineInput = document.getElementById("otpInlineInput");
+    const otpInputs = document.querySelectorAll('#otpInlineForm .otp-input');
+    const otpInlineError = document.getElementById("otpInlineError");
+    const otpInlineCancelBtn = document.getElementById("otpInlineCancelBtn");
+    const otpInlineSubmitBtn = document.getElementById("otpInlineSubmitBtn");
+    const resendOtpBtn = document.getElementById("resendOtpBtn");
+    const backToDashboardBtn = document.getElementById("backToDashboard");
+    
+    // Email Change OTP Elements
+    const emailChangeOtpSection = document.getElementById("emailChangeOtpSection");
+    const emailChangeOtpInputs = document.querySelectorAll('#emailChangeOtpSection .otp-input');
+    const emailChangeOtpField = document.getElementById("emailChangeOtpField");
+    const emailChangeOtpError = document.getElementById("emailChangeOtpError");
+    const cancelEmailChangeBtn = document.getElementById("cancelEmailChange");
+    const resendEmailChangeOtpBtn = document.getElementById("resendEmailChangeOtp");
+
+    // Form fields
+    const profileForm = document.getElementById("profileForm");
+    const firstNameInput = document.getElementById("firstName");
+    const lastNameInput = document.getElementById("lastName");
+    const phoneNumberInput = document.getElementById("phoneNumber");
+    const usernameInput = document.getElementById("username");
+    const emailInput = document.getElementById("email");
+
+    // Security form fields
+    const currentPasswordInput = document.getElementById("currentPassword");
+    const newPasswordInput = document.getElementById("newPassword");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
+
+    // Detail fields
+    const detailUsername = document.getElementById("detailUsername");
+    const detailFullname = document.getElementById("detailFullname");
+    const detailPhone = document.getElementById("detailPhone");
+    const detailEmail = document.getElementById("detailEmail");
+    const detailStatus = document.getElementById("detailStatus");
+    const detailJoinDate = document.getElementById("detailJoinDate");
+    const detailLastLogin = document.getElementById("detailLastLogin");
+    const balanceStat = document.getElementById("balanceStat");
+    const coinStat = document.getElementById("coinStat");
+    const referralStat = document.getElementById("referralStat");
+
+    // State
+    let currentUserData = null;
+    let emailChangeRequest = null; // To track if there's an ongoing email change request
+
+    // Utility functions
+    function showNotification(message, type = "info", element = notification) {
+    element.className = "p-4 mb-6 rounded text-sm font-medium";
+    element.textContent = message;
+    
+    if (type === "success") {
+        element.classList.add("bg-green-100", "text-green-800", "border-l-4", "border-green-600");
+    } else if (type === "error") {
+        element.classList.add("bg-red-100", "text-red-800", "border-l-4", "border-red-600");
+    } else {
+        element.classList.add("bg-blue-100", "text-blue-800", "border-l-4", "border-blue-600");
+    }
+    
+    element.classList.remove("hidden");
+    setTimeout(() => {
+        element.classList.add("hidden");
+        element.textContent = "";
+    }, 5000);
+}
+
+    function setLoading(button, isLoading) {
+      if (isLoading) {
+        button.disabled = true;
+        button.innerHTML = `<svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg> ${button.textContent.trim()}`;
+      } else {
+        button.disabled = false;
+        // Restore original icon and text
+        if (button.id === "saveChanges") {
+          button.innerHTML = `<i class="fas fa-save"></i> Save changes`;
+        } else if (button.id === "changePasswordBtn") {
+          button.innerHTML = `<i class="fas fa-key"></i> Change Password`;
+        } else if (button.id === "regenerateKey") {
+          button.innerHTML = `<i class="fas fa-redo"></i> Regenerate Key`;
+        } else if (button.id === "verifyEmailBtn") {
+          button.innerHTML = `<i class="fas fa-envelope"></i> Verify Email`;
+        } else if (button.id === "otpInlineSubmitBtn") {
+          button.innerHTML = `<i class="fas fa-check"></i> Verify`;
+        } else {
+          button.textContent = button.textContent.trim();
+        }
+      }
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      }).format(amount);
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "N/A";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    // OTP Input Handling for multiple OTP sections
+    function setupOtpInputs(inputs, hiddenField, errorField) {
+      inputs.forEach((input, index) => {
+        // Handle input
+        input.addEventListener('input', (e) => {
+          if (input.value.length === 1) {
+            if (index < inputs.length - 1) {
+              inputs[index + 1].focus();
+            }
+          }
+          
+          // Update the hidden field value
+          let otpValue = '';
+          inputs.forEach(i => otpValue += i.value);
+          hiddenField.value = otpValue;
+          
+          if (errorField) {
+            errorField.textContent = '';
+            errorField.classList.add('hidden');
+          }
+        });
+        
+        // Handle backspace
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && input.value.length === 0) {
+            if (index > 0) {
+              inputs[index - 1].focus();
+            }
+          }
+        });
+        
+        // Handle paste
+        input.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pastedData = (e.clipboardData || window.clipboardData).getData('text/plain');
+          if (/^\d{6}$/.test(pastedData)) {
+            for (let i = 0; i < 6; i++) {
+              if (inputs[i]) {
+                inputs[i].value = pastedData[i] || '';
+              }
+            }
+            if (inputs[5]) inputs[5].focus();
+            
+            // Update the hidden field value
+            hiddenField.value = pastedData;
+          }
+        });
+      });
+    }
+    
+    // Initialize OTP inputs
+    setupOtpInputs(otpInputs, otpInlineInput, otpInlineError);
+    setupOtpInputs(emailChangeOtpInputs, emailChangeOtpField, emailChangeOtpError);
+
+    // Tab switching
+    function switchTab(tabKey) {
+      Object.entries(tabs).forEach(([key, el]) => {
+        if (key === tabKey) {
+          el.classList.remove("hidden");
+          tabButtons[key].setAttribute("aria-selected", "true");
+          tabButtons[key].classList.add("text-blue-600", "border-blue-600");
+          tabButtons[key].classList.remove("text-gray-500");
+          tabButtons[key].classList.remove("border-transparent");
+        } else {
+          el.classList.add("hidden");
+          tabButtons[key].setAttribute("aria-selected", "false");
+          tabButtons[key].classList.remove("text-blue-600", "border-blue-600");
+          tabButtons[key].classList.add("text-gray-500");
+          tabButtons[key].classList.add("border-transparent");
+        }
+      });
+    }
+
+    tabButtons.profile.addEventListener("click", () => switchTab("profile"));
+    tabButtons.security.addEventListener("click", () => switchTab("security"));
+    tabButtons.apikey.addEventListener("click", () => switchTab("apikey"));
+
+    // Profile photo upload
+    editPhotoBtn.addEventListener("click", () => photoUpload.click());
+
+    photoUpload.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 800 * 1024) {
+        showNotification("File size exceeds 800KB limit", "error");
+        return;
+      }
+
+      if (!["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
+        showNotification("Only JPG, PNG, or GIF files are allowed", "error");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        profileImage.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      try {
+        const formData = new FormData();
+        formData.append("photo", file);
+
+        const response = await fetch("/profile/update-photo", {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showNotification("Profile photo updated successfully", "success");
+          profileImage.src = data.profileUrl;
+          currentUserData.profileUrl = data.profileUrl;
+        } else {
+          showNotification(data.message || "Failed to update profile photo", "error");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        showNotification("Failed to update profile photo", "error");
+      }
+    });
+
+    // Populate form and details with user data
+    function populateFormWithUserData(user) {
+    // Mempersiapkan gambar dan nama pengguna
+    profileImage.src = user.profileUrl || "https://placehold.co/120x120/png?text=Profile+Picture";
+    document.getElementById("usernameDisplay").textContent = user.username || "N/A";
+    document.getElementById("emailDisplay").textContent = user.email || "N/A";
+
+    // Mengisi kolom input
+    firstNameInput.value = user.fullname ? user.fullname.split(" ")[0] : "";
+    lastNameInput.value = user.fullname ? user.fullname.split(" ").slice(1).join(" ") : "";
+    phoneNumberInput.value = user.nomor || "";
+    usernameInput.value = user.username || "";
+    emailInput.value = user.email || "";
+
+    // Mengisi detail pengguna
+    detailUsername.textContent = user.username || "N/A";
+    detailFullname.textContent = user.fullname || "N/A";
+    detailPhone.textContent = user.nomor || "N/A";
+    detailEmail.textContent = user.email || "N/A";
+    detailStatus.innerHTML = user.isVerified
+        ? '<span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Verified</span>'
+        : '<span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">Not Verified</span>';
+    detailJoinDate.textContent = formatDate(user.tanggalDaftar);
+    detailLastLogin.textContent = formatDate(user.lastLogin);
+
+    // Update email verification status text and button visibility
+    if (user.isVerified) {
+      emailVerificationStatus.textContent = "Your email is verified.";
+      verifyEmailBtn.style.display = "none";
+    } else {
+      emailVerificationStatus.textContent = "Your email is not verified.";
+      verifyEmailBtn.style.display = "inline-flex";
+    }
+
+    // Menampilkan API key jika ada
+    const apiKeyValue = document.getElementById("apiKeyValue");
+    const apiKeyDate = document.getElementById("apiKeyDate");
+    
+    if (user.apiKey) {
+        apiKeyValue.innerHTML = `
+            ${user.apiKey}
+            <button
+                class="absolute top-2 right-2 bg-blue-100 text-blue-600 rounded px-2 py-1 text-xs font-semibold hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                type="button"
+                aria-label="Copy API key"
+            >
+                <i class="far fa-copy"></i> Copy
+            </button>
+        `;
+        apiKeyDate.textContent = formatDate(user.createdAt);
+    } else {
+        apiKeyValue.textContent = "No API key available.";
+        apiKeyDate.textContent = "N/A";
+    }
+
+    // Reset email change OTP section
+    emailChangeOtpSection.classList.add("hidden");
+    emailChangeRequest = null;
+}
+
+    // Load user data
+    async function loadUserData() {
+    try {
+        const response = await fetch("/profile/users", {
+            credentials: "include",
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            currentUserData = data.user;
+            populateFormWithUserData(data.user);  // Pastikan menampilkan data dengan benar
+        } else {
+            showNotification(data.message || "Failed to load user data", "error");
+        }
+    } catch (error) {
+        console.error("Error loading user data:", error);
+        showNotification("Failed to load user data", "error");
+    }
+}
+
+    // Save profile changes
+    profileForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const firstName = firstNameInput.value.trim();
+      const lastName = lastNameInput.value.trim();
+      const phoneNumber = phoneNumberInput.value.trim();
+      const username = usernameInput.value.trim();
+      const email = emailInput.value.trim();
+
+      if (!firstName || !username || !email) {
+        showNotification("First name, username and email are required", "error");
+        return;
+      }
+      
+      // Check if we're in email change verification mode
+      if (emailChangeRequest && emailChangeRequest.newEmail === email) {
+        // User is submitting OTP for email change
+        try {
+          setLoading(saveChangesBtn, true);
+          
+          const otp = emailChangeOtpField.value;
+          if (!otp || otp.length !== 6) {
+            emailChangeOtpError.textContent = "Please enter a valid 6-digit OTP";
+            emailChangeOtpError.classList.remove("hidden");
+            return;
+          }
+
+          const response = await fetch("/profile/confirm-email-change", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ otp }),
+            credentials: "include",
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            showNotification("Email updated successfully", "success");
+            emailChangeOtpSection.classList.add("hidden");
+            emailChangeOtpField.value = "";
+            await loadUserData();
+          } else {
+            emailChangeOtpError.textContent = data.message || "Invalid OTP";
+            emailChangeOtpError.classList.remove("hidden");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showNotification("Failed to update email", "error");
+        } finally {
+          setLoading(saveChangesBtn, false);
+        }
+        return;
+      }
+
+      // Normal profile update flow
+      try {
+        setLoading(saveChangesBtn, true);
+
+        const newFullname = `${firstName}${lastName ? " " + lastName : ""}`;
+        if (newFullname !== currentUserData.fullname) {
+          const fullnameRes = await fetch("/profile/change-fullname", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ newFullname }),
+            credentials: "include",
+          });
+          const fullnameData = await fullnameRes.json();
+          if (!fullnameData.success) {
+            throw new Error(fullnameData.message || "Failed to update fullname");
+          }
+        }
+
+        if (phoneNumber && phoneNumber !== currentUserData.nomor) {
+          const phoneRes = await fetch("/profile/change-nomor", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ newNomor: phoneNumber }),
+            credentials: "include",
+          });
+          const phoneData = await phoneRes.json();
+          if (!phoneData.success) {
+            throw new Error(phoneData.message || "Failed to update phone number");
+          }
+        }
+
+        if (username !== currentUserData.username) {
+          const usernameRes = await fetch("/profile/change-username", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ newUsername: username }),
+            credentials: "include",
+          });
+          const usernameData = await usernameRes.json();
+          if (!usernameData.success) {
+            throw new Error(usernameData.message || "Failed to update username");
+          }
+        }
+
+        if (email !== currentUserData.email) {
+          // Request email change (will trigger OTP)
+          const emailRes = await fetch("/profile/request-email-change", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ newEmail: email }),
+            credentials: "include",
+          });
+          const emailData = await emailRes.json();
+          
+          if (emailData.success) {
+            showNotification("OTP sent to your current email", "success");
+            emailChangeRequest = { newEmail: email };
+            
+            // Show OTP section
+            emailChangeOtpSection.classList.remove("hidden");
+            for (const input of emailChangeOtpInputs) input.value = '';
+            emailChangeOtpField.value = '';
+            emailChangeOtpInputs[0].focus();
+          } else {
+            throw new Error(emailData.message || "Failed to request email change");
+          }
+        } else {
+          // No email change, just update other fields
+          await loadUserData();
+          showNotification("Profile updated successfully", "success");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        showNotification(error.message || "Failed to update profile", "error");
+      } finally {
+        setLoading(saveChangesBtn, false);
+      }
+    });
+    
+    // Cancel email change
+    cancelEmailChangeBtn.addEventListener("click", () => {
+      emailChangeOtpSection.classList.add("hidden");
+      emailChangeRequest = null;
+      emailInput.value = currentUserData.email;
+      showNotification("Email change canceled", "info");
+    });
+    
+    // Resend email change OTP
+    resendEmailChangeOtpBtn.addEventListener("click", async () => {
+      if (!emailChangeRequest) return;
+      
+      try {
+        setLoading(resendEmailChangeOtpBtn, true);
+        
+        const response = await fetch("/profile/request-email-change", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newEmail: emailChangeRequest.newEmail }),
+          credentials: "include",
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          showNotification("New OTP sent to your current email", "success");
+          for (const input of emailChangeOtpInputs) input.value = '';
+          emailChangeOtpField.value = '';
+          emailChangeOtpInputs[0].focus();
+        } else {
+          showNotification(data.message || "Failed to resend OTP", "error");
+        }
+      } catch (error) {
+        console.error("Error resending OTP:", error);
+        showNotification("Failed to resend OTP", "error");
+      } finally {
+        setLoading(resendEmailChangeOtpBtn, false);
+      }
+    });
+
+    // Cancel changes
+    cancelChangesBtn.addEventListener("click", () => {
+      if (currentUserData) {
+        populateFormWithUserData(currentUserData);
+        emailChangeOtpSection.classList.add("hidden");
+        emailChangeRequest = null;
+      }
+      showNotification("Changes discarded", "success");
+    });
+
+    // Change password
+    document.getElementById("passwordForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const currentPassword = currentPasswordInput.value;
+      const newPassword = newPasswordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        showNotification("All fields are required", "error", passwordNotification);
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showNotification("New passwords do not match", "error", passwordNotification);
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        showNotification("Password must be at least 8 characters", "error", passwordNotification);
+        return;
+      }
+
+      if (!/[A-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+        showNotification(
+          "Password must contain at least one uppercase letter and one number",
+          "error", passwordNotification);
+        return;
+      }
+
+      try {
+        setLoading(changePasswordBtn, true);
+
+        const response = await fetch("/profile/change-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            oldPassword: currentPassword,
+            newPassword: newPassword,
+          }),
+          credentials: "include",
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showNotification("Password changed successfully", "success", passwordNotification);
+          currentPasswordInput.value = "";
+          newPasswordInput.value = "";
+          confirmPasswordInput.value = "";
+        } else {
+          showNotification(data.message || "Failed to change password", "error", passwordNotification);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        showNotification("Failed to change password", "error", passwordNotification);
+      } finally {
+        setLoading(changePasswordBtn, false);
+      }
+    });
+
+    // API Key regenerate
+    regenerateKeyBtn.addEventListener("click", async () => {
+      if (
+        !confirm(
+          "Are you sure you want to regenerate your API key? This will invalidate your current key."
+        )
+      ) {
+        return;
+      }
+
+      try {
+        setLoading(regenerateKeyBtn, true);
+
+        const response = await fetch("/profile/regenerate-apikey", {
+          method: "POST",
+          credentials: "include",
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          apiKeyValue.innerHTML = `
+            ${data.newApiKey}
+            <button
+              class="absolute top-2 right-2 bg-blue-100 text-blue-600 rounded px-2 py-1 text-xs font-semibold hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              type="button"
+              aria-label="Copy API key"
+            >
+              <i class="far fa-copy"></i> Copy
+            </button>
+          `;
+          currentUserData.apiKey = data.newApiKey;
+          showNotification("API Key regenerated successfully", "success");
+        } else {
+          showNotification(data.message || "Failed to regenerate API Key", "error");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        showNotification("Failed to regenerate API Key", "error");
+      } finally {
+        setLoading(regenerateKeyBtn, false);
+      }
+    });
+
+    // API Key refresh
+    refreshKeyBtn.addEventListener("click", async () => {
+      await loadUserData();
+      showNotification("API Key information refreshed", "success");
+    });
+
+    // Copy API Key
+    apiKeyValue.addEventListener("click", (e) => {
+      if (e.target.closest("button")) {
+        const apiKeyText = apiKeyValue.textContent.trim();
+        navigator.clipboard
+          .writeText(apiKeyText)
+          .then(() => {
+            showNotification("API Key copied to clipboard", "success");
+          })
+          .catch((err) => {
+            console.error("Failed to copy:", err);
+            showNotification("Failed to copy API Key", "error");
+          });
+      }
+    });
+
+    // Verify Email button click - show inline OTP form and send OTP
+    verifyEmailBtn.addEventListener("click", async () => {
+      try {
+        setLoading(verifyEmailBtn, true);
+        const response = await fetch("/profile/send-verification-otp", {
+          method: "POST",
+          credentials: "include",
+        });
+        const data = await response.json();
+        if (data.success) {
+          showNotification("OTP sent to your email", "success");
+          otpInlineForm.classList.remove("hidden");
+          
+          // Reset OTP fields
+          otpInlineInput.value = "";
+          for (const input of otpInputs) input.value = '';
+          otpInputs[0].focus();
+          
+          otpInlineError.classList.add("hidden");
+          
+          // Add pulse animation to first input
+          otpInputs[0].classList.add('pulse');
+          setTimeout(() => otpInputs[0].classList.remove('pulse'), 1500);
+        } else {
+          showNotification(data.message || "Failed to send OTP", "error");
+        }
+      } catch (error) {
+        console.error("Error sending OTP:", error);
+        showNotification("Failed to send OTP", "error");
+      } finally {
+        setLoading(verifyEmailBtn, false);
+      }
+    });
+    
+    // Resend OTP button
+    resendOtpBtn.addEventListener("click", async () => {
+      try {
+        setLoading(resendOtpBtn, true);
+        const response = await fetch("/profile/send-verification-otp", {
+          method: "POST",
+          credentials: "include",
+        });
+        const data = await response.json();
+        if (data.success) {
+          showNotification("New OTP sent to your email", "success");
+          for (const input of otpInputs) input.value = '';
+          otpInlineInput.value = '';
+          otpInputs[0].focus();
+          otpInlineError.classList.add("hidden");
+        } else {
+          showNotification(data.message || "Failed to resend OTP", "error");
+        }
+      } catch (error) {
+        console.error("Error resending OTP:", error);
+        showNotification("Failed to resend OTP", "error");
+      } finally {
+        setLoading(resendOtpBtn, false);
+      }
+    });
+
+    // OTP inline form cancel button
+    otpInlineCancelBtn.addEventListener("click", () => {
+      otpInlineForm.classList.add("hidden");
+      otpInlineInput.value = "";
+      for (const input of otpInputs) input.value = '';
+      otpInlineError.classList.add("hidden");
+    });
+
+    // OTP inline form submit
+    otpInlineForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const otp = otpInlineInput.value.trim();
+
+      if (!/^\d{6}$/.test(otp)) {
+        otpInlineError.classList.remove("hidden");
+        otpInputs[0].focus();
+        return;
+      }
+      otpInlineError.classList.add("hidden");
+
+      try {
+        setLoading(otpInlineSubmitBtn, true);
+        const response = await fetch("/profile/verify-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ otp }),
+          credentials: "include",
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          showNotification("Email successfully verified", "success");
+          otpInlineForm.classList.add("hidden");
+          otpInlineInput.value = "";
+          for (const input of otpInputs) input.value = '';
+          await loadUserData();
+        } else {
+          showNotification(data.message || "Invalid OTP", "error");
+          otpInlineError.textContent = data.message || "Invalid OTP";
+          otpInlineError.classList.remove("hidden");
+          otpInputs[0].focus();
+          
+          // Add red border to all OTP inputs
+          for (const input of otpInputs) {
+            input.classList.add('border-red-500');
+            setTimeout(() => input.classList.remove('border-red-500'), 1500);
+          }
+        }
+      } catch (error) {
+        console.error("Error verifying OTP:", error);
+        showNotification("Failed to verify OTP", "error");
+      } finally {
+        setLoading(otpInlineSubmitBtn, false);
+      }
+    });
+
+    // Back to dashboard button
+    backToDashboardBtn.addEventListener("click", () => {
+      window.location.href = "/dashboard";
+    });
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", () => {
+      loadUserData();
+      switchTab("profile");
+    });
+  </script>
+</body>
+</html>
