@@ -905,51 +905,35 @@ function validateApiKey(req, res, next) {
 
 app.get('/h2h/categori', validateApiKey, async (req, res) => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-
     const url = `${BASE_URL}/layanan/price_list`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-
-    await new Promise(resolve => setTimeout(resolve, 5000));
 
     const params = new URLSearchParams();
     params.append("api_key", ATLAN_API_KEY);
     params.append("type", "prabayar");
 
-    const response = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json(); 
-    }, url, params.toString());
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+      body: params
+    });
 
-    await browser.close();
+    const data = await response.json();
 
-    if (!response.status) {
+    if (!data.status) {
       return res.status(500).json({
         success: false,
         message: 'Server maintenance',
         maintenance: true,
-        ip_message: response.message.replace(/[^0-9.]+/g, '')
+        ip_message: data.message.replace(/[^0-9.]+/g, '')
       });
     }
 
-    const categories = [...new Set(response.data.map(item => item.category))];
+    const categories = [...new Set(data.data.map(item => item.category))];
 
     res.json({
       success: true,
@@ -1013,76 +997,72 @@ app.get('/api/providers', validateApiKey, async (req, res) => {
   }
 });
 
+const customImageUrl = "https://i.pinimg.com/236x/f2/7d/e0/f27de0e4a01ba9dfe8607ac03a4f7aae.jpg";
+
+const regeXcomp = (a, b) => {
+  const aPrice = Number(a.price.replace(/[^0-9.-]+/g, ""));
+  const bPrice = Number(b.price.replace(/[^0-9.-]+/g, ""));
+  return aPrice - bPrice;
+};
+
+const calculateFinalPrice = (price) => {
+  const cleanPrice = Number(price.toString().replace(/[^0-9.-]+/g, ""));
+  return cleanPrice + 100;
+};
+
+const toRupiah = (value) => {
+  return value.toLocaleString('id-ID');
+};
+
+const getProductsByProvider = async (provider) => {
+  const url = `${BASE_URL}/layanan/price_list`;
+
+  const params = new URLSearchParams();
+  params.append("api_key", ATLAN_API_KEY);
+  params.append("type", "prabayar");
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Referer': url,
+    },
+    body: params
+  });
+
+  const data = await response.json();
+  
+  if (!data.status) {
+    throw new Error('Server maintenance');
+  }
+
+  data.data.sort(regeXcomp);
+
+  return data.data
+    .filter(i => i.provider === provider)
+    .map(i => {
+      const finalPrice = calculateFinalPrice(i.price);
+      return {
+        code: i.code,
+        name: i.name,
+        category: i.category,
+        type: i.type,
+        provider: i.provider,
+        brand_status: i.brand_status,
+        status: i.status,
+        img_url: customImageUrl,
+        final_price: finalPrice,
+        price_formatted: `Rp ${toRupiah(finalPrice)}`,
+        status_emoji: i.status === "available" ? "✅" : "❎"
+      };
+    });
+};
+
 app.get('/h2h/ewalet/dana', validateApiKey, async (req, res) => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-    const url = `${BASE_URL}/layanan/price_list`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    const params = new URLSearchParams();
-    params.append("api_key", ATLAN_API_KEY);
-    params.append("type", "prabayar");
-    const response = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json(); 
-    }, url, params.toString());
-    await browser.close();
-    if (!response.status) {
-      return res.status(500).json({
-        success: false,
-        message: 'Server maintenance',
-        maintenance: true,
-        ip_message: response.message.replace(/[^0-9.]+/g, '')
-      });
-    }
-    const regeXcomp = (a, b) => {
-      const aPrice = Number(a.price.replace(/[^0-9.-]+/g, ""));
-      const bPrice = Number(b.price.replace(/[^0-9.-]+/g, ""));
-      return aPrice - bPrice;
-    };
-    const calculateFinalPrice = (price) => {
-      const cleanPrice = Number(price.toString().replace(/[^0-9.-]+/g, ""));
-      return cleanPrice + 100;
-    };
-    const toRupiah = (value) => {
-      return value.toLocaleString('id-ID');
-    };
-    const customImageUrl = "https://i.pinimg.com/236x/f2/7d/e0/f27de0e4a01ba9dfe8607ac03a4f7aae.jpg";
-    response.data.sort(regeXcomp);
-    const danaProducts = response.data
-      .filter(i => i.provider === "DANA")
-      .map(i => {
-        const finalPrice = calculateFinalPrice(i.price);
-        return {
-          code: i.code,
-          name: i.name,
-          category: i.category,
-          type: i.type,
-          provider: i.provider,
-          brand_status: i.brand_status,
-          status: i.status,
-          img_url: customImageUrl,
-          final_price: finalPrice,
-          price_formatted: `Rp ${toRupiah(finalPrice)}`,
-          status_emoji: i.status === "available" ? "✅" : "❎"
-        };
-      });
+    const danaProducts = await getProductsByProvider("DANA");
     res.json({
       success: true,
       data: danaProducts,
@@ -1092,81 +1072,14 @@ app.get('/h2h/ewalet/dana', validateApiKey, async (req, res) => {
     console.error('Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Terjadi kesalahan pada server'
+      message: error.message || 'Terjadi kesalahan pada server'
     });
   }
 });
 
 app.get('/h2h/ewalet/ovo', validateApiKey, async (req, res) => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-    const url = `${BASE_URL}/layanan/price_list`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    const params = new URLSearchParams();
-    params.append("api_key", ATLAN_API_KEY);
-    params.append("type", "prabayar");
-    const response = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json(); 
-    }, url, params.toString());
-    await browser.close();
-    if (!response.status) {
-      return res.status(500).json({
-        success: false,
-        message: 'Server maintenance',
-        maintenance: true,
-        ip_message: response.message.replace(/[^0-9.]+/g, '')
-      });
-    }
-    const regeXcomp = (a, b) => {
-      const aPrice = Number(a.price.replace(/[^0-9.-]+/g, ""));
-      const bPrice = Number(b.price.replace(/[^0-9.-]+/g, ""));
-      return aPrice - bPrice;
-    };
-    const calculateFinalPrice = (price) => {
-      const cleanPrice = Number(price.toString().replace(/[^0-9.-]+/g, ""));
-      return cleanPrice + 100;
-    };
-    const toRupiah = (value) => {
-      return value.toLocaleString('id-ID');
-    };
-    const customImageUrl = "https://i.pinimg.com/236x/f2/7d/e0/f27de0e4a01ba9dfe8607ac03a4f7aae.jpg";
-    response.data.sort(regeXcomp);
-    const ovoProducts = response.data
-      .filter(i => i.provider === "OVO")
-      .map(i => {
-        const finalPrice = calculateFinalPrice(i.price);
-        return {
-          code: i.code,
-          name: i.name,
-          category: i.category,
-          type: i.type,
-          provider: i.provider,
-          brand_status: i.brand_status,
-          status: i.status,
-          img_url: customImageUrl,
-          final_price: finalPrice,
-          price_formatted: `Rp ${toRupiah(finalPrice)}`,
-          status_emoji: i.status === "available" ? "✅" : "❎"
-        };
-      });
+    const ovoProducts = await getProductsByProvider("OVO");
     res.json({
       success: true,
       data: ovoProducts,
@@ -1176,267 +1089,48 @@ app.get('/h2h/ewalet/ovo', validateApiKey, async (req, res) => {
     console.error('Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Terjadi kesalahan pada server'
+      message: error.message || 'Terjadi kesalahan pada server'
     });
   }
 });
 
 app.get('/h2h/ewalet/gopay', validateApiKey, async (req, res) => {
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-    const url = `${BASE_URL}/layanan/price_list`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    const params = new URLSearchParams();
-    params.append("api_key", ATLAN_API_KEY);
-    params.append("type", "prabayar");
-    const response = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json(); 
-    }, url, params.toString());
-    await browser.close();
-    if (!response.status) {
-      return res.status(500).json({
-        success: false,
-        message: 'Server maintenance',
-        maintenance: true,
-        ip_message: response.message.replace(/[^0-9.]+/g, '')
-      });
-    }
-    const regeXcomp = (a, b) => {
-      const aPrice = Number(a.price.replace(/[^0-9.-]+/g, ""));
-      const bPrice = Number(b.price.replace(/[^0-9.-]+/g, ""));
-      return aPrice - bPrice;
-    };
-    const calculateFinalPrice = (price) => {
-      const cleanPrice = Number(price.toString().replace(/[^0-9.-]+/g, ""));
-      return cleanPrice + 100;
-    };
-    const toRupiah = (value) => {
-      return value.toLocaleString('id-ID');
-    };
-    const customImageUrl = "https://i.pinimg.com/236x/f2/7d/e0/f27de0e4a01ba9dfe8607ac03a4f7aae.jpg";
-    response.data.sort(regeXcomp);
-    const ovoProducts = response.data
-      .filter(i => i.provider === "GO PAY")
-      .map(i => {
-        const finalPrice = calculateFinalPrice(i.price);
-        return {
-          code: i.code,
-          name: i.name,
-          category: i.category,
-          type: i.type,
-          provider: i.provider,
-          brand_status: i.brand_status,
-          status: i.status,
-          img_url: customImageUrl,
-          final_price: finalPrice,
-          price_formatted: `Rp ${toRupiah(finalPrice)}`,
-          status_emoji: i.status === "available" ? "✅" : "❎"
-        };
-      });
+    const gopayProducts = await getProductsByProvider("GO PAY");
     res.json({
       success: true,
-      data: ovoProducts,
+      data: gopayProducts,
       message: 'Data produk Gopay berhasil didapatkan'
     });
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({
       success: false,
-      message: 'Terjadi kesalahan pada server'
+      message: error.message || 'Terjadi kesalahan pada server'
     });
   }
 });
 
 app.get('/h2h/game/mobile-legends', validateApiKey, async (req, res) => {
-  try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-    const url = `${BASE_URL}/layanan/price_list`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    const params = new URLSearchParams();
-    params.append("api_key", ATLAN_API_KEY);
-    params.append("type", "prabayar");
-    const response = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json(); 
-    }, url, params.toString());
-    await browser.close();
-    if (!response.status) {
-      return res.status(500).json({
-        success: false,
-        message: 'Server maintenance',
-        maintenance: true,
-        ip_message: response.message.replace(/[^0-9.]+/g, '')
-      });
-    }
-    const regeXcomp = (a, b) => {
-      const aPrice = Number(a.price.replace(/[^0-9.-]+/g, ""));
-      const bPrice = Number(b.price.replace(/[^0-9.-]+/g, ""));
-      return aPrice - bPrice;
-    };
-    const calculateFinalPrice = (price) => {
-      const cleanPrice = Number(price.toString().replace(/[^0-9.-]+/g, ""));
-      return cleanPrice + 100;
-    };
-    const toRupiah = (value) => {
-      return value.toLocaleString('id-ID');
-    };
-    const customImageUrl = "https://i.pinimg.com/236x/f2/7d/e0/f27de0e4a01ba9dfe8607ac03a4f7aae.jpg";
-    response.data.sort(regeXcomp);
-    const danaProducts = response.data
-      .filter(i => i.provider === "MOBILE LEGENDS")
-      .map(i => {
-        const finalPrice = calculateFinalPrice(i.price);
-        return {
-          code: i.code,
-          name: i.name,
-          category: i.category,
-          type: i.type,
-          provider: i.provider,
-          brand_status: i.brand_status,
-          status: i.status,
-          img_url: customImageUrl,
-          final_price: finalPrice,
-          price_formatted: `Rp ${toRupiah(finalPrice)}`,
-          status_emoji: i.status === "available" ? "✅" : "❎"
-        };
-      });
-    res.json({
-      success: true,
-      data: danaProducts,
-      message: 'Data produk MOBILE LEGENDS berhasil didapatkan'
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan pada server'
-    });
+  const result = await fetchProducts('MOBILE LEGENDS');
+  if (result.success === false) {
+    return res.status(500).json(result);
   }
+  res.json({ success: true, data: result, message: 'Data produk MOBILE LEGENDS berhasil didapatkan' });
 });
 
 app.get('/h2h/game/free-fire', validateApiKey, async (req, res) => {
-  try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-    const url = `${BASE_URL}/layanan/price_list`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    const params = new URLSearchParams();
-    params.append("api_key", ATLAN_API_KEY);
-    params.append("type", "prabayar");
-    const response = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json(); 
-    }, url, params.toString());
-    await browser.close();
-    if (!response.status) {
-      return res.status(500).json({
-        success: false,
-        message: 'Server maintenance',
-        maintenance: true,
-        ip_message: response.message.replace(/[^0-9.]+/g, '')
-      });
-    }
-    const regeXcomp = (a, b) => {
-      const aPrice = Number(a.price.replace(/[^0-9.-]+/g, ""));
-      const bPrice = Number(b.price.replace(/[^0-9.-]+/g, ""));
-      return aPrice - bPrice;
-    };
-    const calculateFinalPrice = (price) => {
-      const cleanPrice = Number(price.toString().replace(/[^0-9.-]+/g, ""));
-      return cleanPrice + 100;
-    };
-    const toRupiah = (value) => {
-      return value.toLocaleString('id-ID');
-    };
-    const customImageUrl = "https://i.pinimg.com/236x/f2/7d/e0/f27de0e4a01ba9dfe8607ac03a4f7aae.jpg";
-    response.data.sort(regeXcomp);
-    const danaProducts = response.data
-      .filter(i => i.provider === "FREE FIRE")
-      .map(i => {
-        const finalPrice = calculateFinalPrice(i.price);
-        return {
-          code: i.code,
-          name: i.name,
-          category: i.category,
-          type: i.type,
-          provider: i.provider,
-          brand_status: i.brand_status,
-          status: i.status,
-          img_url: customImageUrl,
-          final_price: finalPrice,
-          price_formatted: `Rp ${toRupiah(finalPrice)}`,
-          status_emoji: i.status === "available" ? "✅" : "❎"
-        };
-      });
-    res.json({
-      success: true,
-      data: danaProducts,
-      message: 'Data produk Free Fire berhasil didapatkan'
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan pada server'
-    });
+  const result = await fetchProducts('FREE FIRE');
+  if (result.success === false) {
+    return res.status(500).json(result);
   }
+  res.json({ success: true, data: result, message: 'Data produk Free Fire berhasil didapatkan' });
 });
 
 app.get('/api/order/create', validateApiKey, async (req, res) => {
   try {
     const { code, target } = req.query;
-    const user = req.user; 
+    const user = req.user;
 
     if (!code) {
       return res.status(400).json({
@@ -1452,51 +1146,30 @@ app.get('/api/order/create', validateApiKey, async (req, res) => {
       });
     }
 
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-
     const priceListUrl = `${BASE_URL}/layanan/price_list`;
-    await page.goto(priceListUrl, { waitUntil: 'networkidle2', timeout: 60000 });
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
-
+    // Fetch harga produk
     const priceParams = new URLSearchParams();
     priceParams.append("api_key", ATLAN_API_KEY);
     priceParams.append("type", "prabayar");
 
-    const priceResponse = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json();
-    }, priceListUrl, priceParams.toString());
+    const priceResponse = await axios.post(priceListUrl, priceParams, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      }
+    });
 
-    await browser.close();
-
-    if (!priceResponse.status) {
+    if (!priceResponse.data.status) {
       return res.status(500).json({
         success: false,
         message: 'Server maintenance',
         maintenance: true,
-        ip_message: priceResponse.message.replace(/[^0-9.]+/g, '')
+        ip_message: priceResponse.data.message.replace(/[^0-9.]+/g, '')
       });
     }
 
-    const product = priceResponse.data.find(item => item.code === code);
+    const product = priceResponse.data.data.find(item => item.code === code);
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -1524,44 +1197,21 @@ app.get('/api/order/create', validateApiKey, async (req, res) => {
 
     const reff_id = generateReffId();
 
-    const transactionBrowser = await puppeteer.launch({ headless: true });
-    const transactionPage = await transactionBrowser.newPage();
-
-    await transactionPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-
     const createTransactionUrl = `${BASE_URL}/transaksi/create`;
-    await transactionPage.goto(createTransactionUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-
-    await new Promise(resolve => setTimeout(resolve, 5000));
-
     const transactionParams = new URLSearchParams();
     transactionParams.append("api_key", ATLAN_API_KEY);
     transactionParams.append("code", code);
     transactionParams.append("reff_id", reff_id);
     transactionParams.append("target", target);
 
-    const transactionResponse = await transactionPage.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json();
-    }, createTransactionUrl, transactionParams.toString());
+    const transactionResponse = await axios.post(createTransactionUrl, transactionParams, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      }
+    });
 
-    await transactionBrowser.close();
-
-    const trx = transactionResponse?.data;
+    const trx = transactionResponse.data?.data;
     if (!trx?.id || !trx?.price) {
       user.history.push({
         aktivitas: 'Order',
@@ -1587,43 +1237,20 @@ app.get('/api/order/create', validateApiKey, async (req, res) => {
     });
 
     const checkStatus = async () => {
-      const statusBrowser = await puppeteer.launch({ headless: true });
-      const statusPage = await statusBrowser.newPage();
-
-      await statusPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-
       const statusUrl = `${BASE_URL}/transaksi/status`;
-      await statusPage.goto(statusUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-
-      await new Promise(resolve => setTimeout(resolve, 5000));
-
       const statusParams = new URLSearchParams();
       statusParams.append("api_key", ATLAN_API_KEY);
       statusParams.append("id", trx.id);
       statusParams.append("type", "prabayar");
 
-      const statusResponse = await statusPage.evaluate(async (url, params) => {
-        const formData = new URLSearchParams(params).toString();
-        const fetchResponse = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-User': '?1',
-            'Referer': url
-          },
-          body: formData
-        });
-        return fetchResponse.json();
-      }, statusUrl, statusParams.toString());
+      const statusResponse = await axios.post(statusUrl, statusParams, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        }
+      });
 
-      await statusBrowser.close();
-
-      const status = statusResponse.data?.status;
+      const status = statusResponse.data.data?.status;
 
       if (status === "success") {
         user.saldo -= hargaTotal;
@@ -1680,7 +1307,7 @@ app.get('/api/order/check', async (req, res) => {
     if (!apikey || !trxid) {
       return res.status(400).json({
         success: false,
-        message: 'Parmeter "trxid" dan "apikey" harus di isi'
+        message: 'Parameter "trxid" dan "apikey" harus diisi'
       });
     }
 
@@ -1692,43 +1319,21 @@ app.get('/api/order/check', async (req, res) => {
       });
     }
 
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-
     const statusUrl = `${BASE_URL}/transaksi/status`;
-    await page.goto(statusUrl, { waitUntil: 'networkidle2', timeout: 60000 });
+    const statusParams = new URLSearchParams();
+    statusParams.append("api_key", ATLAN_API_KEY);
+    statusParams.append("id", trxid);
+    statusParams.append("type", "prabayar");
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Menggunakan axios untuk mendapatkan status transaksi
+    const response = await axios.post(statusUrl, statusParams, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      }
+    });
 
-    const params = new URLSearchParams();
-    params.append("api_key", ATLAN_API_KEY);
-    params.append("id", trxid);
-    params.append("type", "prabayar");
-
-    const response = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json(); 
-    }, statusUrl, params.toString());
-
-    await browser.close();
-
-    const status = response?.data?.status;
+    const status = response.data?.data?.status;
 
     if (!status) {
       return res.status(404).json({
@@ -1779,16 +1384,7 @@ app.get('/api/deposit/create', validateApiKey, async (req, res) => {
     }
 
     const reff_id = generateReffId();
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    );
-
     const url = `${BASE_URL}/deposit/create`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise(resolve => setTimeout(resolve, 3000));
 
     const params = new URLSearchParams();
     params.append("api_key", ATLAN_API_KEY);
@@ -1797,28 +1393,16 @@ app.get('/api/deposit/create', validateApiKey, async (req, res) => {
     params.append("type", "ewallet");
     params.append("metode", "qrisfast");
 
-    const depositResponse = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': navigator.userAgent,
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json();
-    }, url, params.toString());
+    // Menggunakan axios untuk membuat permintaan deposit
+    const depositResponse = await axios.post(url, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
 
-    const depositData = depositResponse?.data;
+    const depositData = depositResponse.data?.data;
     if (!depositData?.id) {
-      await browser.close();
       return res.status(400).json({
         success: false,
         message: 'Gagal membuat permintaan deposit'
@@ -1832,43 +1416,20 @@ app.get('/api/deposit/create', validateApiKey, async (req, res) => {
     });
 
     const checkDeposit = async () => {
-      const statusBrowser = await puppeteer.launch({ headless: true });
-      const statusPage = await statusBrowser.newPage();
-
-      await statusPage.setUserAgent(
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      );
-
       const statusUrl = `${BASE_URL}/deposit/status`;
-      await statusPage.goto(statusUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
       const statusParams = new URLSearchParams();
       statusParams.append("api_key", ATLAN_API_KEY);
       statusParams.append("id", depositData.id);
 
-      const statusResponse = await statusPage.evaluate(async (url, params) => {
-        const formData = new URLSearchParams(params).toString();
-        const fetchResponse = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': navigator.userAgent,
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-User': '?1',
-            'Referer': url
-          },
-          body: formData
-        });
-        return fetchResponse.json();
-      }, statusUrl, statusParams.toString());
+      // Menggunakan axios untuk memeriksa status deposit
+      const statusResponse = await axios.post(statusUrl, statusParams.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+      });
 
-      await statusBrowser.close();
-
-      const statusData = statusResponse?.data;
+      const statusData = statusResponse.data?.data;
       const status = statusData?.status;
 
       if (status === "success") {
@@ -1898,10 +1459,10 @@ app.get('/api/deposit/create', validateApiKey, async (req, res) => {
         console.log(`❌ Deposit gagal untuk ${user.username}`);
         return;
       }
+
       setTimeout(checkDeposit, 5000);
     };
 
-    await browser.close();
     checkDeposit();
 
   } catch (error) {
@@ -1925,43 +1486,20 @@ app.get('/api/deposit/status', validateApiKey, async (req, res) => {
   }
 
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    );
-
     const url = `${BASE_URL}/deposit/status`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
     const params = new URLSearchParams();
     params.append("api_key", ATLAN_API_KEY);
     params.append("id", trxid);
 
-    const statusResponse = await page.evaluate(async (url, params) => {
-      const formData = new URLSearchParams(params).toString();
-      const fetchResponse = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': navigator.userAgent,
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Referer': url
-        },
-        body: formData
-      });
-      return fetchResponse.json();
-    }, url, params.toString());
+    // Menggunakan axios untuk mengirim permintaan status deposit
+    const statusResponse = await axios.post(url, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
 
-    await browser.close();
-
-    const statusData = statusResponse?.data;
+    const statusData = statusResponse.data?.data;
     if (!statusData) {
       return res.status(404).json({
         success: false,
