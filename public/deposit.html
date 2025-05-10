@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VPedia - Deposit System</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="description" content="Layanan Kebutuhan Digital & Integrasi H2H Terbaru Di Indonesia.">
+  <meta name="keywords" content="Layanan Kebutuhan Digital & Integrasi H2H Terbaru Di Indonesia.">
+  <meta name="author" content="Rerezz Official">
+  <meta property="og:title" content="TopUp H2H - Rerezz">
+  <meta property="og:description" content="Layanan Kebutuhan Digital & Integrasi H2H Terbaru Di Indonesia.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/style/deposit/deposit.css">
+  <meta property="og:url" content="https://www.v-pedia.web.id/">
+  <meta property="og:image" content="https://files.catbox.moe/oj984n.png">
+
+</head>
+<body>
+  <!-- Floating Background Elements -->
+  <div class="bg-elements">
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+    <div class="bg-circle circle-3"></div>
+  </div>
+
+  <!-- QR Popup -->
+  <div class="qr-popup" id="qrPopup">
+    <div class="qr-popup-content">
+      <div class="qr-popup-close" id="closePopup">
+        <i class="fas fa-times"></i>
+      </div>
+      <img src="" alt="QR Code" class="qr-popup-img" id="popupQrImage">
+      <p>Scan QR Code untuk melakukan pembayaran</p>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-icon">
+        <i class="fas fa-wallet"></i>
+      </div>
+      <h1>Top Up Saldo</h1>
+      <p>Lengkapi form berikut untuk melakukan deposit</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Deposit Form -->
+      <div class="deposit-form-container">
+        <div class="section-title">
+          <div class="section-icon">
+            <i class="fas fa-coins"></i>
+          </div>
+          <h2>Buat Deposit</h2>
+        </div>
+        
+        <form id="createDepositForm">
+          <div class="form-group">
+            <label for="nominal">Nominal Deposit</label>
+            <div class="input-container">
+              <span class="prefix">Rp</span>
+              <input type="number" id="nominal" class="form-control" placeholder="Contoh: 100000" min="500" step="100" required>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-credit-card"></i> Lakukan Deposit
+          </button>
+        </form>
+        
+        <!-- Response Container -->
+        <div id="createDepositResponse" class="response-container">
+          <div class="response-message">
+            <div class="response-icon">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="response-text">Message will appear here</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Deposit Guide -->
+      <div class="guide-container">
+        <div class="section-title">
+          <div class="section-icon">
+            <i class="fas fa-question-circle"></i>
+          </div>
+          <h2>Panduan Deposit</h2>
+        </div>
+        
+        <div class="guide-item">
+          <div class="guide-number">1</div>
+          <div class="guide-text">Masukkan nominal deposit yang diinginkan (minimal Rp500)</div>
+        </div>
+        
+        <div class="guide-item">
+          <div class="guide-number">2</div>
+          <div class="guide-text">Klik tombol "Lakukan Deposit"</div>
+        </div>
+        
+        <div class="guide-item">
+          <div class="guide-number">3</div>
+          <div class="guide-text">Lakukan pembayaran sesuai instruksi</div>
+        </div>
+        
+        <div class="guide-item">
+          <div class="guide-number">4</div>
+          <div class="guide-text">Saldo akan otomatis masuk dalam 1-5 menit</div>
+        </div>
+        
+        <div class="note">
+          <i class="fas fa-info-circle"></i>
+          <span>Minimal deposit Rp500 tanpa biaya tambahan</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Deposit Status Section -->
+    <div class="status-section" id="statusSection">
+      <div class="section-title">
+        <div class="section-icon">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <h2>Status Deposit</h2>
+      </div>
+      
+      <div class="status-grid">
+        <div class="status-item">
+          <p>Trx ID</p>
+          <p id="trxId">-</p>
+        </div>
+        <div class="status-item">
+          <p>Ref ID</p>
+          <p id="refId">-</p>
+        </div>
+        <div class="status-item">
+          <p>Nominal</p>
+          <p id="amount">-</p>
+        </div>
+        <div class="status-item">
+          <p>Status</p>
+          <p>
+            <span class="status-badge status-pending" id="statusText">
+              <i class="fas fa-spinner fa-spin"></i> Loading...
+            </span>
+          </p>
+        </div>
+      </div>
+      
+      <div class="qr-section" id="qrContainer">
+        <p class="qr-title">QR Code Pembayaran</p>
+        <div class="qr-container" id="qrClickable">
+          <img id="qrImage" src="" alt="QR Code" class="qr-image">
+        </div>
+        <p class="qr-note">Klik QR code untuk memperbesar</p>
+      </div>
+      
+      <div class="status-footer">
+        <p>Pemeriksaan otomatis setiap 5 detik</p>
+        <button class="btn btn-danger" id="cancelButton">
+          <i class="fas fa-times"></i> Batalkan Deposit
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script src="/style/deposit/deposit.js"></script>
+</body>
+</html>
