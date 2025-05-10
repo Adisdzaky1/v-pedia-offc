@@ -196,7 +196,11 @@ app.get('/profile', requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 
-app.get('/docs', requireLogin, (req, res) => {
+app.get('/deposit', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'deposit.html'));
+});
+
+app.get('/docs', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'docs.html'));
 });
 
