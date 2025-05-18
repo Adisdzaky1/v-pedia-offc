@@ -2161,6 +2161,231 @@ app.get('/h2h/deposit/cancel', validateApiKey, async (req, res) => {
   }
 });
 
+app.post("/api/v1/buy-panel", validateApiKey, async (req, res) => {
+  const { username, paket } = req.body; // Ambil input dari body request
+  const user = req.user; // Dapatkan user dari middleware validateApiKey
+
+  // Daftar paket yang tersedia
+  const availablePackets = ["1gb", "2gb", "3gb", "4gb", "5gb", "6gb", "7gb", "8gb", "9gb", "20gb", "unli"];
+
+  // Validasi input
+  if (!username) {
+    return res.status(400).json({
+      success: false,
+      message: "Parameter 'username' harus diisi",
+    });
+  }
+  if (!paket || !availablePackets.includes(paket.toLowerCase())) {
+    return res.status(400).json({
+      success: false,
+      message: `Paket tidak valid. Paket yang tersedia: ${availablePackets.join(", ")}`,
+    });
+  }
+
+  // Tentukan harga dan spesifikasi berdasarkan paket
+  let memo, disk, cpu, harga;
+  switch (paket.toLowerCase()) {
+    case "1gb":
+      memo = 1024;
+      disk = 1024;
+      cpu = 50;
+      harga = 1000;
+      break;
+    case "2gb":
+      memo = 2048;
+      disk = 2048;
+      cpu = 100;
+      harga = 2000;
+      break;
+    case "3gb":
+      memo = 3072;
+      disk = 3072;
+      cpu = 150;
+      harga = 3000;
+      break;
+    case "4gb":
+  memo = 4096;
+  disk = 4096;
+  cpu = 200;
+  harga = 4000;
+  break;
+case "5gb":
+  memo = 5120;
+  disk = 5120;
+  cpu = 250;
+  harga = 5000;
+  break;
+case "6gb":
+  memo = 6144;
+  disk = 6144;
+  cpu = 300;
+  harga = 6000;
+  break;
+case "7gb":
+  memo = 7168;
+  disk = 7168;
+  cpu = 350;
+  harga = 7000;
+  break;
+case "8gb":
+  memo = 8192;
+  disk = 8192;
+  cpu = 400;
+  harga = 8000;
+  break;
+case "9gb":
+  memo = 9216;
+  disk = 9216;
+  cpu = 450;
+  harga = 9000;
+  break;
+case "10gb":
+  memo = 10240;
+  disk = 10240;
+  cpu = 500;
+  harga = 10000;
+  break;
+case "unli":
+  memo = 0;
+  disk = 0;
+  cpu = 0;
+  harga = 15000;
+  break;
+    default:
+      return res.status(400).json({
+        success: false,
+        message: "Paket tidak dikenali",
+      });
+  }
+
+  // Validasi saldo pengguna
+  if (user.saldo < harga) {
+    user.history.push({
+      aktivitas: "Buy Panel",
+      nominal: harga,
+      status: "Gagal - Saldo tidak mencukupi",
+      tanggal: new Date(),
+    });
+    await user.save();
+    return res.status(400).json({
+      success: false,
+      message: "Saldo tidak mencukupi",
+    });
+  }
+
+  try {
+    // Konfigurasi headers untuk request ke Pterodactyl API
+    const headers = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.PTERO_API_KEY}`,
+    };
+
+    // Buat user baru di Pterodactyl
+    const email = `${username}@gmail.com`;
+    const password = `${username}${disk}`; // Password sederhana berdasarkan username dan disk
+    const createUserResponse = await axios.post(
+      `${process.env.PTERO_DOMAIN}/api/application/users`,
+      {
+        email,
+        username,
+        first_name: username,
+        last_name: username,
+        language: "en",
+        password,
+      },
+      { headers }
+    );
+
+    const newUser = createUserResponse.data.attributes;
+
+    // Buat server baru di Pterodactyl
+    const createServerResponse = await axios.post(
+      `${process.env.PTERO_DOMAIN}/api/application/servers`,
+      {
+        name: username,
+        description: "Server dibuat via API Buy Panel",
+        user: newUser.id,
+        egg: 15, // Egg ID untuk Node.js
+        docker_image: "ghcr.io/parkervcp/yolks:nodejs_18",
+        startup: "npm start",
+        environment: {
+          INST: "npm",
+          USER_UPLOAD: "0",
+          AUTO_UPDATE: "0",
+          CMD_RUN: "npm start",
+          JS_FILE: "index.js",
+        },
+        limits: {
+          memory: memo,
+          swap: 0,
+          disk,
+          io: 500,
+          cpu,
+        },
+        feature_limits: {
+          databases: 5,
+          backups: 5,
+          allocations: 5,
+        },
+        deploy: {
+          locations: [1], // Lokasi server (ID lokasi)
+          dedicated_ip: false,
+          port_range: [],
+        },
+      },
+      { headers }
+    );
+
+    const newServer = createServerResponse.data.attributes;
+
+    user.saldo -= harga;
+    user.history.push({
+      aktivitas: "Buy Panel",
+      nominal: harga,
+      status: "Sukses",
+      tanggal: new Date(),
+    });
+    await user.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Server berhasil dibuat",
+      data: {
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          email,
+          password,
+        },
+        server: {
+          id: newServer.id,
+          name: newServer.name,
+          memory: memo,
+          disk,
+          cpu,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error creating server:", error.response?.data || error.message);
+
+    user.history.push({
+      aktivitas: "Buy Panel",
+      nominal: harga,
+      status: "Gagal - Internal server error",
+      tanggal: new Date(),
+    });
+    await user.save();
+
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat membuat server",
+      error: error.response?.data || error.message,
+    });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
