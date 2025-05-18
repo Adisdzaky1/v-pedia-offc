@@ -200,6 +200,18 @@ app.get('/deposit', requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'deposit.html'));
 });
 
+app.get('/price-list', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'price-list.html'));
+});
+
+app.get('/mutation', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'mutation.html'));
+});
+
+app.get('/api-key-page', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'api-key-page.html'));
+});
+
 app.get('/docs', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'docs.html'));
 });
@@ -778,7 +790,6 @@ app.post('/transfer-saldo', requireLogin, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Sender not found' });
     }
     if (sender.saldo < amount) {
-      // Tambahkan history gagal untuk pengirim
       sender.history.push({
         aktivitas: 'Transfer',
         nominal: amount,
@@ -791,7 +802,6 @@ app.post('/transfer-saldo', requireLogin, async (req, res) => {
     }
     const recipient = await User.findOne({ username: recipientUsername });
     if (!recipient) {
-      // Tambahkan history gagal untuk pengirim
       sender.history.push({
         aktivitas: 'Transfer',
         nominal: amount,
@@ -1128,6 +1138,176 @@ app.post('/deposit/cancel', requireLogin, async (req, res) => {
   }
 });
 
+
+app.post('/api/categori', requireLogin, async (req, res) => {
+  try {
+    const url = `${BASE_URL}/layanan/price_list`;
+
+    const params = new URLSearchParams();
+    params.append("api_key", ATLAN_API_KEY);
+    params.append("type", "prabayar");
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+      body: params
+    });
+
+    const data = await response.json();
+
+    if (!data.status) {
+      return res.status(500).json({
+        success: false,
+        message: 'Server maintenance',
+        maintenance: true,
+        ip_message: data.message.replace(/[^0-9.]+/g, '')
+      });
+    }
+
+    const categories = [...new Set(data.data.map(item => item.category))];
+
+    res.json({
+      success: true,
+      data: categories,
+      message: 'Data kategori berhasil didapatkan'
+    });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+app.post('/api/providers', requireLogin, async (req, res) => {
+  try {
+    const url = `${BASE_URL}/layanan/price_list`;
+
+    const params = new URLSearchParams();
+    params.append("api_key", ATLAN_API_KEY);
+    params.append("type", "prabayar");
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+      body: params
+    });
+
+    const data = await response.json();
+
+    if (!data.status) {
+      return res.status(500).json({
+        success: false,
+        message: 'Server maintenance',
+        maintenance: true,
+        ip_message: data.message.replace(/[^0-9.]+/g, '')
+      });
+    }
+
+    const providers = [...new Set(data.data.map(item => item.provider))];
+
+    res.json({
+      success: true,
+      data: providers,
+      message: 'Data provider berhasil didapatkan'
+    });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan pada server'
+    });
+  }
+});
+
+app.post('/api/price-list', requireLogin, async (req, res) => {
+  try {
+    const { category, provider } = req.body;
+
+    const url = `${BASE_URL}/layanan/price_list`;
+
+    const params = new URLSearchParams();
+    params.append("api_key", ATLAN_API_KEY);
+    params.append("type", "prabayar");
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+      body: params
+    });
+
+    const result = await response.json();
+
+    if (!result.status) {
+      throw new Error('Server maintenance');
+    }
+
+    let data = result.data || [];
+
+    data.sort(regeXcomp);
+
+    if (category) {
+      data = data.filter(i => 
+        i.category && i.category.toLowerCase() === category.toLowerCase()
+      );
+    }
+
+    if (provider) {
+      data = data.filter(i =>
+        i.provider && i.provider.toLowerCase() === provider.toLowerCase()
+      );
+    }
+
+    const formattedData = data.map(i => {
+      const finalPrice = calculateFinalPrice(i.price);
+      return {
+        code: i.code,
+        name: i.name,
+        category: i.category,
+        type: i.type,
+        provider: i.provider,
+        brand_status: i.brand_status,
+        status: i.status,
+        img_url: customImageUrl,
+        final_price: finalPrice,
+        price_formatted: `Rp ${toRupiah(finalPrice)}`,
+        status_emoji: i.status === "available" ? "✅" : "❎"
+      };
+    });
+
+    res.json({
+      success: true,
+      data: formattedData,
+      message: 'Data produk berhasil didapatkan'
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Terjadi kesalahan pada server'
+    });
+  }
+});
+
+
 //=====[ PRODUCT ENDPOINT ]=====//
 
 function validateApiKey(req, res, next) {
@@ -1136,34 +1316,59 @@ function validateApiKey(req, res, next) {
   if (!apiKey) {
     return res.status(400).json({
       success: false,
-      message: 'Prameter "apikey" harus di isi'
+      message: 'Parameter "apikey" harus diisi',
     });
   }
 
   User.findOne({ apiKey })
-    .then(user => {
+    .then(async (user) => {
       if (!user) {
         return res.status(401).json({
           success: false,
-          message: 'Invalid API Key'
+          message: "Invalid API Key",
         });
       }
 
-      if (!user.isVerified) {
-        return res.status(403).json({
+      if (user.isLocked) {
+        return res.status(429).json({
           success: false,
-          message: 'Akun belum terverifikasi. Silakan verifikasi akun terlebih dahulu.'
+          message:
+            "Anda harus menunggu 5 detik sebelum melakukan request lagi.",
         });
       }
 
-      req.user = user;
-      next();
+      user.isLocked = true;
+      await user.save();
+
+      setTimeout(async () => {
+        try {
+          if (!user.isVerified) {
+            return res.status(403).json({
+              success: false,
+              message:
+                "Akun belum terverifikasi. Silakan verifikasi akun terlebih dahulu.",
+            });
+          }
+
+          req.user = user;
+          next();
+        } catch (error) {
+          console.error("Error validating API Key:", error);
+          return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+          });
+        } finally {
+          user.isLocked = false;
+          await user.save();
+        }
+      }, 5000); // Delay 5 detik
     })
-    .catch(error => {
-      console.error('Error validating API Key:', error);
+    .catch((error) => {
+      console.error("Error validating API Key:", error);
       return res.status(500).json({
         success: false,
-        message: 'Internal server error'
+        message: "Internal server error",
       });
     });
 }
@@ -1291,17 +1496,14 @@ app.get('/h2h/price-list', validateApiKey, async (req, res) => {
 
     let data = result.data || [];
 
-    // Sort by price ascending
     data.sort(regeXcomp);
 
-    // Filter by category if provided
     if (category) {
       data = data.filter(i => 
         i.category && i.category.toLowerCase() === category.toLowerCase()
       );
     }
 
-    // Filter by provider if provided
     if (provider) {
       data = data.filter(i =>
         i.provider && i.provider.toLowerCase() === provider.toLowerCase()
@@ -1405,72 +1607,6 @@ const getProductsByProvider = async (provider) => {
     });
 };
 
-app.get('/h2h/ewalet/dana', validateApiKey, async (req, res) => {
-  try {
-    const danaProducts = await getProductsByProvider("DANA");
-    res.json({
-      success: true,
-      data: danaProducts,
-      message: 'Data produk DANA berhasil didapatkan'
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Terjadi kesalahan pada server'
-    });
-  }
-});
-
-app.get('/h2h/ewalet/ovo', validateApiKey, async (req, res) => {
-  try {
-    const ovoProducts = await getProductsByProvider("OVO");
-    res.json({
-      success: true,
-      data: ovoProducts,
-      message: 'Data produk OVO berhasil didapatkan'
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Terjadi kesalahan pada server'
-    });
-  }
-});
-
-app.get('/h2h/ewalet/gopay', validateApiKey, async (req, res) => {
-  try {
-    const gopayProducts = await getProductsByProvider("GO PAY");
-    res.json({
-      success: true,
-      data: gopayProducts,
-      message: 'Data produk Gopay berhasil didapatkan'
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Terjadi kesalahan pada server'
-    });
-  }
-});
-
-app.get('/h2h/game/mobile-legends', validateApiKey, async (req, res) => {
-  const result = await fetchProducts('MOBILE LEGENDS');
-  if (result.success === false) {
-    return res.status(500).json(result);
-  }
-  res.json({ success: true, data: result, message: 'Data produk MOBILE LEGENDS berhasil didapatkan' });
-});
-
-app.get('/h2h/game/free-fire', validateApiKey, async (req, res) => {
-  const result = await fetchProducts('FREE FIRE');
-  if (result.success === false) {
-    return res.status(500).json(result);
-  }
-  res.json({ success: true, data: result, message: 'Data produk Free Fire berhasil didapatkan' });
-});
 
 app.get('/h2h/order/create', validateApiKey, async (req, res) => {
   try {
@@ -1493,7 +1629,6 @@ app.get('/h2h/order/create', validateApiKey, async (req, res) => {
 
     const priceListUrl = `${BASE_URL}/layanan/price_list`;
 
-    // Fetch harga produk
     const priceParams = new URLSearchParams();
     priceParams.append("api_key", ATLAN_API_KEY);
     priceParams.append("type", "prabayar");
@@ -1670,7 +1805,6 @@ app.get('/h2h/order/check', async (req, res) => {
     statusParams.append("id", trxid);
     statusParams.append("type", "prabayar");
 
-    // Menggunakan axios untuk mendapatkan status transaksi
     const response = await axios.post(statusUrl, statusParams, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1869,7 +2003,6 @@ app.get('/h2h/deposit/status', validateApiKey, async (req, res) => {
     params.append("api_key", ATLAN_API_KEY);
     params.append("id", trxid);
 
-    // Menggunakan axios untuk mengirim permintaan status deposit
     const statusResponse = await axios.post(url, params.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1921,7 +2054,6 @@ app.get('/h2h/deposit/cancel', validateApiKey, async (req, res) => {
     params.append("api_key", ATLAN_API_KEY);
     params.append("id", trxid);
 
-    // Menggunakan axios untuk mengirim permintaan cancel deposit
     const cancelResponse = await axios.post(url, params.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -1950,7 +2082,6 @@ app.get('/h2h/deposit/cancel', validateApiKey, async (req, res) => {
   } catch (error) {
     console.error('❌ Error saat membatalkan deposit:', error);
     
-    // Handle error response dari API eksternal jika ada
     if (error.response && error.response.data) {
       return res.status(error.response.status || 500).json({
         success: false,
