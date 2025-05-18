@@ -660,7 +660,7 @@ app.post('/profile/change-password', requireLogin, async (req, res) => {
   }
 });
 
-app.get('/data/users', async (req, res) => {
+app.get('/data/users', requireAdmin, async (req, res) => {
   try {
     const users = await User.find({}, '-password -__v');
     res.json(users);
