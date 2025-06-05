@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V Pedia - Top Up</title>
+    <title>V Pedia - Daftar Harga</title>
     <meta name="description" content="V-Pedia solusi cepat untuk memenuhi kebutuhan digital anda dengan layanan integrasi H2H yang mudah di gunakan dan provider layanan yang cukup banyak.">
     <meta name="keywords" content="V-Pedia Lyanan topup digital & dan integrasi API terbaru di indonesia">
     <meta name="author" content="V Pedia">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.vpedia.com/topup">
-    <meta property="og:title" content="V Pedia - Top Up">
+    <meta property="og:url" content="https://www.vpedia.com/price-list">
+    <meta property="og:title" content="V Pedia - Daftar Harga">
     <meta property="og:description" content="V-Pedia solusi cepat untuk memenuhi kebutuhan digital anda dengan layanan integrasi H2H yang mudah di gunakan dan provider layanan yang cukup banyak.">
     <meta property="og:image" content="https://files.catbox.moe/oj984n.png">
 
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://www.vpedia.com/topup">
-    <meta property="twitter:title" content="V Pedia - Top Up">
+    <meta property="twitter:url" content="https://www.vpedia.com/price-list">
+    <meta property="twitter:title" content="V Pedia - Daftar Harga">
     <meta property="twitter:description" content="V-Pedia solusi cepat untuk memenuhi kebutuhan digital anda dengan layanan integrasi H2H yang mudah di gunakan dan provider layanan yang cukup banyak.">
     <meta property="twitter:image" content="https://files.catbox.moe/oj984n.png">
 
@@ -975,13 +975,13 @@
             }
         }
 
-        .topup-section {
+        .price-list-section {
             padding: 20px;
             max-width: 1200px;
             margin: 20px auto;
         }
 
-        .product-selection-card {
+        .product-list-card {
             background-color: var(--bg-secondary);
             border-radius: 12px;
             padding: 30px;
@@ -989,7 +989,7 @@
             margin-bottom: 20px;
         }
 
-        .product-selection-card h3 {
+        .product-list-card h3 {
             font-size: 1.4rem;
             margin-bottom: 20px;
             color: var(--accent-color);
@@ -998,7 +998,7 @@
             gap: 10px;
         }
 
-        .product-selection-card h3 i {
+        .product-list-card h3 i {
             color: var(--highlight-color);
         }
 
@@ -1049,7 +1049,6 @@
             border-radius: 10px;
             padding: 15px;
             text-align: left;
-            cursor: pointer;
             border: 2px solid transparent;
             transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 0 4px 8px var(--shadow-color);
@@ -1065,13 +1064,6 @@
         .product-card-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 16px var(--shadow-hover-color);
-        }
-
-        .product-card-item.selected {
-            border-color: var(--accent-color);
-            background-color: rgba(var(--accent-color-r), var(--accent-color-g), var(--accent-color-b), 0.15);
-            box-shadow: 0 4px 10px rgba(var(--accent-color-r), var(--accent-color-g), var(--accent-color-b), 0.3);
-            transform: translateY(-2px);
         }
 
         .product-card-item img {
@@ -1118,7 +1110,8 @@
         .product-card-item .product-name i,
         .product-card-item .product-meta i,
         .product-card-item .product-price i,
-        .product-card-item .product-status i {
+        .product-card-item .product-status i,
+        .product-card-item .product-notes i {
             margin-right: 5px;
             color: var(--text-secondary);
             font-size: 0.9em;
@@ -1135,6 +1128,9 @@
         }
         .product-card-item .product-status.unavailable i {
             color: #f44336;
+        }
+        .product-card-item .product-notes i {
+            color: var(--text-secondary);
         }
 
 
@@ -1166,6 +1162,18 @@
             margin-bottom: 5px;
         }
         
+        .product-card-item .product-notes {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Limit to 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .product-card-item .product-status {
             font-size: 0.8rem;
             color: var(--notification-success);
@@ -1431,9 +1439,9 @@
                 <div class="banner-indicators" id="banner-indicators"></div>
             </div>
 
-            <section class="topup-section">
-                <h2><i class="fas fa-gamepad"></i> Top Up Game & Produk Digital</h2>
-                <div class="product-selection-card">
+            <section class="price-list-section">
+                <h2><i class="fas fa-tags"></i> Daftar Harga Produk</h2>
+                <div class="product-list-card">
                     <div class="filter-controls">
                         <div class="form-group">
                             <label for="product-category-select">Filter Kategori:</label>
@@ -1448,30 +1456,14 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="target-id">ID Pelanggan / ID Game:</label>
-                        <input type="text" id="target-id" name="target" placeholder="Masukkan ID Pelanggan/ID Game Anda" class="form-control">
-                    </div>
                     
-                    <h3><i class="fas fa-cubes"></i> Pilih Produk</h3>
+                    <h3><i class="fas fa-cubes"></i> Semua Produk</h3>
                     <div id="product-list-container" class="product-grid">
                         <p class="loading-message text-secondary"><i class="fas fa-spinner fa-spin"></i> Memuat produk...</p>
                     </div>
                     <div class="load-more-container">
                         <button id="load-more-button" class="btn btn-secondary" style="display: none;">Lihat Selengkapnya</button>
                     </div>
-                </div>
-                
-                <div class="checkout-summary-card" id="checkout-summary-card" style="display: none;">
-                    <h3><i class="fas fa-shopping-cart"></i> Rincian Pembelian</h3>
-                    <div id="selected-product-details">
-                        <p>Produk: <strong>-</strong></p>
-                        <p>Harga: <strong>Rp 0</strong></p>
-                        <p>ID Target: <strong>-</strong></p>
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="buy-button" disabled>Beli Sekarang</button>
-                    <div id="topup-status-message" class="status-message" style="display: none;"></div>
                 </div>
             </section>
 
@@ -1567,19 +1559,13 @@
 
             const categorySelectElement = document.getElementById('product-category-select');
             const providerSelectElement = document.getElementById('product-provider-select');
-            const targetIdInput = document.getElementById('target-id');
             const productListContainer = document.getElementById('product-list-container');
             const loadMoreButton = document.getElementById('load-more-button');
-            const buyButton = document.getElementById('buy-button');
-            const topupStatusMessage = document.getElementById('topup-status-message');
-            const checkoutSummaryCard = document.getElementById('checkout-summary-card');
-            const selectedProductDetails = document.getElementById('selected-product-details');
 
             const PRODUCTS_PER_LOAD = 50;
             let allProducts = [];
             let productsToDisplay = [];
             let currentProductIndex = 0;
-            let selectedProduct = null;
 
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
@@ -1672,7 +1658,7 @@
                     popupProfileSaldo.textContent = formatRupiah(user.saldo || 0);
                     popupProfileCoin.textContent = (user.coin || 0).toLocaleString('id-ID');
                 } else {
-                    profileImg.src = 'https://i.pinimg.com/236x/a2/80/e2/a280e2a50bf6240f29b49a72875adee5.jpg';
+                    profileImg.src = 'https://i.pinimg.com/236x/a2/80e2/a280e2a50bf6240f29b49a72875adee5.jpg';
                     popupProfileFullname.innerHTML = 'Tidak Login';
                     popupProfileUsername.textContent = '@tamu';
                     popupProfileSaldo.textContent = 'Rp 0';
@@ -1809,7 +1795,7 @@
                 link.classList.remove('active');
                 const linkHref = link.getAttribute('href');
 
-                if (linkHref === currentPath) {
+                if (linkHref === '/price-list') { 
                     link.classList.add('active');
                 }
             });
@@ -1840,14 +1826,12 @@
                         productListContainer.innerHTML = '<p class="loading-message text-secondary"><i class="fas fa-exclamation-circle"></i> Gagal memuat produk: ' + data.message + '</p>';
                         categorySelectElement.innerHTML = '<option value="">Gagal memuat kategori</option>';
                         providerSelectElement.innerHTML = '<option value="">Gagal memuat provider</option>';
-                        showStatusMessage(data.message, 'error');
                     }
                 } catch (error) {
                     console.error('Error fetching all products:', error);
                     productListContainer.innerHTML = '<p class="loading-message text-secondary"><i class="fas fa-exclamation-circle"></i> Terjadi kesalahan saat memuat produk.</p>';
                     categorySelectElement.innerHTML = '<option value="">Gagal memuat kategori</option>';
                     providerSelectElement.innerHTML = '<option value="">Gagal memuat provider</option>';
-                    showStatusMessage('Terjadi kesalahan saat memuat daftar harga.', 'error');
                 }
             }
 
@@ -1909,8 +1893,6 @@
                 if (reset) {
                     productListContainer.innerHTML = '';
                     currentProductIndex = 0;
-                    selectedProduct = null;
-                    updateBuyButtonAndSummary();
                 }
                 renderProducts();
             }
@@ -1929,9 +1911,6 @@
                     const productCard = document.createElement('div');
                     productCard.classList.add('product-card-item');
                     productCard.dataset.code = product.code;
-                    productCard.dataset.name = product.name;
-                    productCard.dataset.price = product.final_price;
-                    productCard.dataset.priceFormatted = product.price_formatted;
                     productCard.innerHTML = `
                         <img src="${product.img_url || 'https://via.placeholder.com/60'}" alt="${product.name}">
                         <div class="product-name"><i class="fas fa-cube"></i> ${product.name}</div>
@@ -1940,18 +1919,12 @@
                             <span class="product-provider-small"><i class="fas fa-network-wired"></i> ${product.provider}</span>
                         </div>
                         <div class="product-price"><i class="fas fa-dollar-sign"></i> ${product.price_formatted}</div>
+                        <div class="product-notes"><i class="fas fa-info-circle"></i> ${product.notes || 'Tidak ada catatan.'}</div>
                         <div class="product-status ${product.status === 'available' ? '' : 'unavailable'}">
                             <i class="fas ${product.status === 'available' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
                             ${product.status === 'available' ? 'Available' : 'Unavailable'}
                         </div>
                     `;
-                    if (product.status !== 'available') {
-                        productCard.classList.add('disabled');
-                        productCard.style.opacity = '0.6';
-                        productCard.style.cursor = 'not-allowed';
-                    } else {
-                        productCard.addEventListener('click', () => selectProduct(productCard, product));
-                    }
                     productListContainer.appendChild(productCard);
                 });
                 
@@ -1961,103 +1934,9 @@
                 } else {
                     loadMoreButton.style.display = 'none';
                 }
-
-                updateBuyButtonAndSummary();
             }
 
-            function selectProduct(cardElement, productData) {
-                productListContainer.querySelectorAll('.product-card-item').forEach(el => el.classList.remove('selected'));
-                cardElement.classList.add('selected');
-                selectedProduct = productData;
-                updateBuyButtonAndSummary();
-            }
-
-            function updateBuyButtonAndSummary() {
-                const targetId = targetIdInput.value.trim();
-                selectedProductDetails.innerHTML = ''; 
-
-                if (selectedProduct && selectedProduct.img_url) {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = selectedProduct.img_url;
-                    imgElement.alt = selectedProduct.name;
-                    imgElement.classList.add('product-summary-image');
-                    selectedProductDetails.appendChild(imgElement);
-                }
-
-                selectedProductDetails.innerHTML += `
-                    <p class="summary-item">Produk: <strong><i class="fas fa-cube"></i> ${selectedProduct ? selectedProduct.name : '-'}</strong></p>
-                    <p class="summary-item">Kategori: <strong><i class="fas fa-folder"></i> ${selectedProduct ? selectedProduct.category : '-'}</strong></p>
-                    <p class="summary-item">Provider: <strong><i class="fas fa-network-wired"></i> ${selectedProduct ? selectedProduct.provider : '-'}</strong></p>
-                    <p class="summary-item">Harga: <strong><i class="fas fa-dollar-sign"></i> ${selectedProduct ? selectedProduct.price_formatted : 'Rp 0'}</strong></p>
-                    <p class="summary-item">ID Target: <strong><i class="fas fa-id-card"></i> ${targetId ? targetId : '-'}</strong></p>
-                    <p class="summary-item">Catatan: <strong><i class="fas fa-info-circle"></i> ${selectedProduct && selectedProduct.notes ? selectedProduct.notes : 'Tidak ada catatan.'}</strong></p>
-                `;
-
-                if (targetId && selectedProduct) {
-                    buyButton.disabled = false;
-                    checkoutSummaryCard.style.display = 'block';
-                } else {
-                    buyButton.disabled = true;
-                    checkoutSummaryCard.style.display = 'none';
-                }
-            }
-
-            targetIdInput.addEventListener('input', updateBuyButtonAndSummary);
             loadMoreButton.addEventListener('click', renderProducts);
-
-            buyButton.addEventListener('click', async (e) => {
-                e.preventDefault();
-                buyButton.disabled = true;
-                showStatusMessage('Memproses transaksi Anda...', 'info');
-
-                const target = targetIdInput.value.trim();
-                const code = selectedProduct ? selectedProduct.code : null;
-
-                if (!code || !target) {
-                    showStatusMessage('Harap lengkapi ID Pelanggan/ID Game dan pilih produk.', 'error');
-                    buyButton.disabled = false;
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/order/create', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ code, target })
-                    });
-                    const data = await response.json();
-
-                    if (data.success) {
-                        showStatusMessage(`Transaksi berhasil dibuat! Status: ${data.data.status}`, 'success');
-                        setTimeout(() => {
-                            window.location.href = '/mutation';
-                        }, 2000);
-                    } else {
-                        showStatusMessage(`Transaksi gagal: ${data.message}`, 'error');
-                        buyButton.disabled = false;
-                    }
-                } catch (error) {
-                    console.error('Error during top-up:', error);
-                    showStatusMessage('Terjadi kesalahan pada server saat memproses transaksi.', 'error');
-                    buyButton.disabled = false;
-                }
-            });
-
-            function showStatusMessage(message, type) {
-                topupStatusMessage.textContent = message;
-                topupStatusMessage.className = 'status-message'; 
-                topupStatusMessage.style.display = 'flex';
-                if (type === 'success') {
-                    topupStatusMessage.classList.add('success');
-                    topupStatusMessage.innerHTML = `<i class="fas fa-check-circle"></i> <span>${message}</span>`;
-                } else if (type === 'error') {
-                    topupStatusMessage.classList.add('error');
-                    topupStatusMessage.innerHTML = `<i class="fas fa-times-circle"></i> <span>${message}</span>`;
-                } else {
-                    topupStatusMessage.classList.add('info');
-                    topupStatusMessage.innerHTML = `<i class="fas fa-info-circle"></i> <span>${message}</span>`;
-                }
-            }
         });
     </script>
 </body>

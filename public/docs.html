@@ -1,239 +1,513 @@
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dokumentasi API</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-    rel="stylesheet"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --color-primary-50: #eff6ff;
+      --color-primary-100: #dbeafe;
+      --color-primary-200: #bfdbfe;
+      --color-primary-500: #3b82f6;
+      --color-primary-600: #2563eb;
+      --color-primary-700: #1d4ed8;
+
+      --color-gray-50: #f9fafb;
+      --color-gray-200: #e5e7eb;
+      --color-gray-500: #6b7280;
+      --color-gray-600: #4b5563;
+      --color-gray-700: #374151;
+      --color-gray-800: #1f2937;
+      --color-gray-900: #111827;
+
+      --color-green-300: #86efac;
+      --color-green-700: #047857;
+      --color-green-800: #065f46;
+      --color-success-button: #28a745;
+
+      --color-red-400: #f87171;
+      --color-red-700: #b91c1c;
+      --color-red-800: #991b1b;
+
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+      --rounded-md: 0.375rem;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #f9fafb;
-      color: #1e293b;
+      background-color: var(--color-gray-50);
+      color: var(--color-gray-900);
       line-height: 1.6;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: relative;
     }
     a {
       text-decoration: none;
-      color: #3b82f6;
+      color: var(--color-primary-500);
     }
     a:hover {
       text-decoration: underline;
     }
     code {
-      background-color: #e0f2fe;
+      background-color: var(--color-primary-100);
       padding: 0.2rem 0.4rem;
-      border-radius: 4px;
+      border-radius: var(--rounded-md);
       font-family: 'Courier New', Courier, monospace;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: white;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .navbar {
+        padding: 1.25rem 3rem;
+      }
+    }
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--color-primary-500);
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    .navbar-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      color: var(--color-gray-800);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    @media (min-width: 768px) {
+      .navbar-links {
+        font-size: 1rem;
+      }
+    }
+    .navbar-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      color: inherit;
+      transition: color 0.2s ease-in-out;
+    }
+    .navbar-links a:hover {
+      color: var(--color-primary-500);
+      text-decoration: none;
+    }
+    .navbar-links a i {
+      width: 1.25rem;
+      text-align: center;
+    }
+
+    .main-content-wrapper {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .sidebar {
+      display: none;
+      width: 18rem;
+      background-color: white;
+      box-shadow: var(--shadow-inner);
+      overflow-y: auto;
+      position: sticky;
+      top: 72px;
+      height: calc(100vh - 72px);
+    }
+    @media (min-width: 768px) {
+      .sidebar {
+        display: block;
+      }
+    }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      color: var(--color-primary-600);
+      border-bottom: 1px solid var(--color-gray-200);
+      position: sticky;
+      top: 0;
+      background-color: white;
+      z-index: 10;
+    }
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      color: var(--color-gray-700);
+      font-size: 0.875rem;
+    }
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-left: 4px solid transparent;
+      color: inherit;
+      transition: all 0.2s ease-in-out;
+    }
+    .sidebar-nav a:hover {
+      border-color: var(--color-primary-500);
+      background-color: var(--color-primary-50);
+      text-decoration: none;
+    }
+    .sidebar-nav a.active {
+      border-color: var(--color-primary-500);
+      background-color: var(--color-primary-50);
+      font-weight: 600;
+    }
+    .sidebar-nav a i {
+      width: 1.25rem;
+      text-align: center;
+    }
+
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      max-width: 100%;
+      background-color: white;
+      box-shadow: var(--shadow-inner);
+      border-radius: var(--rounded-md);
+      margin: 1rem 1rem;
+    }
+    @media (min-width: 768px) {
+      .main-content {
+        padding: 2.5rem;
+        margin: 0;
+      }
+    }
+
+    section {
+      margin-bottom: 3rem;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-primary-600);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--color-primary-200);
+      padding-bottom: 0.5rem;
+    }
+    .section-description {
+      margin-bottom: 1rem;
+    }
+    .info-message {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--color-primary-600);
+    }
+    .subsection-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .sub-subsection-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--color-gray-800);
+    }
+    .example-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--color-gray-700);
+    }
+    .language-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-top: 0.75rem;
+      margin-bottom: 0.25rem;
+      color: var(--color-gray-600);
+      text-transform: uppercase;
+    }
+
+    .code-block-container {
+      position: relative;
+      background-color: var(--color-primary-50);
+      border-radius: var(--rounded-md);
+      padding: 1rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    .code-block-container.response-success {
+      background-color: var(--color-gray-900);
+      color: var(--color-green-300);
+    }
+    .code-block-container.response-error {
+      background-color: var(--color-gray-900);
+      color: var(--color-red-400);
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background-color: var(--color-primary-600);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--rounded-md);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s ease-in-out;
+    }
+    .copy-button:hover {
+      background-color: var(--color-primary-700);
+    }
+    .code-block-container.response-success .copy-button {
+      background-color: var(--color-green-700);
+    }
+    .code-block-container.response-success .copy-button:hover {
+      background-color: var(--color-green-800);
+    }
+    .code-block-container.response-error .copy-button {
+      background-color: var(--color-red-700);
+    }
+    .code-block-container.response-error .copy-button:hover {
+      background-color: var(--color-red-800);
+    }
+    .copy-button.copied {
+        pointer-events: none;
+        background-color: var(--color-success-button) !important;
+    }
+
+    .error-examples > div {
+      margin-bottom: 2rem;
+    }
+    .error-examples > div:last-child {
+      margin-bottom: 0;
+    }
+
+    .footer {
+      background-color: white;
+      box-shadow: var(--shadow-inner);
+      text-align: center;
+      padding: 1.5rem 0;
+      margin-top: 3rem;
+      color: var(--color-gray-500);
+      font-size: 0.875rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
     }
   </style>
 </head>
-<body class="relative min-h-screen flex flex-col">
+<body class="relative">
   <!-- Navbar -->
-  <nav
-    class="sticky top-0 z-50 bg-white shadow-md flex flex-wrap items-center justify-between px-6 py-4 md:px-12 md:py-5"
-  >
-    <div class="flex items-center gap-2 text-blue-500 font-bold text-xl">
+  <nav class="navbar">
+    <div class="navbar-brand">
       <i class="fas fa-book"></i>
       <span>Dokumentasi API</span>
     </div>
-    <div
-      class="flex flex-wrap gap-6 text-gray-800 font-semibold text-sm md:text-base"
-    >
-      <a
-        href="#pengantar"
-        class="flex items-center gap-1 hover:text-blue-500 transition"
-        ><i class="fas fa-home w-5 text-center"></i><span>Pengantar</span></a
-      >
-
+    <div class="navbar-links">
+      <a href="#pengantar"><i class="fas fa-home"></i><span>Pengantar</span></a>
     </div>
   </nav>
 
-  <div class="flex flex-1 min-h-0">
+  <div class="main-content-wrapper">
     <!-- Sidebar -->
-    <aside
-      class="hidden md:block w-72 bg-white shadow-inner overflow-y-auto sticky top-[72px] h-[calc(100vh-72px)]"
-    >
-      <div
-        class="flex items-center gap-2 px-6 py-4 font-semibold text-blue-600 border-b border-gray-200 sticky top-0 bg-white z-10"
-      >
+    <aside class="sidebar">
+      <div class="sidebar-header">
         <i class="fas fa-list-ul"></i>
         <span>Daftar Isi</span>
       </div>
-      <nav class="flex flex-col text-gray-700 text-sm">
-        <a
-          href="#pengantar"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-blue-500 bg-blue-50 font-semibold"
-          ><i class="fas fa-home w-5 text-center"></i> Pengantar</a
-        >
-        <a
-          href="#profile"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-user w-5 text-center"></i> Profile</a
-        >
-        <a
-          href="#categori"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-tags w-5 text-center"></i> Kategori</a
-        >
-        <a
-          href="#provider"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-building w-5 text-center"></i> Provider</a
-        >
-        <a
-          href="#products"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-shopping-basket w-5 text-center"></i> Products</a
-        >
-        <a
-          href="#order"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-cart-plus w-5 text-center"></i> Order</a
-        >
-        <a
-          href="#order-status"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-info-circle w-5 text-center"></i> Status Order</a
-        >
-        <a
-          href="#deposit"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-wallet w-5 text-center"></i> Deposit</a
-        >
-        <a
-          href="#deposit-status"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-info-circle w-5 text-center"></i> Status Deposit</a
-        >
-        <a
-          href="#deposit-cancel"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-ban w-5 text-center"></i> Cancel Deposit</a
-        >
-        <a
-          href="#buy-panel"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-server w-5 text-center"></i> Buy Panel</a
-        >
-        <a
-          href="#mutasi"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-exchange-alt w-5 text-center"></i> Mutasi</a
-        >
-        <a
-          href="#error"
-          class="flex items-center gap-2 px-6 py-3 border-l-4 border-transparent hover:border-blue-500 hover:bg-blue-50 transition"
-          ><i class="fas fa-exclamation-triangle w-5 text-center"></i> Error</a
-        >
+      <nav class="sidebar-nav">
+        <a href="#pengantar" class="active"><i class="fas fa-home"></i> Pengantar</a>
+        <a href="#profile"><i class="fas fa-user"></i> Profile</a>
+        <a href="#categori"><i class="fas fa-tags"></i> Kategori</a>
+        <a href="#provider"><i class="fas fa-building"></i> Provider</a>
+        <a href="#products"><i class="fas fa-shopping-basket"></i> Products</a>
+        <a href="#order"><i class="fas fa-cart-plus"></i> Order</a>
+        <a href="#order-status"><i class="fas fa-info-circle"></i> Status Order</a>
+        <a href="#deposit-methode"><i class="fas fa-money-check-alt"></i> Metode Deposit</a>
+        <a href="#deposit"><i class="fas fa-wallet"></i> Buat Deposit</a>
+        <a href="#deposit-status"><i class="fas fa-info-circle"></i> Status Deposit</a>
+        <a href="#deposit-cancel"><i class="fas fa-ban"></i> Batalkan Deposit</a>
+        <a href="#buy-panel"><i class="fas fa-server"></i> Beli Panel</a>
+        <a href="#mutasi"><i class="fas fa-exchange-alt"></i> Mutasi</a>
+        <a href="#error"><i class="fas fa-exclamation-triangle"></i> Error</a>
       </nav>
     </aside>
 
     <!-- Main Content -->
-    <main
-      class="flex-1 overflow-y-auto p-6 md:p-10 max-w-full bg-white shadow-inner rounded-md mx-4 md:mx-0"
-    >
+    <main class="main-content">
       <!-- Pengantar -->
-      <section id="pengantar" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
+      <section id="pengantar">
+        <h2 class="section-title">
           <i class="fas fa-home"></i> Pengantar
         </h2>
-        <p class="mb-4">
+        <p class="section-description">
           Selamat datang di dokumentasi API resmi layanan kami. API ini
           menyediakan antarmuka terprogram untuk mengakses berbagai fitur dan
           layanan yang kami sediakan.
         </p>
-        <p class="mb-4 flex items-center gap-2 text-blue-600">
+        <p class="info-message">
           <i class="fas fa-info-circle"></i>
           Dokumentasi ini menjelaskan cara menggunakan API kami dengan contoh
-          permintaan dan respons dalam format JSON.
+          permintaan dan respons dalam format JSON. Anda tidak bisa langsung
+          mengakses endpoint API yang memerlukan API Key melalui browser karena
+          membutuhkan otorisasi khusus.
         </p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-link"></i> Base URL
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>https://www.v-pedia.web.id</pre>
         </div>
+
+        <h3 class="subsection-title">
+            <i class="fas fa-key"></i> Autentikasi
+        </h3>
+        <p class="section-description">
+            Semua permintaan API yang disebutkan dalam dokumentasi ini memerlukan autentikasi menggunakan API Key Anda. API Key harus disertakan melalui header <code>X-APIKEY</code>.
+        </p>
+        <div class="code-block-container">
+            <button class="copy-button" onclick="copyCode(this)">
+                <i class="far fa-copy"></i><span>Salin</span>
+            </button>
+            <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
+        </div>
+
+        <h5 class="example-title">Contoh Penggunaan dengan Header <code>X-APIKEY</code> (untuk endpoint GET /api/profile)</h5>
+        
+        <h6 class="language-title">cURL</h6>
+        <div class="code-block-container">
+            <button class="copy-button" onclick="copyCode(this)">
+                <i class="far fa-copy"></i><span>Salin</span>
+            </button>
+            <pre>curl -X GET \
+  'https://www.v-pedia.web.id/api/profile' \
+  -H 'X-APIKEY: YOUR_APIKEY'</pre>
+        </div>
+
+        <h6 class="language-title">JavaScript (Fetch API)</h6>
+        <div class="code-block-container">
+            <button class="copy-button" onclick="copyCode(this)">
+                <i class="far fa-copy"></i><span>Salin</span>
+            </button>
+            <pre>fetch('https://www.v-pedia.web.id/api/profile', {
+  method: 'GET',
+  headers: {
+    'X-APIKEY': 'YOUR_APIKEY'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));</pre>
+        </div>
+
+        <h6 class="language-title">Python (requests)</h6>
+        <div class="code-block-container">
+            <button class="copy-button" onclick="copyCode(this)">
+                <i class="far fa-copy"></i><span>Salin</span>
+            </button>
+            <pre>import requests
+
+headers = {
+    'X-APIKEY': 'YOUR_APIKEY'
+}
+response = requests.get('https://www.v-pedia.web.id/api/profile', headers=headers)
+print(response.json())</pre>
+        </div>
+
+        <p class="section-description">
+            <strong>Penting:</strong> Untuk keamanan, beberapa endpoint API Anda mungkin memerlukan IP whitelist yang diatur di panel akun Anda. Pastikan IP yang Anda gunakan untuk mengakses API sudah terdaftar. Jika IP tidak terdaftar, permintaan akan ditolak.
+        </p>
       </section>
 
       <!-- Profile -->
-      <section id="profile" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
+      <section id="profile">
+        <h2 class="section-title">
           <i class="fas fa-user"></i> Endpoint Profile
         </h2>
-        <p class="mb-4">
-          Mendapatkan data profil pengguna berdasarkan API key.
+        <p class="section-description">
+          Mendapatkan data profil pengguna berdasarkan API key, termasuk informasi saldo, koin, dan riwayat aktivitas terbaru.
         </p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /h2h/profile?apiKey=YOUR_APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/api/profile</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
   "success": true,
   "message": "Profile data retrieved successfully",
   "data": {
-    "fullname": "Full Name",
-    "username": "username",
+    "fullname": "Nama Lengkap Pengguna",
+    "username": "usernameanda",
     "nomor": "+628123456789",
-    "email": "emaiol@gmail.com",
-    "profileUrl": "https://files.catbox.moe/.png",
-    "saldo": 0,
-    "coin": 0,
-    "apiKey": "V-Pedia-XXXXXXXXXXXXXXX",
+    "email": "emailanda@gmail.com",
+    "profileUrl": "https://files.catbox.moe/example.png",
+    "saldo": 15000,
+    "coin": 50,
+    "apiKey": "V-Pedia-ABCDEFGHIJKLMNOP",
     "tanggalDaftar": "2025-04-28T12:08:11.754Z",
     "role": "user",
     "isVerified": true,
     "lastLogin": "2025-05-17T11:54:35.013Z",
-    "referralCode": "XXXXXXXXXXXXXXX",
+    "referralCode": "USER1234",
     "history": [
       {
-        "aktivitas": "Transfer To rezzzz",
+        "aktivitas": "Transfer Saldo",
         "nominal": 1234,
         "status": "Sukses",
         "code": "TRX-3Q12QQKC",
+        "notes": "Transfer ke pengguna lain",
         "tanggal": "2025-04-30T09:38:02.591Z",
         "_id": "6811ef7a83c861ecf809d002"
-      },
-      {
-        "aktivitas": "Create Server",
-        "nominal": 1000,
-        "status": "Sukses",
-        "tanggal": "2025-05-17T13:50:29.262Z",
-        "_id": "6828942596667bc09b37c23d"
       }
     ]
   }
@@ -242,126 +516,107 @@
       </section>
 
       <!-- Kategori -->
-      <section id="categori" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
-          <i class="fas fa-tags"></i> Endpoint Kategori 
+      <section id="categori">
+        <h2 class="section-title">
+          <i class="fas fa-tags"></i> Endpoint Kategori
         </h2>
-        <p class="mb-4">Mendapatkan daftar kategori produk yang tersedia.</p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <p class="section-description">Mendapatkan daftar kategori produk yang tersedia dari sistem H2H.</p>
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /h2h/categor?apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/categori</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
-  "success": true,
+  "status": true,
   "data": [
     "Data Internet",
     "Pulsa Reguler",
-    "Vietnam Topup"
+    "E-Money",
+    "Token Listrik"
   ],
-  "message": "Data kategori berhasil didapatkan"
+  "message": "V-Pedia"
 }</pre>
         </div>
       </section>
 
       <!-- Provider -->
-      <section id="provider" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
+      <section id="provider">
+        <h2 class="section-title">
           <i class="fas fa-building"></i> Endpoint Provider
         </h2>
-        <p class="mb-4">Mendapatkan daftar provider produk yang tersedia.</p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <p class="section-description">Mendapatkan daftar provider produk yang tersedia dari sistem H2H.</p>
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /h2h/providers?apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/provider</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
-  "success": true,
+  "status": true,
   "data": [
     "TELKOMSEL",
     "INDOSAT",
-    "Magic Chess: Go Go"
+    "DANA",
+    "GoPay",
+    "PLN"
   ],
-  "message": "Data provider berhasil didapatkan"
+  "message": "V-Pedia"
 }</pre>
         </div>
       </section>
 
       <!-- Products -->
-      <section id="products" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
+      <section id="products">
+        <h2 class="section-title">
           <i class="fas fa-shopping-basket"></i> Endpoint Products
         </h2>
-        <p class="mb-4">
-          Mendapatkan daftar produk yang tersedia dengan filter berdasarkan
-          kategori atau provider.
+        <p class="section-description">
+          Mendapatkan daftar produk yang tersedia dengan filter opsional berdasarkan
+          kategori atau provider. Harga yang ditampilkan sudah termasuk markup berdasarkan role Anda (User +10%, Reseller +5%, Admin +0%).
         </p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /h2h/price-list?apikey=YOUR-APIKEY
-GET /h2h/price-list?category=Data%20Internet&apikey=YOUR-APIKEY
-GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/products?category=Data%20Internet</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/products?provider=DANA</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
-  "success": true,
+  "status": true,
   "data": [
     {
       "code": "DANA1",
@@ -372,60 +627,53 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
       "brand_status": "1",
       "status": "available",
       "img_url": "https://i.pinimg.com/236x/f2/7d/e0/f27de0e4a01ba9dfe8607ac03a4f7aae.jpg",
-      "final_price": 1183,
-      "price_formatted": "Rp 1.183",
+      "final_price": 1100,
+      "price_formatted": "Rp 1.100",
       "status_emoji": "✅"
     }
   ],
-  "message": "Data produk berhasil didapatkan"
+  "message": "V-Pedia"
 }</pre>
         </div>
       </section>
 
       <!-- Order -->
-      <section id="order" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
+      <section id="order">
+        <h2 class="section-title">
           <i class="fas fa-cart-plus"></i> Endpoint Order
         </h2>
-        <p class="mb-4">
-          Membuat pesanan baru untuk produk tertentu. Untuk Mobile Legend,
-          pisahkan id dan zone dengan <code>|</code> contoh:
+        <p class="section-description">
+          Membuat pesanan baru untuk produk tertentu. Saldo Anda akan dipotong sesuai harga produk setelah markup.
+          Untuk Mobile Legend, pisahkan ID dan Zone dengan <code>|</code> contoh:
           <code>12345678|1234</code>
         </p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /h2h/order/create?code=CODE-PRODUK&target=NO-TUJUAN&apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/order/create?code=CODE-PRODUK&target=NO-TUJUAN</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
   "success": true,
   "message": "Transaksi berhasil dibuat",
   "data": {
-    "id": "XXXXXXXXXXXXXXX",
-    "reff_id": "TRX-XXXXXXXXXXXXXXX",
+    "id": "ORD-1234567890",
+    "reff_id": "TRX-ABCDEFGHIJ",
     "layanan": "DANA 1.000",
     "code": "DANA1",
-    "target": "XXXXXXXXXXXXXXX",
-    "price": 1183,
+    "target": "081234567890",
+    "price": 1100,
     "sn": null,
     "status": "pending",
     "created_at": "2025-05-17 21:58:59"
@@ -435,90 +683,129 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
       </section>
 
       <!-- Status Order -->
-      <section id="order-status" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
+      <section id="order-status">
+        <h2 class="section-title">
           <i class="fas fa-info-circle"></i> Endpoint Status Order
         </h2>
-        <p class="mb-4">Cek status transaksi berdasarkan ID transaksi.</p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <p class="section-description">Cek status transaksi pesanan berdasarkan ID transaksi.</p>
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /h2h/order/check?trxid=ID-TRANSAKSI&apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/order/check?trxid=ID-TRANSAKSI</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
   "success": true,
   "message": "Transaksi berhasil",
   "data": {
-    "trxid": "XXXXXXXXXXXXXXX",
-    "status": "success"
+    "id": "ORD-1234567890",
+    "reff_id": "TRX-ABCDEFGHIJ",
+    "layanan": "DANA 1.000",
+    "code": "DANA1",
+    "target": "081234567890",
+    "price": 1100,
+    "sn": "DANA1234567890",
+    "status": "success",
+    "created_at": "2025-05-17 21:58:59"
   }
 }</pre>
         </div>
       </section>
 
-      <!-- Deposit -->
-      <section id="deposit" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
-          <i class="fas fa-wallet"></i> Endpoint Deposit
+      <!-- Deposit Methode -->
+      <section id="deposit-methode">
+        <h2 class="section-title">
+          <i class="fas fa-money-check-alt"></i> Endpoint Metode Deposit
         </h2>
-        <p class="mb-4">
-          Membuat permintaan deposit dengan nominal minimal 500.
-        </p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <p class="section-description">Mendapatkan daftar metode deposit yang tersedia, dengan opsi filter berdasarkan tipe atau nama metode.</p>
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /h2h/deposit/create?nominal=NOMINAL-DEPOSIT&apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/deposit/methode</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/deposit/methode?type=ewallet</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/deposit/methode?metode=QRISFAST</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
+            <i class="far fa-copy"></i><span>Salin</span>
+          </button>
+          <pre>{
+  "status": true,
+  "message": "V-Pedia",
+  "data": [
+    {
+      "metode": "QRISFAST",
+      "type": "ewallet",
+      "name": "QRIS (Semua E-wallet / Bank)",
+      "min": "500",
+      "max": "10000000",
+      "fee": "17",
+      "fee_persen": "1.00",
+      "status": "active",
+      "img_url": "https://file.atlantich2h.com/img/metode/QRISFAST.png"
+    }
+  ]
+}</pre>
+        </div>
+      </section>
+
+      <!-- Deposit Create -->
+      <section id="deposit">
+        <h2 class="section-title">
+          <i class="fas fa-wallet"></i> Endpoint Buat Deposit
+        </h2>
+        <p class="section-description">
+          Membuat permintaan deposit baru. Nominal minimal adalah 500.
+          Parameter <code>metode</code> (contoh: <code>qrisfast</code>) dan <code>type</code> (contoh: <code>ewallet</code>) bersifat opsional.
+        </p>
+        <h3 class="subsection-title">
+          <i class="fas fa-code"></i> Request
+        </h3>
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
+            <i class="far fa-copy"></i><span>Salin</span>
+          </button>
+          <pre>GET https://www.v-pedia.web.id/h2h/deposit/create?nominal=NOMINAL-DEPOSIT&metode=METODE-DEPOSIT&type=TIPE-DEPOSIT</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
+        </div>
+        <h3 class="subsection-title">
+          <i class="fas fa-reply"></i> Response
+        </h3>
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
   "success": true,
   "message": "Permintaan deposit dibuat",
   "data": {
-    "id": "XXXXXXXXXXXXXXX",
-    "reff_id": "TRX-XXXXXXXXXXXXXXX",
+    "id": "DEP-ABCDEFGHIJ",
+    "reff_id": "TRX-KLMNOPQRST",
     "nominal": 500,
     "tambahan": 0,
     "fee": 7,
     "get_balance": 493,
-    "qr_string": "0000000000000000000000000000",
-    "qr_image": "https://files.cloudmini.net/download/.png",
+    "qr_string": "base64encodedqrdata",
+    "qr_image": "https://files.cloudmini.net/download/qr_image.png",
     "status": "pending",
     "created_at": "2025-05-17 22:02:55",
     "expired_at": "2025-05-17 23:02:55"
@@ -528,82 +815,72 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
       </section>
 
       <!-- Deposit Status -->
-      <section id="deposit-status" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
+      <section id="deposit-status">
+        <h2 class="section-title">
           <i class="fas fa-info-circle"></i> Endpoint Status Deposit
         </h2>
-        <p class="mb-4">Cek status deposit berdasarkan ID transaksi.</p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <p class="section-description">Cek status deposit berdasarkan ID transaksi deposit.</p>
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /h2h/deposit/status?trxid=ID-TRANSAKSI&apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/deposit/status?trxid=ID-TRANSAKSI</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
   "success": true,
   "message": "Status deposit ditemukan",
   "data": {
-    "trxid": "TRX-XXXXXXXXXXXXXXX",
+    "trxid": "TRX-KLMNOPQRST",
     "status": "success",
-    "saldo_masuk": "493"
+    "nominal": 500,
+    "metode": "QRISFAST",
+    "fee_dari_api": 7,
+    "saldo_masuk": 493,
+    "created_at": "2025-05-17 22:02:55"
   }
 }</pre>
         </div>
       </section>
 
       <!-- Cancel Deposit -->
-      <section id="deposit-cancel" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
-          <i class="fas fa-ban"></i> Endpoint Cancel Deposit
+      <section id="deposit-cancel">
+        <h2 class="section-title">
+          <i class="fas fa-ban"></i> Endpoint Batalkan Deposit
         </h2>
-        <p class="mb-4">Membatalkan permintaan deposit berdasarkan ID transaksi.</p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <p class="section-description">Membatalkan permintaan deposit berdasarkan ID transaksi. Pembatalan hanya bisa dilakukan jika status masih pending.</p>
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /h2h/deposit/cancel?trxid=ID-TRANSAKSI&apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/h2h/deposit/cancel?trxid=ID-TRANSAKSI</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
   "success": true,
   "message": "Deposit berhasil dibatalkan",
   "data": {
-    "trxid": "XXXXXXXXXXXXXXX",
+    "trxid": "DEP-ABCDEFGHIJ",
     "status": "cancel",
     "created_at": "2025-05-17 22:07:14"
   }
@@ -612,123 +889,109 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
       </section>
 
       <!-- Buy Panel -->
-      <section id="buy-panel" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
-          <i class="fas fa-server"></i> Endpoint Buy Panel
+      <section id="buy-panel">
+        <h2 class="section-title">
+          <i class="fas fa-server"></i> Endpoint Beli Panel
         </h2>
-        <p class="mb-4">
-          Membeli paket panel dengan username dan paket RAM tertentu.
-          Paket tersedia: 1gb, 2gb, 3gb, 4gb, 5gb, 6gb, 7gb, 8gb, 9gb, 10gb,
-          unli.
+        <p class="section-description">
+          Membeli paket panel Pterodactyl dengan username dan paket RAM/Disk/CPU tertentu.
+          Pastikan saldo Anda mencukupi.
+          <br><strong>Paket yang tersedia:</strong> <code>1gb</code>, <code>2gb</code>, <code>3gb</code>, <code>4gb</code>, <code>5gb</code>, <code>6gb</code>, <code>7gb</code>, <code>8gb</code>, <code>9gb</code>, <code>10gb</code>, <code>unli</code>.
         </p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>/api/v1/cpanel?username=USERNAME-PANEL&paket=PAKET-RAM&apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/api/v1/buy-panel?username=USERNAME-PANEL&paket=PAKET-RAM</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response Success
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
-  "status": true,
-  "message": "User dan server berhasil dibuat!",
-  "user": {
-    "id": 20,
-    "username": "XXXXXXXXXXXXXXX",
-    "email": "XXXXXXXXXXXXXXX@gmail.com",
-    "password": "XXXXXXXXXXXXXXX",
-    "domain": "XXXXXXXXXXXXXXX.com"
-  },
-  "server": {
-    "id": 22,
-    "name": "XXXXXXXXXXXXXXX",
-    "memory": 1015,
-    "disk": 1015,
-    "cpu": 50
+  "success": true,
+  "message": "Server berhasil dibuat",
+  "data": {
+    "user": {
+      "id": 20,
+      "username": "contohuser",
+      "email": "contohuser@gmail.com",
+      "password": "contohuser1024"
+    },
+    "server": {
+      "id": 22,
+      "name": "contohuser",
+      "memory": 1024,
+      "disk": 1024,
+      "cpu": 50
+    }
   }
 }</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response Error
         </h3>
-        <div class="relative bg-gray-900 text-red-400 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-red-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-red-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-error">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
-  "status": false,
-  "message": "Username sudah ada atau data belum di set"
+  "success": false,
+  "message": "Saldo tidak mencukupi"
 }</pre>
         </div>
       </section>
 
       <!-- Mutasi -->
-      <section id="mutasi" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
+      <section id="mutasi">
+        <h2 class="section-title">
           <i class="fas fa-exchange-alt"></i> Endpoint Mutasi
         </h2>
-        <p class="mb-4">Melihat riwayat mutasi transaksi pengguna.</p>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <p class="section-description">Melihat riwayat mutasi transaksi saldo dan koin pengguna.</p>
+        <h3 class="subsection-title">
           <i class="fas fa-code"></i> Request
         </h3>
-        <div class="relative bg-blue-50 rounded-md p-4 font-mono text-sm overflow-x-auto mb-6">
-          <button
-            class="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-blue-700 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
-          <pre>GET /api/mutasi?apikey=YOUR-APIKEY</pre>
+          <pre>GET https://www.v-pedia.web.id/api/mutasi</pre>
+          <pre>Header: X-APIKEY: YOUR_APIKEY</pre>
         </div>
-        <h3 class="text-lg font-semibold flex items-center gap-2 mb-3">
+        <h3 class="subsection-title">
           <i class="fas fa-reply"></i> Response
         </h3>
-        <div class="relative bg-gray-900 text-green-300 rounded-md p-4 font-mono text-sm overflow-x-auto">
-          <button
-            class="absolute top-2 right-2 bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-green-800 transition"
-            onclick="copyCode(this)"
-          >
+        <div class="code-block-container response-success">
+          <button class="copy-button" onclick="copyCode(this)">
             <i class="far fa-copy"></i><span>Salin</span>
           </button>
           <pre>{
   "success": true,
   "history": [
     {
-      "aktivitas": "Transfer To rezzzz",
-      "nominal": 1234,
-      "status": "Sukses",
-      "code": "TRX-3Q12QQKC",
-      "tanggal": "2025-04-30T09:38:02.591Z",
-      "_id": "6811ef7a83c861ecf809d002"
-    },
-    {
       "aktivitas": "Deposit",
       "nominal": 493,
       "status": "Sukses",
       "code": "9HSLQJRiMUR6ayK863sm",
+      "notes": "Deposit Saldo Via Api success dengan metode QRISFAST | Reward: 1 koin",
       "tanggal": "2025-05-17T15:05:08.783Z",
       "_id": "6828a5a496667bc09b37ceae"
+    },
+    {
+      "aktivitas": "Order",
+      "nominal": 1100,
+      "status": "Sukses",
+      "code": "ORD-1234567890",
+      "notes": "Order DANA1 target 081234567890",
+      "tanggal": "2025-05-17T14:30:00.000Z",
+      "_id": "6828a5a496667bc09b37c000"
     }
   ]
 }</pre>
@@ -736,45 +999,46 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
       </section>
 
       <!-- Error -->
-      <section id="error" class="mb-12">
-        <h2
-          class="text-2xl font-bold text-blue-600 flex items-center gap-3 mb-6 border-b border-blue-200 pb-2"
-        >
+      <section id="error">
+        <h2 class="section-title">
           <i class="fas fa-exclamation-triangle"></i> Contoh Response Error
         </h2>
-        <p class="mb-4">
-          Berikut adalah contoh respons error yang mungkin Anda temui saat
-          menggunakan API.
+        <p class="section-description">
+          Berikut adalah beberapa contoh respons error yang mungkin Anda temui saat
+          menggunakan API kami, beserta kemungkinan penyebabnya.
         </p>
 
-        <div class="space-y-8">
+        <div class="error-examples">
           <div>
-            <h3 class="text-lg font-semibold mb-2">APIKEY HARUS DI ISI</h3>
-            <div
-              class="relative bg-gray-900 text-red-400 rounded-md p-4 font-mono text-sm overflow-x-auto"
-            >
-              <button
-                class="absolute top-2 right-2 bg-red-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-red-800 transition"
-                onclick="copyCode(this)"
-              >
+            <h3 class="subsection-title">API Key Tidak Valid (Status 401 Unauthorized)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
                 <i class="far fa-copy"></i><span>Salin</span>
               </button>
               <pre>{
   "success": false,
-  "message": "Parameter \"apikey\" harus diisi"
+  "message": "Invalid API Key"
 }</pre>
             </div>
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-2">AKUN BELUM TERVERIFIKASI</h3>
-            <div
-              class="relative bg-gray-900 text-red-400 rounded-md p-4 font-mono text-sm overflow-x-auto"
-            >
-              <button
-                class="absolute top-2 right-2 bg-red-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-red-800 transition"
-                onclick="copyCode(this)"
-              >
+            <h3 class="subsection-title">API Key Tidak Disertakan (Status 400 Bad Request)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
+                <i class="far fa-copy"></i><span>Salin</span>
+              </button>
+              <pre>{
+  "success": false,
+  "message": "API Key harus disertakan di header \"X-APIKEY\""
+}</pre>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="subsection-title">Akun Belum Terverifikasi (Status 403 Forbidden)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
                 <i class="far fa-copy"></i><span>Salin</span>
               </button>
               <pre>{
@@ -785,14 +1049,23 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-2">REQUEST TERLALU CEPAT</h3>
-            <div
-              class="relative bg-gray-900 text-red-400 rounded-md p-4 font-mono text-sm overflow-x-auto"
-            >
-              <button
-                class="absolute top-2 right-2 bg-red-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-red-800 transition"
-                onclick="copyCode(this)"
-              >
+            <h3 class="subsection-title">IP Tidak Diizinkan (Whitelist) (Status 403 Forbidden)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
+                <i class="far fa-copy"></i><span>Salin</span>
+              </button>
+              <pre>{
+  "success": false,
+  "message": "IP Anda saat ini tidak diizinkan untuk menggunakan API Key ini.",
+  "your_ip": "XXX.XXX.XXX.XXX"
+}</pre>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="subsection-title">Request Terlalu Cepat (Rate Limit) (Status 429 Too Many Requests)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
                 <i class="far fa-copy"></i><span>Salin</span>
               </button>
               <pre>{
@@ -803,32 +1076,22 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-2">SERVER ERROR</h3>
-            <div
-              class="relative bg-gray-900 text-red-400 rounded-md p-4 font-mono text-sm overflow-x-auto"
-            >
-              <button
-                class="absolute top-2 right-2 bg-red-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-red-800 transition"
-                onclick="copyCode(this)"
-              >
+            <h3 class="subsection-title">Parameter Wajib Tidak Terisi (Status 400 Bad Request)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
                 <i class="far fa-copy"></i><span>Salin</span>
               </button>
               <pre>{
   "success": false,
-  "message": "Internal server error"
+  "message": "Parameter [nama_parameter] wajib diisi"
 }</pre>
             </div>
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-2">SALDO TIDAK CUKUP</h3>
-            <div
-              class="relative bg-gray-900 text-red-400 rounded-md p-4 font-mono text-sm overflow-x-auto"
-            >
-              <button
-                class="absolute top-2 right-2 bg-red-700 text-white px-3 py-1 rounded flex items-center gap-1 text-xs hover:bg-red-800 transition"
-                onclick="copyCode(this)"
-              >
+            <h3 class="subsection-title">Saldo Tidak Cukup (Status 400 Bad Request)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
                 <i class="far fa-copy"></i><span>Salin</span>
               </button>
               <pre>{
@@ -837,14 +1100,51 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
 }</pre>
             </div>
           </div>
+          
+          <div>
+            <h3 class="subsection-title">Produk Tidak Ditemukan (Status 404 Not Found)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
+                <i class="far fa-copy"></i><span>Salin</span>
+              </button>
+              <pre>{
+  "success": false,
+  "message": "Produk tidak ditemukan atau harga tidak valid"
+}</pre>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="subsection-title">Transaksi Tidak Ditemukan (Status 404 Not Found)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
+                <i class="far fa-copy"></i><span>Salin</span>
+              </button>
+              <pre>{
+  "success": false,
+  "message": "Transaksi tidak ditemukan atau gagal mendapatkan status"
+}</pre>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="subsection-title">Internal Server Error (Status 500 Internal Server Error)</h3>
+            <div class="code-block-container response-error">
+              <button class="copy-button" onclick="copyCode(this)">
+                <i class="far fa-copy"></i><span>Salin</span>
+              </button>
+              <pre>{
+  "success": false,
+  "message": "Internal server error"
+}</pre>
+            </div>
+          </div>
         </div>
       </section>
     </main>
   </div>
 
-  <footer
-    class="bg-white shadow-inner text-center py-6 mt-12 text-gray-500 text-sm flex justify-center items-center gap-2"
-  >
+  <footer class="footer">
     <i class="far fa-copyright"></i>
     <span>2023 Dokumentasi API. Hak Cipta Dilindungi.</span>
   </footer>
@@ -858,22 +1158,24 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
         const icon = button.querySelector('i');
         const span = button.querySelector('span');
 
-        const originalIcon = icon.className;
+        const originalIconClass = icon.className;
         const originalText = span.textContent;
+        const originalBgColor = getComputedStyle(button).backgroundColor;
 
         icon.className = 'fas fa-check';
         span.textContent = 'Tersalin!';
+        button.style.backgroundColor = 'var(--color-success-button)';
         button.classList.add('copied');
 
         setTimeout(() => {
-          icon.className = originalIcon;
+          icon.className = originalIconClass;
           span.textContent = originalText;
+          button.style.backgroundColor = originalBgColor;
           button.classList.remove('copied');
         }, 3000);
       });
     }
 
-    // Highlight sidebar menu on scroll
     document.addEventListener('DOMContentLoaded', () => {
       const sections = document.querySelectorAll('main section[id]');
       const menuItems = document.querySelectorAll('aside nav a');
@@ -883,7 +1185,7 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
         const scrollY = window.pageYOffset;
 
         sections.forEach((section) => {
-          const sectionTop = section.offsetTop - 120;
+          const sectionTop = section.offsetTop - 100;
           const sectionHeight = section.offsetHeight;
           if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
             current = section.getAttribute('id');
@@ -891,9 +1193,9 @@ GET /h2h/price-list?provider=DANA&apikey=YOUR-APIKEY</pre>
         });
 
         menuItems.forEach((item) => {
-          item.classList.remove('border-blue-500', 'bg-blue-50', 'font-semibold');
+          item.classList.remove('active');
           if (item.getAttribute('href') === `#${current}`) {
-            item.classList.add('border-blue-500', 'bg-blue-50', 'font-semibold');
+            item.classList.add('active');
           }
         });
       }

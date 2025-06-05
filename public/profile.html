@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <title>User Profile - V-Pedia</title>
+  <title>Profil Pengguna - V-Pedia</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
   <style>
@@ -13,11 +13,26 @@
       color: #212529;
       line-height: 1.6;
       min-height: 100vh;
-      padding: 20px;
+      padding: 0;
+      margin: 0;
+    }
+    .main-header {
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
     }
     .container {
       max-width: 1200px;
-      margin: 0 auto;
+      margin: 20px auto;
       padding: 0 10px;
       display: grid;
       grid-template-columns: 280px 1fr;
@@ -35,14 +50,14 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       padding: 24px;
       position: sticky;
-      top: 24px;
+      top: calc(20px + 60px);
       align-self: flex-start;
     }
     @media (max-width: 768px) {
       .sidebar {
         position: static;
         top: auto;
-        width: 100%;
+        width: 91%;
       }
     }
     .profile-header {
@@ -133,7 +148,7 @@
       color: #374151;
       margin-bottom: 4px;
     }
-    .form-group input {
+    .form-group input, .form-group textarea {
       width: 100%;
       border-radius: 6px;
       border: 1px solid #d1d5db;
@@ -142,7 +157,11 @@
       box-sizing: border-box;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
-    .form-group input:focus {
+    .form-group textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+    .form-group input:focus, .form-group textarea:focus {
       border-color: #2563eb;
       box-shadow: 0 0 0 1px #2563eb;
       outline: none;
@@ -197,9 +216,9 @@
       background-color: #f3f4f6;
     }
      .button-secondary:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.5);
-    }
+         outline: none;
+         box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.5);
+     }
      .button-danger {
         background-color: #dc2626;
         color: #fff;
@@ -239,11 +258,12 @@
     }
     .tab-navigation {
         display: flex;
-        border-bottom: 1px solid #e5e7eb;
-        margin-bottom: 24px;
+        justify-content: center;
+        width: 100%;
         overflow-x: auto;
         -ms-overflow-style: none;
         scrollbar-width: none;
+        border-bottom: 1px solid #e5e7eb;
     }
     .tab-navigation::-webkit-scrollbar {
         display: none;
@@ -261,6 +281,7 @@
         border-top: none;
         border-left: none;
         border-right: none;
+        flex-shrink: 0;
     }
     .tab-button:hover:not([aria-selected="true"]) {
         color: #2563eb;
@@ -510,45 +531,6 @@
     .security-notice strong {
         color: #374151;
     }
-    .api-docs-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 24px;
-    }
-    .api-doc-card {
-        background-color: #eff6ff;
-        border-radius: 8px;
-        padding: 20px;
-        cursor: pointer;
-        transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .api-doc-card:hover {
-        transform: translateY(-4px);
-        background-color: #2563eb;
-        color: #fff;
-    }
-     .api-doc-card:focus {
-         outline: none;
-         box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.5);
-     }
-    .api-doc-card i {
-        font-size: 24px;
-        margin-bottom: 12px;
-    }
-    .api-doc-card:hover i {
-        color: #fff;
-    }
-    .api-doc-card h3 {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 4px;
-    }
-    .api-doc-card p {
-        font-size: 14px;
-    }
     .notification {
         padding: 16px;
         margin-bottom: 24px;
@@ -582,226 +564,287 @@
      .spinner {
          animation: spin 1s linear infinite;
      }
-     .email-change-otp-section {
+     .phone-change-otp-section {
         background-color: #eff6ff;
         border-radius: 8px;
         padding: 16px;
         border: 1px solid #bfdbfe;
         margin-top: 16px;
      }
-     .email-change-otp-section h3 {
+     .phone-change-otp-section h3 {
          font-size: 14px;
          font-weight: 500;
          color: #1e40af;
          margin-bottom: 8px;
      }
-     .email-change-otp-section p {
+     .phone-change-otp-section p {
          font-size: 12px;
          color: #1c51b9;
          margin-bottom: 12px;
      }
-      .email-change-otp-section .otp-error {
+      .phone-change-otp-section .otp-error {
         font-size: 12px;
         color: #dc2626;
         margin-top: 8px;
       }
-      .email-change-otp-section .otp-form-actions {
+      .phone-change-otp-section .otp-form-actions {
           margin-top: 16px;
       }
-       .email-change-otp-section .otp-form-actions button {
+       .phone-change-otp-section .otp-form-actions button {
            font-size: 12px;
            padding: 6px 12px;
+       }
+       .ip-whitelist-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f9fafb;
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        font-family: monospace;
+       }
+       .ip-whitelist-item span {
+        flex-grow: 1;
+       }
+       .ip-whitelist-item button {
+        background: none;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px;
+       }
+       .ip-whitelist-item button:hover {
+        color: #b91c1c;
+       }
+       #currentIpWhitelist li:last-child {
+           margin-bottom: 0;
+       }
+       #ipWhitelistManagementForm .form-group {
+           margin-bottom: 12px;
+       }
+       #ipWhitelistManagementForm .button-group {
+           margin-top: 16px;
        }
   </style>
 </head>
 <body>
+  <header class="main-header">
+    <div class="header-content">
+      <nav aria-label="Bagian Profil" class="tab-navigation" role="tablist">
+        <button aria-controls="profileOverviewTab" aria-selected="true" class="tab-button" id="tabProfileOverview" type="button">
+          <i class="fas fa-user"></i>
+          Profil
+        </button>
+        <button aria-controls="profileSettingsTab" aria-selected="false" class="tab-button" id="tabProfileSettings" type="button">
+            <i class="fas fa-cog"></i>
+            Pengaturan Profil
+        </button>
+        <button aria-controls="securityTab" aria-selected="false" class="tab-button" id="tabSecurity" role="tab" type="button">
+          <i class="fas fa-shield-alt"></i>
+          Keamanan
+        </button>
+        <button aria-controls="apikeyTab" aria-selected="false" class="tab-button" id="tabApiKey" role="tab" type="button">
+          <i class="fas fa-key"></i>
+          Kunci API
+        </button>
+        <button aria-controls="coinExchangeTab" aria-selected="false" class="tab-button" id="tabCoinExchange" type="button">
+            <i class="fas fa-exchange-alt"></i>
+            Tukar Coin
+        </button>
+        <button aria-controls="upgradeResellerTab" aria-selected="false" class="tab-button" id="tabUpgradeReseller" type="button">
+            <i class="fas fa-crown"></i>
+            Upgrade Reseller
+        </button>
+      </nav>
+    </div>
+  </header>
+
   <div class="container">
-    <aside class="sidebar fade-in" aria-label="User profile sidebar">
+    <aside class="sidebar fade-in" aria-label="Sidebar profil pengguna">
       <div class="profile-header">
         <div class="profile-image-container">
-            <img alt="User profile picture" class="profile-image" height="120" id="profileImage" src="https://i.pinimg.com/236x/a2/80/e2/a280e2a50bf6240f29b49a72875adee5.jpg" width="120"/>
-            <button aria-label="Edit profile photo" class="edit-photo-button" id="editPhotoBtn" type="button">
+            <img alt="Gambar profil pengguna" class="profile-image" height="120" id="profileImage" src="https://i.pinimg.com/236x/a2/80/e2/a280e2a50bf6240f29b49a72875adee5.jpg" width="120"/>
+            <button aria-label="Edit foto profil" class="edit-photo-button" id="editPhotoBtn" type="button">
               <i class="fas fa-camera"></i>
             </button>
         </div>
-        <h3 class="username-display" id="usernameDisplay">Loading...</h3>
-        <p class="email-display" id="emailDisplay">Loading...!</p>
+        <h3 class="username-display" id="usernameDisplay">Memuat...</h3>
+        <p class="email-display" id="emailDisplay">Memuat...!</p>
       </div>
       <div class="file-upload-info">
         <input accept="image/jpeg,image/png,image/gif" class="hidden" id="photoUpload" type="file"/>
-        <p>Allowed JPG, GIF or PNG.</p>
+        <p>Hanya JPG, GIF atau PNG yang diizinkan.</p>
       </div>
       <div class="divider"></div>
-      <form autocomplete="off" class="profile-form" id="profileForm" novalidate="">
-        <div class="form-group">
-          <label for="firstName">First Name</label>
-          <input id="firstName" name="firstName" placeholder="First name" required="" type="text"/>
-        </div>
-        <div class="form-group">
-          <label for="lastName">Last Name</label>
-          <input id="lastName" name="lastName" placeholder="Last name" type="text"/>
-        </div>
-        <div class="form-group">
-          <label for="phoneNumber">Phone Number</label>
-          <input id="phoneNumber" name="phoneNumber" placeholder="Phone number" type="text"/>
-        </div>
-        <div class="divider"></div>
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input id="username" name="username" placeholder="Username" required="" type="text"/>
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input id="email" name="email" placeholder="Email" required="" type="email"/>
-        </div>
-        <div id="emailChangeOtpSection" class="email-change-otp-section hidden">
-          <h3>Email Change Verification</h3>
-          <p>We've sent a verification OTP to your current email. Please enter it below to confirm your email change.</p>
-          <div class="otp-input-group">
-            <input type="text" maxlength="1" class="otp-input" data-index="0" autocomplete="one-time-code">
-            <input type="text" maxlength="1" class="otp-input" data-index="1">
-            <input type="text" maxlength="1" class="otp-input" data-index="2">
-            <input type="text" maxlength="1" class="otp-input" data-index="3">
-            <input type="text" maxlength="1" class="otp-input" data-index="4">
-            <input type="text" maxlength="1" class="otp-input" data-index="5">
-          </div>
-          <input type="hidden" id="emailChangeOtpField">
-          <p class="otp-error hidden" id="emailChangeOtpError"></p>
-          <div class="otp-form-actions">
-            <button type="button" id="cancelEmailChange" class="button button-secondary">Cancel</button>
-            <button type="button" id="resendEmailChangeOtp" class="button button-secondary">Resend OTP</button>
-          </div>
-        </div>
-        <div class="button-group">
-          <button class="button button-primary" id="saveChanges" type="submit">
-            <i class="fas fa-save"></i>
-            Save changes
-          </button>
-          <button class="button button-secondary" id="cancelChanges" type="button">
-            <i class="fas fa-times"></i>
-            Cancel
-          </button>
-        </div>
-      </form>
+      <button aria-label="Kembali ke Dashboard" class="back-button" id="backToDashboard" type="button">
+        <i class="fas fa-arrow-left"></i>
+        Kembali ke Dashboard
+      </button>
     </aside>
     <main class="main-content fade-in">
-      <button aria-label="Back to Dashboard" class="back-button" id="backToDashboard" type="button">
-        <i class="fas fa-arrow-left"></i>
-        Back to Dashboard
-      </button>
-      <nav aria-label="Profile sections" class="tab-navigation" role="tablist">
-        <button aria-controls="customTab" aria-selected="true" class="tab-button" id="tabProfile" role="tab" type="button">
-          <i class="fas fa-user mr-1"></i>
-          Profile
-        </button>
-        <button aria-controls="securityTab" aria-selected="false" class="tab-button" id="tabSecurity" role="tab" type="button">
-          <i class="fas fa-shield-alt mr-1"></i>
-          Security
-        </button>
-        <button aria-controls="apikeyTab" aria-selected="false" class="tab-button" id="tabApiKey" role="tab" type="button">
-          <i class="fas fa-key mr-1"></i>
-          API Key
-        </button>
-      </nav>
       <div class="notification hidden" id="notification"></div>
-      <section aria-labelledby="tabProfile" class="tab-content" id="customTab" role="tabpanel">
+
+      <section aria-labelledby="profileOverviewTab" class="tab-content" id="profileOverviewTab" role="tabpanel">
         <h1 class="section-title">
           <i class="fas fa-id-card"></i>
-          Profile Information
+          Informasi Profil
         </h1>
-        <div aria-label="User statistics" class="stats-grid">
+        <div aria-label="Statistik Pengguna" class="stats-grid">
           <div class="stat-card">
             <p aria-live="polite" class="stat-value" id="balanceStat">Rp 0</p>
-            <p class="stat-label">Your Balance</p>
+            <p class="stat-label">Saldo Anda</p>
           </div>
           <div class="stat-card">
             <p aria-live="polite" class="stat-value" id="coinStat">0</p>
-            <p class="stat-label">Your Coins</p>
+            <p class="stat-label">Koin Anda</p>
           </div>
           <div class="stat-card">
             <p aria-live="polite" class="stat-value" id="referralStat">-</p>
-            <p class="stat-label">Referral Code</p>
+            <p class="stat-label">Kode Referral</p>
           </div>
         </div>
-        <h2 class="security-section-title">Account Details</h2>
+        <h2 class="security-section-title">Detail Akun</h2>
         <div class="overflow-x-auto">
           <table class="details-table">
             <tbody>
               <tr>
                 <th>Username:</th>
-                <td id="detailUsername">Loading...</td>
+                <td id="detailUsername">Memuat...</td>
               </tr>
               <tr>
-                <th>Full name:</th>
-                <td id="detailFullname">Loading...</td>
+                <th>Nama Lengkap:</th>
+                <td id="detailFullname">Memuat...</td>
               </tr>
               <tr>
-                <th>Phone number:</th>
-                <td id="detailPhone">Loading...</td>
+                <th>Nomor Telepon:</th>
+                <td id="detailPhone">Memuat...</td>
               </tr>
               <tr>
                 <th>Email:</th>
-                <td id="detailEmail">Loading...</td>
+                <td id="detailEmail">Memuat...</td>
               </tr>
               <tr>
-                <th>H2H Status:</th>
+                <th>Status H2H:</th>
                 <td id="detailStatus"></td>
               </tr>
               <tr>
-                <th>Join Date:</th>
-                <td id="detailJoinDate">Loading...</td>
+                <th>Tanggal Bergabung:</th>
+                <td id="detailJoinDate">Memuat...</td>
               </tr>
               <tr>
-                <th>Last Login:</th>
-                <td id="detailLastLogin">Loading...</td>
+                <th>Login Terakhir:</th>
+                <td id="detailLastLogin">Memuat...</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
-      <section aria-labelledby="tabSecurity" class="tab-content hidden" id="securityTab" role="tabpanel">
+
+      <section aria-labelledby="profileSettingsTab" class="tab-content hidden" id="profileSettingsTab" role="tabpanel">
+        <h1 class="section-title">
+          <i class="fas fa-cog"></i>
+          Pengaturan Profil
+        </h1>
+        <form autocomplete="off" class="profile-form" id="profileForm" novalidate="">
+          <div class="form-group">
+            <label for="firstName">Nama Depan</label>
+            <input id="firstName" name="firstName" placeholder="Nama depan" required="" type="text"/>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Nama Belakang</label>
+            <input id="lastName" name="lastName" placeholder="Nama belakang" type="text"/>
+          </div>
+          <div class="form-group">
+            <label for="phoneNumber">Nomor Telepon</label>
+            <input id="phoneNumber" name="phoneNumber" placeholder="Nomor telepon" type="text"/>
+          </div>
+          <div class="divider"></div>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input id="username" name="username" placeholder="Username" required="" type="text"/>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" name="email" placeholder="Email" required="" type="email"/>
+          </div>
+          
+          <div id="phoneChangeOtpSection" class="phone-change-otp-section hidden">
+              <h3>Konfirmasi Perubahan Nomor Telepon</h3>
+              <p>Kami telah mengirim OTP verifikasi ke nomor telepon lama Anda. Harap masukkan di bawah untuk mengkonfirmasi perubahan nomor telepon Anda.</p>
+              <div class="otp-input-group">
+                  <input type="text" maxlength="1" class="otp-input" data-index="0" autocomplete="one-time-code">
+                  <input type="text" maxlength="1" class="otp-input" data-index="1">
+                  <input type="text" maxlength="1" class="otp-input" data-index="2">
+                  <input type="text" maxlength="1" class="otp-input" data-index="3">
+                  <input type="text" maxlength="1" class="otp-input" data-index="4">
+                  <input type="text" maxlength="1" class="otp-input" data-index="5">
+              </div>
+              <input type="hidden" id="phoneChangeOtpField">
+              <p class="otp-error hidden" id="phoneChangeOtpError"></p>
+              <div class="otp-form-actions">
+                  <button type="button" id="cancelPhoneChange" class="button button-secondary">Batal</button>
+                  <button type="button" id="resendPhoneChangeOtp" class="button button-secondary">Kirim Ulang OTP</button>
+              </div>
+          </div>
+
+          <div class="button-group">
+            <button class="button button-primary" id="saveChanges" type="submit">
+              <i class="fas fa-save"></i>
+              Simpan perubahan
+            </button>
+            <button class="button button-secondary" id="cancelChanges" type="button">
+              <i class="fas fa-times"></i>
+              Batal
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section aria-labelledby="securityTab" class="tab-content hidden" id="securityTab" role="tabpanel">
         <h1 class="section-title">
           <i class="fas fa-shield-alt"></i>
-          Security Settings
+          Pengaturan Keamanan
         </h1>
         <div aria-live="assertive" class="notification hidden" id="passwordNotification" role="alert"></div>
-        <h2 class="security-section-title">Change Password</h2>
-        <p class="security-section-description">Ensure your account security with a strong password</p>
+        <h2 class="security-section-title">Ubah Kata Sandi</h2>
+        <p class="security-section-description">Pastikan keamanan akun Anda dengan kata sandi yang kuat</p>
         <form autocomplete="off" id="passwordForm" novalidate="">
           <div class="form-group">
-            <label for="currentPassword">Current Password</label>
-            <input autocomplete="current-password" id="currentPassword" name="currentPassword" placeholder="Enter current password" required="" type="password"/>
+            <label for="currentPassword">Kata Sandi Saat Ini</label>
+            <input autocomplete="current-password" id="currentPassword" name="currentPassword" placeholder="Masukkan kata sandi saat ini" required="" type="password"/>
           </div>
           <div class="form-group">
-            <label for="newPassword">New Password</label>
-            <input autocomplete="new-password" id="newPassword" name="newPassword" placeholder="Enter new password" required="" type="password"/>
+            <label for="newPassword">Kata Sandi Baru</label>
+            <input autocomplete="new-password" id="newPassword" name="newPassword" placeholder="Masukkan kata sandi baru" required="" type="password"/>
           </div>
           <div class="form-group">
-            <label for="confirmPassword">Confirm New Password</label>
-            <input autocomplete="new-password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password" required="" type="password"/>
+            <label for="confirmPassword">Konfirmasi Kata Sandi Baru</label>
+            <input autocomplete="new-password" id="confirmPassword" name="confirmPassword" placeholder="Konfirmasi kata sandi baru" required="" type="password"/>
           </div>
-          <div aria-label="Password requirements" class="password-requirements">
-            <strong>Password Requirements:</strong>
+          <div aria-label="Persyaratan kata sandi" class="password-requirements">
+            <strong>Persyaratan Kata Sandi:</strong>
             <ul>
-              <li>Minimum 6 characters</li>
-              <li>At least one uppercase letter</li>
-              <li>At least one number</li>
+              <li>Minimal 6 karakter</li>
+              <li>Setidaknya satu huruf kapital</li>
+              <li>Setidaknya satu angka</li>
             </ul>
           </div>
           <button class="button button-primary" id="changePasswordBtn" type="submit">
             <i class="fas fa-key"></i>
-            Change Password
+            Ubah Kata Sandi
           </button>
         </form>
         <div class="divider"></div>
-        <h2 class="security-section-title">Email Verification</h2>
-        <p aria-live="polite" class="email-verification-status" id="emailVerificationStatus">Loading verification status...</p>
+        <h2 class="security-section-title">Verifikasi Email</h2>
+        <p aria-live="polite" class="email-verification-status" id="emailVerificationStatus">Memuat status verifikasi...</p>
         <button class="button button-primary" id="verifyEmailBtn" style="display: none;" type="button">
           <i class="fas fa-envelope"></i>
-          Verify Email
+          Verifikasi Email
         </button>
         <form autocomplete="off" class="otp-form hidden" id="otpInlineForm" novalidate="">
-          <p class="otp-form-description">We've sent a 6-digit verification code to your email. Please enter it below.</p>
+          <p class="otp-form-description">Kami telah mengirim kode verifikasi 6 digit ke email Anda. Harap masukkan di bawah.</p>
           <div class="otp-input-group">
             <input type="text" maxlength="1" class="otp-input pulse" data-index="0" autocomplete="one-time-code">
             <input type="text" maxlength="1" class="otp-input" data-index="1">
@@ -811,40 +854,41 @@
             <input type="text" maxlength="1" class="otp-input" data-index="5">
           </div>
           <input type="hidden" id="otpInlineInput">
-          <p aria-live="assertive" class="otp-error hidden" id="otpInlineError" role="alert">Invalid OTP. Please enter a 6-digit numeric code.</p>
+          <p aria-live="assertive" class="otp-error hidden" id="otpInlineError" role="alert">OTP tidak valid. Harap masukkan kode numerik 6 digit.</p>
           <div class="otp-form-actions">
-            <button class="button button-secondary" id="resendOtpBtn" type="button">Resend OTP</button>
+            <button class="button button-secondary" id="resendOtpBtn" type="button">Kirim Ulang OTP</button>
             <div class="button-group">
               <button class="button button-secondary" id="otpInlineCancelBtn" type="button">
-                Cancel
+                Batal
               </button>
               <button class="button button-primary" id="otpInlineSubmitBtn" type="submit">
                 <i class="fas fa-check"></i>
-                Verify
+                Verifikasi
               </button>
             </div>
           </div>
         </form>
       </section>
-      <section aria-labelledby="tabApiKey" class="tab-content hidden" id="apikeyTab" role="tabpanel">
+
+      <section aria-labelledby="apikeyTab" class="tab-content hidden" id="apikeyTab" role="tabpanel">
         <h1 class="section-title">
           <i class="fas fa-key"></i>
-          API Key Management
+          Manajemen Kunci API
         </h1>
-        <p class="security-section-description">Secure access key for integrating with our services</p>
+        <p class="security-section-description">Kunci akses aman untuk integrasi dengan layanan kami</p>
         <div class="divider"></div>
-        <h2 class="security-section-title">Your Current API Key</h2>
-        <p class="security-section-description">Created on <span id="apiKeyDate">Loading...</span></p>
-        <div aria-label="API key value" aria-live="polite" class="api-key-value" id="apiKeyValue">
-          Loading API key...
-          <button aria-label="Copy API key" class="copy-button" type="button">
+        <h2 class="security-section-title">Kunci API Anda Saat Ini</h2>
+        <p class="security-section-description">Dibuat pada <span id="apiKeyDate">Memuat...</span></p>
+        <div aria-label="Nilai kunci API" aria-live="polite" class="api-key-value" id="apiKeyValue">
+          Memuat kunci API...
+          <button aria-label="Salin kunci API" class="copy-button" type="button">
             <i class="far fa-copy"></i>
-            Copy
+            Salin
           </button>
         </div>
         <div class="checkbox-group">
           <input aria-checked="true" checked="" type="checkbox" id="keyActive"/>
-          <label for="keyActive">Key Active</label>
+          <label for="keyActive">Kunci Aktif</label>
         </div>
         <div class="button-group">
           <button class="button button-secondary" id="refreshKey" type="button">
@@ -853,76 +897,180 @@
           </button>
           <button class="button button-danger" id="regenerateKey" type="button">
             <i class="fas fa-redo"></i>
-            Regenerate Key
+            Regenerasi Kunci
           </button>
         </div>
         <div class="divider"></div>
         <div class="checkbox-group">
           <input aria-checked="true" checked="" type="checkbox" id="securityNotice"/>
-          <label for="securityNotice">Security Notice</label>
+          <label for="securityNotice">Pemberitahuan Keamanan</label>
         </div>
         <p class="security-notice">
-          <strong>Treat your API key like a password.</strong>
-          Keep it secure and never expose it in client side code or public repositories. Regenerate your key immediately if you suspect it's been compromised.
+          <strong>Perlakukan kunci API Anda seperti kata sandi.</strong>
+          Jaga keamanannya dan jangan pernah mengeksposnya dalam kode sisi klien atau repositori publik. Regenerasi kunci Anda segera jika Anda menduga telah disusupi.
         </p>
         <div class="divider"></div>
-        <h2 class="security-section-title">API Documentation</h2>
-        <p class="security-section-description">API documentation for integrating with our services</p>
-        <div aria-label="API documentation sections" class="api-docs-grid">
-          <article class="api-doc-card" tabindex="0">
-            <i class="fas fa-server"></i>
-            <h3>Services</h3>
-            <p>Manage your services</p>
-          </article>
-          <article class="api-doc-card" tabindex="0">
-            <i class="fas fa-globe"></i>
-            <h3>Countries</h3>
-            <p>Available countries</p>
-          </article>
-          <article class="api-doc-card" tabindex="0">
-            <i class="fas fa-phone"></i>
-            <h3>Numbers</h3>
-            <p>Phone numbers</p>
-          </article>
-          <article class="api-doc-card" tabindex="0">
-            <i class="fas fa-shopping-cart"></i>
-            <h3>Orders</h3>
-            <p>Order management</p>
-          </article>
-          <article class="api-doc-card" tabindex="0">
-            <i class="fas fa-info-circle"></i>
-            <h3>Order Status</h3>
-            <p>Check order status</p>
-          </article>
+
+        <h2 class="security-section-title">Manajemen IP Whitelist</h2>
+        <p class="security-section-description">Kelola alamat IP yang diizinkan untuk menggunakan Kunci API Anda. Gunakan '0.0.0.0' untuk mengizinkan semua IP. Pisahkan beberapa IP dengan koma.</p>
+        <div aria-live="assertive" class="notification hidden" id="ipWhitelistNotification" role="alert"></div>
+
+        <form id="ipWhitelistManagementForm">
+            <div class="form-group">
+                <label for="ipWhitelistInput">IP yang di-whitelist (dipisahkan koma)</label>
+                <textarea id="ipWhitelistInput" name="ipWhitelistInput" placeholder="misalnya, 192.168.1.1, 10.0.0.5, 0.0.0.0" rows="3"></textarea>
+            </div>
+            <div class="button-group">
+                <button class="button button-primary" id="saveIpWhitelistBtn" type="submit">
+                    <i class="fas fa-save"></i>
+                    Simpan IP Whitelist
+                </button>
+            </div>
+        </form>
+        <div class="divider"></div>
+        <h3 class="security-section-title">IP Whitelist Saat Ini</h3>
+        <ul id="currentIpWhitelist" style="list-style: none; padding-left: 0;">
+            <li class="ip-whitelist-item"><span>Memuat...</span></li>
+        </ul>
+
+      </section>
+
+      <section aria-labelledby="coinExchangeTab" class="tab-content hidden" id="coinExchangeTab" role="tabpanel">
+        <h1 class="section-title">
+            <i class="fas fa-exchange-alt"></i>
+            Tukar Coin ke Saldo
+        </h1>
+        <div class="notification hidden" id="exchangeNotification"></div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p class="stat-value" id="currentCoinExchange">0</p>
+                <p class="stat-label">Coin Anda Saat Ini</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-value" id="currentSaldoExchange">Rp 0</p>
+                <p class="stat-label">Saldo Anda Saat Ini</p>
+            </div>
+             <div class="stat-card" style="grid-column: span 1; display: flex; flex-direction: column; justify-content: center;">
+                 <p class="stat-value" style="font-size: 1.25rem;">Rasio: 10 Coin = Rp 1 Saldo</p>
+                 <p class="stat-label">Penukaran Minimum: 10 Coin</p>
+             </div>
+        </div>
+
+        <form id="coinExchangeForm">
+            <div class="form-group">
+                <label for="coinAmountInput">Jumlah Coin yang Ditukar</label>
+                <input type="number" id="coinAmountInput" name="coinAmountInput" placeholder="Masukkan jumlah coin (kelipatan 10)" min="10" step="10" required>
+            </div>
+            <div class="form-group">
+                <label for="saldoResult">Saldo yang Akan Ditambahkan</label>
+                <input type="text" id="saldoResult" value="Rp 0" readonly>
+            </div>
+            <p class="security-notice">
+                Setiap <strong>10 coin</strong> yang ditukar akan menghasilkan <strong>Rp 1 saldo</strong>. Pastikan jumlah coin yang Anda masukkan adalah kelipatan 10.
+            </p>
+            <button class="button button-primary" id="exchangeButton" type="submit">
+                <i class="fas fa-exchange-alt"></i>
+                Tukar Sekarang
+            </button>
+        </form>
+      </section>
+
+      <section aria-labelledby="upgradeResellerTab" class="tab-content hidden" id="upgradeResellerTab" role="tabpanel">
+        <h1 class="section-title">
+            <i class="fas fa-crown"></i>
+            Upgrade ke Reseller
+        </h1>
+        <div class="notification hidden" id="upgradeNotification"></div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p class="stat-value" id="currentRole">Memuat...</p>
+                <p class="stat-label">Peran Anda Saat Ini</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-value" id="currentSaldoForUpgrade">Rp 0</p>
+                <p class="stat-label">Saldo Anda Saat Ini</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-value" id="upgradePriceDisplay">Mulai Rp 25.000</p>
+                <p class="stat-label">Biaya Upgrade Saat Ini</p>
+            </div>
+        </div>
+
+        <div id="upgradeContent">
+            <p class="security-section-description">
+                Dapatkan keuntungan eksklusif dan harga yang lebih baik sebagai reseller. Biaya upgrade bervariasi tergantung pada jumlah reseller saat ini (25.000, 50.000, atau 70.000).
+            </p>
+            <ul style="list-style: disc; margin-left: 20px; font-size: 14px; color: #4b5563; margin-bottom: 24px;">
+                <li>Akses harga produk khusus reseller.</li>
+                <li>Prioritas dukungan pelanggan.</li>
+                <li>Potensi keuntungan lebih besar.</li>
+            </ul>
+            <button class="button button-primary" id="doUpgradeBtn" type="button">
+                <i class="fas fa-arrow-up"></i>
+                Upgrade Sekarang
+            </button>
+        </div>
+        <div id="alreadyResellerMessage" class="notification info hidden">
+            Anda sudah memiliki status Reseller atau Admin. Tidak perlu upgrade lagi.
         </div>
       </section>
+
     </main>
   </div>
   <script>
-    const tabs = {
-      profile: document.getElementById("customTab"),
-      security: document.getElementById("securityTab"),
-      apikey: document.getElementById("apikeyTab"),
+    let currentUserData = null;
+    let phoneNumberChangeRequest = null;
+
+    const sections = {
+      profileOverviewTab: document.getElementById("profileOverviewTab"),
+      profileSettingsTab: document.getElementById("profileSettingsTab"),
+      securityTab: document.getElementById("securityTab"),
+      apikeyTab: document.getElementById("apikeyTab"),
+      coinExchangeTab: document.getElementById("coinExchangeTab"),
+      upgradeResellerTab: document.getElementById("upgradeResellerTab"),
     };
     const tabButtons = {
-      profile: document.getElementById("tabProfile"),
+      profileOverview: document.getElementById("tabProfileOverview"),
+      profileSettings: document.getElementById("tabProfileSettings"),
       security: document.getElementById("tabSecurity"),
       apikey: document.getElementById("tabApiKey"),
+      coinExchange: document.getElementById("tabCoinExchange"),
+      upgradeReseller: document.getElementById("tabUpgradeReseller"),
     };
+
     const notification = document.getElementById("notification");
     const passwordNotification = document.getElementById("passwordNotification");
+    const ipWhitelistNotification = document.getElementById("ipWhitelistNotification");
     const profileImage = document.getElementById("profileImage");
     const photoUpload = document.getElementById("photoUpload");
     const editPhotoBtn = document.getElementById("editPhotoBtn");
+    const backToDashboardBtn = document.getElementById("backToDashboard");
+
+    const profileForm = document.getElementById("profileForm");
     const saveChangesBtn = document.getElementById("saveChanges");
     const cancelChangesBtn = document.getElementById("cancelChanges");
+    const firstNameInput = document.getElementById("firstName");
+    const lastNameInput = document.getElementById("lastName");
+    const phoneNumberInput = document.getElementById("phoneNumber");
+    const usernameInput = document.getElementById("username");
+    const emailInput = document.getElementById("email");
+
+    const phoneChangeOtpSection = document.getElementById("phoneChangeOtpSection");
+    const phoneChangeOtpInputs = document.querySelectorAll('#phoneChangeOtpSection .otp-input');
+    const phoneChangeOtpField = document.getElementById("phoneChangeOtpField");
+    const phoneChangeOtpError = document.getElementById("phoneChangeOtpError");
+    const cancelPhoneChangeBtn = document.getElementById("cancelPhoneChange");
+    const resendPhoneChangeOtpBtn = document.getElementById("resendPhoneChangeOtp");
+
+    const currentPasswordInput = document.getElementById("currentPassword");
+    const newPasswordInput = document.getElementById("newPassword");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
     const changePasswordBtn = document.getElementById("changePasswordBtn");
-    const regenerateKeyBtn = document.getElementById("regenerateKey");
-    const refreshKeyBtn = document.getElementById("refreshKey");
-    const verifyEmailBtn = document.getElementById("verifyEmailBtn");
-    const apiKeyValue = document.getElementById("apiKeyValue");
-    const apiKeyDate = document.getElementById("apiKeyDate");
+
     const emailVerificationStatus = document.getElementById("emailVerificationStatus");
+    const verifyEmailBtn = document.getElementById("verifyEmailBtn");
     const otpInlineForm = document.getElementById("otpInlineForm");
     const otpInlineInput = document.getElementById("otpInlineInput");
     const otpInputs = document.querySelectorAll('#otpInlineForm .otp-input');
@@ -930,22 +1078,16 @@
     const otpInlineCancelBtn = document.getElementById("otpInlineCancelBtn");
     const otpInlineSubmitBtn = document.getElementById("otpInlineSubmitBtn");
     const resendOtpBtn = document.getElementById("resendOtpBtn");
-    const backToDashboardBtn = document.getElementById("backToDashboard");
-    const emailChangeOtpSection = document.getElementById("emailChangeOtpSection");
-    const emailChangeOtpInputs = document.querySelectorAll('#emailChangeOtpSection .otp-input');
-    const emailChangeOtpField = document.getElementById("emailChangeOtpField");
-    const emailChangeOtpError = document.getElementById("emailChangeOtpError");
-    const cancelEmailChangeBtn = document.getElementById("cancelEmailChange");
-    const resendEmailChangeOtpBtn = document.getElementById("resendEmailChangeOtp");
-    const profileForm = document.getElementById("profileForm");
-    const firstNameInput = document.getElementById("firstName");
-    const lastNameInput = document.getElementById("lastName");
-    const phoneNumberInput = document.getElementById("phoneNumber");
-    const usernameInput = document.getElementById("username");
-    const emailInput = document.getElementById("email");
-    const currentPasswordInput = document.getElementById("currentPassword");
-    const newPasswordInput = document.getElementById("newPassword");
-    const confirmPasswordInput = document.getElementById("confirmPassword");
+
+    const apiKeyValueEl = document.getElementById("apiKeyValue");
+    const apiKeyDate = document.getElementById("apiKeyDate");
+    const regenerateKeyBtn = document.getElementById("regenerateKey");
+    const refreshKeyBtn = document.getElementById("refreshKey");
+    const ipWhitelistManagementForm = document.getElementById("ipWhitelistManagementForm");
+    const ipWhitelistInput = document.getElementById("ipWhitelistInput");
+    const saveIpWhitelistBtn = document.getElementById("saveIpWhitelistBtn");
+    const currentIpWhitelistEl = document.getElementById("currentIpWhitelist");
+
     const detailUsername = document.getElementById("detailUsername");
     const detailFullname = document.getElementById("detailFullname");
     const detailPhone = document.getElementById("detailPhone");
@@ -956,24 +1098,42 @@
     const balanceStat = document.getElementById("balanceStat");
     const coinStat = document.getElementById("coinStat");
     const referralStat = document.getElementById("referralStat");
-    let currentUserData = null;
-    let emailChangeRequest = null;
-    function showNotification(message, type = "info", element = notification) {
-    element.className = "notification";
-    element.textContent = message;
-    if (type === "success") {
-        element.classList.add("success");
-    } else if (type === "error") {
-        element.classList.add("error");
-    } else {
-        element.classList.add("info");
+
+    const currentCoinExchange = document.getElementById("currentCoinExchange");
+    const currentSaldoExchange = document.getElementById("currentSaldoExchange");
+    const coinAmountInput = document.getElementById("coinAmountInput");
+    const saldoResult = document.getElementById("saldoResult");
+    const exchangeButton = document.getElementById("exchangeButton");
+    const coinExchangeForm = document.getElementById("coinExchangeForm");
+    const exchangeNotification = document.getElementById("exchangeNotification");
+
+    const currentRoleDisplay = document.getElementById("currentRole");
+    const currentSaldoForUpgrade = document.getElementById("currentSaldoForUpgrade");
+    const upgradePriceDisplay = document.getElementById("upgradePriceDisplay");
+    const doUpgradeBtn = document.getElementById("doUpgradeBtn");
+    const upgradeNotification = document.getElementById("upgradeNotification");
+    const upgradeContent = document.getElementById("upgradeContent");
+    const alreadyResellerMessage = document.getElementById("alreadyResellerMessage");
+
+    function showNotification(message, type = "info", elementId = "notification") {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        element.className = "notification";
+        element.textContent = message;
+        if (type === "success") {
+            element.classList.add("success");
+        } else if (type === "error") {
+            element.classList.add("error");
+        } else {
+            element.classList.add("info");
+        }
+        element.classList.remove("hidden");
+        setTimeout(() => {
+            element.classList.add("hidden");
+            element.textContent = "";
+        }, 5000);
     }
-    element.classList.remove("hidden");
-    setTimeout(() => {
-        element.classList.add("hidden");
-        element.textContent = "";
-    }, 5000);
-}
+
     function setLoading(button, isLoading) {
       if (isLoading) {
         button.disabled = true;
@@ -993,12 +1153,14 @@
         }
       }
     }
+
     function formatCurrency(amount) {
       return new Intl.NumberFormat("id-ID", {
         style: "currency",
         currency: "IDR",
       }).format(amount);
     }
+
     function formatDate(dateString) {
       if (!dateString) return "N/A";
       const date = new Date(dateString);
@@ -1010,9 +1172,10 @@
         minute: "2-digit",
       });
     }
+
     function setupOtpInputs(inputs, hiddenField, errorField) {
       inputs.forEach((input, index) => {
-        input.addEventListener('input', (e) => {
+        input.addEventListener('input', () => {
           if (input.value.length === 1) {
             if (index < inputs.length - 1) {
               inputs[index + 1].focus();
@@ -1024,6 +1187,7 @@
           if (errorField) {
             errorField.textContent = '';
             errorField.classList.add('hidden');
+            input.classList.remove('border-red-500');
           }
         });
         input.addEventListener('keydown', (e) => {
@@ -1044,320 +1208,452 @@
             }
             if (inputs[5]) inputs[5].focus();
             hiddenField.value = pastedData;
+            if (errorField) {
+                errorField.textContent = '';
+                errorField.classList.add('hidden');
+                inputs.forEach(input => input.classList.remove('border-red-500'));
+            }
           }
         });
       });
     }
+
+    setupOtpInputs(phoneChangeOtpInputs, phoneChangeOtpField, phoneChangeOtpError);
     setupOtpInputs(otpInputs, otpInlineInput, otpInlineError);
-    setupOtpInputs(emailChangeOtpInputs, emailChangeOtpField, emailChangeOtpError);
+
     function switchTab(tabKey) {
-      Object.entries(tabs).forEach(([key, el]) => {
-        if (key === tabKey) {
-          el.classList.remove("hidden");
-          tabButtons[key].setAttribute("aria-selected", "true");
-          tabButtons[key].classList.add("text-blue-600", "border-blue-600");
-          tabButtons[key].classList.remove("text-gray-500");
-          tabButtons[key].classList.remove("border-transparent");
-        } else {
-          el.classList.add("hidden");
-          tabButtons[key].setAttribute("aria-selected", "false");
-          tabButtons[key].classList.remove("text-blue-600", "border-blue-600");
-          tabButtons[key].classList.add("text-gray-500");
-          tabButtons[key].classList.add("border-transparent");
+        Object.keys(sections).forEach(sectionId => {
+            sections[sectionId].classList.add("hidden");
+        });
+        Object.keys(tabButtons).forEach(buttonKey => {
+            tabButtons[buttonKey].setAttribute("aria-selected", "false");
+        });
+
+        if (tabKey === "profileOverview") {
+            sections.profileOverviewTab.classList.remove("hidden");
+            tabButtons.profileOverview.setAttribute("aria-selected", "true");
+        } else if (tabKey === "profileSettings") {
+            sections.profileSettingsTab.classList.remove("hidden");
+            tabButtons.profileSettings.setAttribute("aria-selected", "true");
+        } else if (tabKey === "security") {
+            sections.securityTab.classList.remove("hidden");
+            tabButtons.security.setAttribute("aria-selected", "true");
+        } else if (tabKey === "apikey") {
+            sections.apikeyTab.classList.remove("hidden");
+            tabButtons.apikey.setAttribute("aria-selected", "true");
+        } else if (tabKey === "coinExchange") {
+            sections.coinExchangeTab.classList.remove("hidden");
+            tabButtons.coinExchange.setAttribute("aria-selected", "true");
+            if (currentUserData) {
+                currentCoinExchange.textContent = currentUserData.coin || 0;
+                currentSaldoExchange.textContent = formatCurrency(currentUserData.saldo || 0);
+                coinAmountInput.value = '';
+                saldoResult.value = formatCurrency(0);
+                showNotification('', 'info', 'exchangeNotification');
+            }
+        } else if (tabKey === "upgradeReseller") {
+            sections.upgradeResellerTab.classList.remove("hidden");
+            tabButtons.upgradeReseller.setAttribute("aria-selected", "true");
+            if (currentUserData) {
+                currentRoleDisplay.textContent = currentUserData.role === "reseller" ? "Reseller" : currentUserData.role === "admin" ? "Admin" : "Pengguna Biasa";
+                currentSaldoForUpgrade.textContent = formatCurrency(currentUserData.saldo || 0);
+                if (currentUserData.role === "reseller" || currentUserData.role === "admin") {
+                    upgradeContent.classList.add("hidden");
+                    alreadyResellerMessage.classList.remove("hidden");
+                } else {
+                    upgradeContent.classList.remove("hidden");
+                    alreadyResellerMessage.classList.add("hidden");
+                }
+            }
+            showNotification('', 'info', 'upgradeNotification');
         }
-      });
     }
-    tabButtons.profile.addEventListener("click", () => switchTab("profile"));
+
+    tabButtons.profileOverview.addEventListener("click", () => switchTab("profileOverview"));
+    tabButtons.profileSettings.addEventListener("click", () => switchTab("profileSettings"));
     tabButtons.security.addEventListener("click", () => switchTab("security"));
     tabButtons.apikey.addEventListener("click", () => switchTab("apikey"));
+    tabButtons.coinExchange.addEventListener("click", () => switchTab("coinExchange"));
+    tabButtons.upgradeReseller.addEventListener("click", () => switchTab("upgradeReseller"));
+
     editPhotoBtn.addEventListener("click", () => photoUpload.click());
     photoUpload.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-
       if (!["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
-        showNotification("Only JPG, PNG, or GIF files are allowed", "error");
+        showNotification("Hanya file JPG, PNG, atau GIF yang diizinkan", "error");
         return;
       }
-
       const reader = new FileReader();
       reader.onload = function (event) {
         profileImage.src = event.target.result;
       };
       reader.readAsDataURL(file);
-
       try {
-        // Show loading state on the profile image or a separate indicator
-        profileImage.style.opacity = '0.5'; // Example visual feedback
-
+        profileImage.style.opacity = '0.5';
         const formData = new FormData();
         formData.append("photo", file);
-
         const response = await fetch("/profile/update-photo", {
           method: "POST",
           body: formData,
           credentials: "include",
         });
-
         const data = await response.json();
-
         if (data.success) {
-          showNotification("Profile photo updated successfully", "success");
-          // Update the image source with the URL from the server response
+          showNotification("Foto profil berhasil diperbarui", "success");
           profileImage.src = data.profileUrl;
-          currentUserData.profileUrl = data.profileUrl; // Update local user data
+          if(currentUserData) currentUserData.profileUrl = data.profileUrl;
         } else {
-          showNotification(data.message || "Failed to update profile photo", "error");
-          // Revert image source if update failed (optional)
-          profileImage.src = currentUserData.profileUrl || "https://placehold.co/120x120/png?text=Profile+Picture";
+          showNotification(data.message || "Gagal memperbarui foto profil", "error");
+          profileImage.src = currentUserData ? (currentUserData.profileUrl || "https://placehold.co/120x120/png?text=Profile+Picture") : "https://placehold.co/120x120/png?text=Profile+Picture";
         }
       } catch (error) {
         console.error("Error:", error);
-        showNotification("Failed to update profile photo", "error");
-        // Revert image source on network error (optional)
-        profileImage.src = currentUserData.profileUrl || "https://placehold.co/120x120/png?text=Profile+Picture";
+        showNotification("Gagal memperbarui foto profil", "error");
+        profileImage.src = currentUserData ? (currentUserData.profileUrl || "https://placehold.co/120x120/png?text=Profile+Picture") : "https://placehold.co/120x120/png?text=Profile+Picture";
       } finally {
-        // Remove loading state
         profileImage.style.opacity = '1';
       }
     });
 
-    function populateFormWithUserData(user) {
-    profileImage.src = user.profileUrl || "https://placehold.co/120x120/png?text=Profile+Picture";
-    document.getElementById("usernameDisplay").textContent = user.username || "N/A";
-    document.getElementById("emailDisplay").textContent = user.email || "N/A";
-    firstNameInput.value = user.fullname ? user.fullname.split(" ")[0] : "";
-    lastNameInput.value = user.fullname ? user.fullname.split(" ").slice(1).join(" ") : "";
-    phoneNumberInput.value = user.nomor || "";
-    usernameInput.value = user.username || "";
-    emailInput.value = user.email || "";
-    detailUsername.textContent = user.username || "N/A";
-    detailFullname.textContent = user.fullname || "N/A";
-    detailPhone.textContent = user.nomor || "N/A";
-    detailEmail.textContent = user.email || "N/A";
-    detailStatus.innerHTML = user.isVerified
-        ? '<span class="status-badge verified">Verified</span>'
-        : '<span class="status-badge not-verified">Not Verified</span>';
-    detailJoinDate.textContent = formatDate(user.tanggalDaftar);
-    detailLastLogin.textContent = formatDate(user.lastLogin);
-    if (user.isVerified) {
-      emailVerificationStatus.textContent = "Your email is verified.";
-      verifyEmailBtn.style.display = "none";
-    } else {
-      emailVerificationStatus.textContent = "Your email is not verified.";
-      verifyEmailBtn.style.display = "inline-flex";
+    function populateFormAndDetails(user) {
+        profileImage.src = user.profileUrl || "https://placehold.co/120x120/png?text=Profile+Picture";
+        document.getElementById("usernameDisplay").textContent = user.username || "N/A";
+        document.getElementById("emailDisplay").textContent = user.email || "N/A";
+        
+        firstNameInput.value = user.fullname ? user.fullname.split(" ")[0] : "";
+        lastNameInput.value = user.fullname ? user.fullname.split(" ").slice(1).join(" ") : "";
+        phoneNumberInput.value = user.nomor || "";
+        usernameInput.value = user.username || "";
+        emailInput.value = user.email || "";
+
+        detailUsername.textContent = user.username || "N/A";
+        detailFullname.textContent = user.fullname || "N/A";
+        detailPhone.textContent = user.nomor || "N/A";
+        detailEmail.textContent = user.email || "N/A";
+        detailStatus.innerHTML = user.isVerified
+            ? '<span class="status-badge verified">Verified</span>'
+            : '<span class="status-badge not-verified">Not Verified</span>';
+        detailJoinDate.textContent = formatDate(user.tanggalDaftar);
+        detailLastLogin.textContent = formatDate(user.lastLogin);
+        balanceStat.textContent = formatCurrency(user.saldo || 0);
+        coinStat.textContent = user.coin || 0;
+        referralStat.textContent = user.referralCode || '-';
+        currentCoinExchange.textContent = user.coin || 0;
+        currentSaldoExchange.textContent = formatCurrency(user.saldo || 0);
+
+        currentRoleDisplay.textContent = user.role === "reseller" ? "Reseller" : user.role === "admin" ? "Admin" : "Pengguna Biasa";
+        currentSaldoForUpgrade.textContent = formatCurrency(user.saldo || 0);
+        if (user.role === "reseller" || user.role === "admin") {
+            upgradeContent.classList.add("hidden");
+            alreadyResellerMessage.classList.remove("hidden");
+        } else {
+            upgradeContent.classList.remove("hidden");
+            alreadyResellerMessage.classList.add("hidden");
+        }
+
+        if (user.isVerified) {
+          emailVerificationStatus.textContent = "Email Anda telah diverifikasi.";
+          verifyEmailBtn.style.display = "none";
+          otpInlineForm.classList.add("hidden");
+        } else {
+          emailVerificationStatus.textContent = "Email Anda belum diverifikasi.";
+          verifyEmailBtn.style.display = "inline-flex";
+        }
+
+        if (apiKeyValueEl && user.apiKey) {
+            apiKeyValueEl.innerHTML = `
+                ${user.apiKey}
+                <button class="copy-button" type="button" aria-label="Salin kunci API">
+                    <i class="far fa-copy"></i> Salin
+                </button>
+            `;
+            apiKeyDate.textContent = formatDate(user.tanggalDaftar);
+        } else if (apiKeyValueEl) {
+            apiKeyValueEl.textContent = "Tidak ada kunci API yang tersedia.";
+            apiKeyDate.textContent = "N/A";
+        }
+        
+        phoneChangeOtpSection.classList.add("hidden");
+        phoneNumberChangeRequest = null;
+        for (const input of phoneChangeOtpInputs) input.value = '';
+        phoneChangeOtpField.value = '';
+        phoneChangeOtpError.classList.add("hidden");
+
+        if (user.whitelistIp && Array.isArray(user.whitelistIp) && user.whitelistIp.length > 0) {
+            ipWhitelistInput.value = user.whitelistIp.join(', ');
+            renderCurrentIpWhitelist(user.whitelistIp);
+        } else {
+            ipWhitelistInput.value = '0.0.0.0';
+            renderCurrentIpWhitelist(['0.0.0.0']);
+        }
     }
-    const apiKeyValue = document.getElementById("apiKeyValue");
-    const apiKeyDate = document.getElementById("apiKeyDate");
-    if (user.apiKey) {
-        apiKeyValue.innerHTML = `
-            ${user.apiKey}
-            <button
-                class="copy-button"
-                type="button"
-                aria-label="Copy API key"
-            >
-                <i class="far fa-copy"></i> Copy
-            </button>
-        `;
-        apiKeyDate.textContent = formatDate(user.createdAt);
-    } else {
-        apiKeyValue.textContent = "No API key available.";
-        apiKeyDate.textContent = "N/A";
+
+    function renderCurrentIpWhitelist(ipsArray) {
+        currentIpWhitelistEl.innerHTML = '';
+        if (ipsArray && ipsArray.length > 0) {
+            ipsArray.forEach(ip => {
+                const li = document.createElement('li');
+                li.className = 'ip-whitelist-item';
+                li.innerHTML = `<span>${ip}</span>`;
+                currentIpWhitelistEl.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.className = 'ip-whitelist-item';
+            li.innerHTML = `<span>Tidak ada IP yang di-whitelist (defaultnya 0.0.0.0 - semua diizinkan)</span>`;
+            currentIpWhitelistEl.appendChild(li);
+        }
     }
-    emailChangeOtpSection.classList.add("hidden");
-    emailChangeRequest = null;
-}
+
     async function loadUserData() {
-    try {
-        const response = await fetch("/profile/users", {
-            credentials: "include",
-        });
-        const data = await response.json();
-        if (data.success) {
-            currentUserData = data.user;
-            populateFormWithUserData(data.user);
-        } else {
-            showNotification(data.message || "Failed to load user data", "error");
-        }
-    } catch (error) {
-        console.error("Error loading user data:", error);
-        showNotification("Failed to load user data", "error");
-    }
-}
-    profileForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const firstName = firstNameInput.value.trim();
-      const lastName = lastNameInput.value.trim();
-      const phoneNumber = phoneNumberInput.value.trim();
-      const username = usernameInput.value.trim();
-      const email = emailInput.value.trim();
-      if (!firstName || !username || !email) {
-        showNotification("First name, username and email are required", "error");
-        return;
-      }
-      if (emailChangeRequest && emailChangeRequest.newEmail === email) {
         try {
-          setLoading(saveChangesBtn, true);
-          const otp = emailChangeOtpField.value;
-          if (!otp || otp.length !== 6) {
-            emailChangeOtpError.textContent = "Please enter a valid 6-digit OTP";
-            emailChangeOtpError.classList.remove("hidden");
-            return;
-          }
-          const response = await fetch("/profile/confirm-email-change", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ otp }),
-            credentials: "include",
-          });
-          const data = await response.json();
-          if (data.success) {
-            showNotification("Email updated successfully", "success");
-            emailChangeOtpSection.classList.add("hidden");
-            emailChangeOtpField.value = "";
-            await loadUserData();
-          } else {
-            emailChangeOtpError.textContent = data.message || "Invalid OTP";
-            emailChangeOtpError.classList.remove("hidden");
-          }
+            const response = await fetch("/profile/users", {
+                credentials: "include",
+            });
+            const data = await response.json();
+            if (data.success) {
+                currentUserData = data.user;
+                populateFormAndDetails(data.user);
+            } else {
+                showNotification(data.message || "Gagal memuat data pengguna", "error");
+            }
         } catch (error) {
-          console.error("Error:", error);
-          showNotification("Failed to update email", "error");
-        } finally {
-          setLoading(saveChangesBtn, false);
+            console.error("Error loading user data:", error);
+            showNotification("Gagal memuat data pengguna", "error");
         }
-        return;
-      }
-      try {
+    }
+
+    profileForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
         setLoading(saveChangesBtn, true);
+
+        const firstName = firstNameInput.value.trim();
+        const lastName = lastNameInput.value.trim();
         const newFullname = `${firstName}${lastName ? " " + lastName : ""}`;
-        if (newFullname !== currentUserData.fullname) {
-          const fullnameRes = await fetch("/profile/change-fullname", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ newFullname }),
-            credentials: "include",
-          });
-          const fullnameData = await fullnameRes.json();
-          if (!fullnameData.success) {
-            throw new Error(fullnameData.message || "Failed to update fullname");
-          }
+        const newPhoneNumber = phoneNumberInput.value.trim();
+        const username = usernameInput.value.trim();
+        const newEmail = emailInput.value.trim();
+
+        const oldPhoneNumber = currentUserData ? currentUserData.nomor : '';
+        const oldEmail = currentUserData ? currentUserData.email : '';
+        const oldFullname = currentUserData ? currentUserData.fullname : '';
+        const oldUsername = currentUserData ? currentUserData.username : '';
+
+        if (phoneNumberChangeRequest && newPhoneNumber === phoneNumberChangeRequest.newNomor) {
+            try {
+                const otp = phoneChangeOtpField.value;
+                if (!otp || otp.length !== 6) {
+                    phoneChangeOtpError.textContent = "Masukkan 6 digit OTP yang valid.";
+                    phoneChangeOtpError.classList.remove("hidden");
+                    setLoading(saveChangesBtn, false);
+                    return;
+                }
+                phoneChangeOtpError.classList.add("hidden"); 
+
+                const response = await fetch("/auth/change-number", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nomorLama: oldPhoneNumber, otp, nomorBaru: newPhoneNumber }),
+                    credentials: "include",
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showNotification("Nomor telepon berhasil diubah.", "success");
+                    phoneChangeOtpSection.classList.add("hidden");
+                    phoneNumberChangeRequest = null;
+                    await loadUserData();
+                } else {
+                    phoneChangeOtpError.textContent = data.message || "OTP tidak valid atau kadaluarsa.";
+                    phoneChangeOtpError.classList.remove("hidden");
+                    for (const input of phoneChangeOtpInputs) {
+                        input.classList.add('border-red-500');
+                        setTimeout(() => input.classList.remove('border-red-500'), 1500);
+                    }
+                }
+            } catch (error) {
+                console.error("Error confirming phone change:", error);
+                showNotification("Gagal mengubah nomor telepon.", "error");
+            } finally {
+                setLoading(saveChangesBtn, false);
+            }
+            return;
         }
-        if (phoneNumber && phoneNumber !== currentUserData.nomor) {
-          const phoneRes = await fetch("/profile/change-nomor", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ newNomor: phoneNumber }),
-            credentials: "include",
-          });
-          const phoneData = await phoneRes.json();
-          if (!phoneData.success) {
-            throw new Error(phoneData.message || "Failed to update phone number");
-          }
+
+        if (newPhoneNumber && newPhoneNumber !== oldPhoneNumber && !phoneNumberChangeRequest) {
+            const phoneRegex = /^[0-9]{10,15}$/;
+            if (!phoneRegex.test(newPhoneNumber)) {
+                showNotification("Format nomor baru tidak valid. Minimum 10, maksimum 15 digit, dan hanya angka.", "error");
+                setLoading(saveChangesBtn, false);
+                return;
+            }
+            try {
+                const response = await fetch("/get/otp-change-nomor", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nomorLama: oldPhoneNumber }),
+                    credentials: "include",
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showNotification("OTP telah dikirim ke nomor telepon lama Anda. Masukkan di bawah untuk konfirmasi.", "success");
+                    phoneNumberChangeRequest = { newNomor: newPhoneNumber };
+                    phoneChangeOtpSection.classList.remove("hidden");
+                    phoneChangeOtpInputs[0].focus();
+                    phoneChangeOtpInputs[0].classList.add('pulse');
+                    setTimeout(() => phoneChangeOtpInputs[0].classList.remove('pulse'), 1500);
+                } else {
+                    showNotification(data.message || "Gagal meminta OTP perubahan nomor telepon.", "error");
+                }
+            } catch (error) {
+                console.error("Error requesting phone change OTP:", error);
+                showNotification("Gagal meminta OTP perubahan nomor telepon.", "error");
+            } finally {
+                setLoading(saveChangesBtn, false);
+            }
+            return;
         }
-        if (username !== currentUserData.username) {
-          const usernameRes = await fetch("/profile/change-username", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ newUsername: username }),
-            credentials: "include",
-          });
-          const usernameData = await usernameRes.json();
-          if (!usernameData.success) {
-            throw new Error(usernameData.message || "Failed to update username");
-          }
+
+        if (newEmail && newEmail !== oldEmail) {
+            try {
+                const response = await fetch("/profile/request-email-change", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ newEmail: newEmail }),
+                    credentials: "include",
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showNotification("Email berhasil diubah.", "success");
+                    await loadUserData();
+                } else {
+                    emailInput.value = oldEmail; 
+                    showNotification(data.message || "Gagal mengubah email.", "error");
+                }
+            } catch (error) {
+                console.error("Error changing email:", error);
+                emailInput.value = oldEmail;
+                showNotification("Gagal mengubah email.", "error");
+            } finally {
+                setLoading(saveChangesBtn, false);
+            }
+            return;
         }
-        if (email !== currentUserData.email) {
-          const emailRes = await fetch("/profile/request-email-change", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ newEmail: email }),
-            credentials: "include",
-          });
-          const emailData = await emailRes.json();
-          if (emailData.success) {
-            showNotification("OTP sent to your current email", "success");
-            emailChangeRequest = { newEmail: email };
-            emailChangeOtpSection.classList.remove("hidden");
-            for (const input of emailChangeOtpInputs) input.value = '';
-            emailChangeOtpField.value = '';
-            emailChangeOtpInputs[0].focus();
-          } else {
-            throw new Error(emailData.message || "Failed to request email change");
-          }
-        } else {
-          await loadUserData();
-          showNotification("Profile updated successfully", "success");
+
+        let changesMade = false;
+
+        try {
+            if (newFullname !== oldFullname) {
+                const fullnameRes = await fetch("/profile/change-fullname", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ newFullname: newFullname }),
+                    credentials: "include",
+                });
+                const fullnameData = await fullnameRes.json();
+                if (!fullnameData.success) {
+                    throw new Error(fullnameData.message || "Gagal mengubah nama lengkap.");
+                }
+                changesMade = true;
+            }
+
+            if (username !== oldUsername) {
+                const usernameRes = await fetch("/profile/change-username", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ newUsername: username }),
+                    credentials: "include",
+                });
+                const usernameData = await usernameRes.json();
+                if (!usernameData.success) {
+                    throw new Error(usernameData.message || "Gagal mengubah username.");
+                }
+                changesMade = true;
+            }
+
+            if (changesMade) {
+                showNotification("Profil berhasil diperbarui.", "success");
+                await loadUserData();
+            } else {
+                showNotification("Tidak ada perubahan yang terdeteksi pada informasi profil.", "info");
+            }
+        } catch (error) {
+            console.error("Error updating general profile:", error);
+            showNotification(error.message || "Gagal memperbarui profil.", "error");
+        } finally {
+            setLoading(saveChangesBtn, false);
         }
-      } catch (error) {
-        console.error("Error:", error);
-        showNotification(error.message || "Failed to update profile", "error");
-      } finally {
-        setLoading(saveChangesBtn, false);
-      }
     });
-    cancelEmailChangeBtn.addEventListener("click", () => {
-      emailChangeOtpSection.classList.add("hidden");
-      emailChangeRequest = null;
-      emailInput.value = currentUserData.email;
-      showNotification("Email change canceled", "info");
+
+    cancelPhoneChangeBtn.addEventListener("click", () => {
+        phoneChangeOtpSection.classList.add("hidden");
+        phoneNumberChangeRequest = null;
+        if(currentUserData) phoneNumberInput.value = currentUserData.nomor;
+        for (const input of phoneChangeOtpInputs) input.value = '';
+        phoneChangeOtpField.value = '';
+        phoneChangeOtpError.classList.add("hidden");
+        showNotification("Perubahan nomor telepon dibatalkan", "info");
     });
-    resendEmailChangeOtpBtn.addEventListener("click", async () => {
-      if (!emailChangeRequest) return;
-      try {
-        setLoading(resendEmailChangeOtpBtn, true);
-        const response = await fetch("/profile/request-email-change", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ newEmail: emailChangeRequest.newEmail }),
-          credentials: "include",
-        });
-        const data = await response.json();
-        if (data.success) {
-          showNotification("New OTP sent to your current email", "success");
-          for (const input of emailChangeOtpInputs) input.value = '';
-          emailChangeOtpField.value = '';
-          emailChangeOtpInputs[0].focus();
-        } else {
-          showNotification(data.message || "Failed to resend OTP", "error");
+
+    resendPhoneChangeOtpBtn.addEventListener("click", async () => {
+        if (!currentUserData || !currentUserData.nomor) {
+            showNotification("Tidak dapat mengirim ulang OTP, nomor telepon saat ini tidak ditemukan.", "error");
+            return;
         }
-      } catch (error) {
-        console.error("Error resending OTP:", error);
-        showNotification("Failed to resend OTP", "error");
-      } finally {
-        setLoading(resendEmailChangeOtpBtn, false);
-      }
+        try {
+            setLoading(resendPhoneChangeOtpBtn, true);
+            const response = await fetch("/get/otp-change-nomor", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nomorLama: currentUserData.nomor }),
+                credentials: "include",
+            });
+            const data = await response.json();
+            if (data.success) {
+                showNotification("OTP baru dikirim ke nomor telepon lama Anda", "success");
+                for (const input of phoneChangeOtpInputs) input.value = '';
+                phoneChangeOtpField.value = '';
+                phoneChangeOtpInputs[0].focus();
+                phoneChangeOtpError.classList.add("hidden");
+            } else {
+                showNotification(data.message || "Gagal mengirim ulang OTP", "error");
+            }
+        } catch (error) {
+            console.error("Error resending OTP:", error);
+            showNotification("Gagal mengirim ulang OTP", "error");
+        } finally {
+            setLoading(resendPhoneChangeOtpBtn, false);
+        }
     });
+
     cancelChangesBtn.addEventListener("click", () => {
       if (currentUserData) {
-        populateFormWithUserData(currentUserData);
-        emailChangeOtpSection.classList.add("hidden");
-        emailChangeRequest = null;
+        populateFormAndDetails(currentUserData);
       }
-      showNotification("Changes discarded", "success");
+      showNotification("Perubahan dibatalkan", "info");
     });
+
     document.getElementById("passwordForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const currentPassword = currentPasswordInput.value;
       const newPassword = newPasswordInput.value;
       const confirmPassword = confirmPasswordInput.value;
       if (!currentPassword || !newPassword || !confirmPassword) {
-        showNotification("All fields are required", "error", passwordNotification);
+        showNotification("Semua kolom harus diisi", "error", "passwordNotification");
         return;
       }
       if (newPassword !== confirmPassword) {
-        showNotification("New passwords do not match", "error", passwordNotification);
+        showNotification("Kata sandi baru tidak cocok", "error", "passwordNotification");
         return;
       }
       if (newPassword.length < 6) {
-        showNotification("Password must be at least 6 characters", "error", passwordNotification);
+        showNotification("Kata sandi harus minimal 6 karakter", "error", "passwordNotification");
         return;
       }
       if (!/[A-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
         showNotification(
-          "Password must contain at least one uppercase letter and one number",
-          "error", passwordNotification);
+          "Kata sandi harus mengandung setidaknya satu huruf kapital dan satu angka",
+          "error", "passwordNotification");
         return;
       }
       try {
@@ -1373,24 +1669,25 @@
         });
         const data = await response.json();
         if (data.success) {
-          showNotification("Password changed successfully", "success", passwordNotification);
+          showNotification("Kata sandi berhasil diubah", "success", "passwordNotification");
           currentPasswordInput.value = "";
           newPasswordInput.value = "";
           confirmPasswordInput.value = "";
         } else {
-          showNotification(data.message || "Failed to change password", "error", passwordNotification);
+          showNotification(data.message || "Gagal mengubah kata sandi", "error", "passwordNotification");
         }
       } catch (error) {
         console.error("Error:", error);
-        showNotification("Failed to change password", "error", passwordNotification);
+        showNotification("Gagal mengubah kata sandi", "error", "passwordNotification");
       } finally {
         setLoading(changePasswordBtn, false);
       }
     });
+
     regenerateKeyBtn.addEventListener("click", async () => {
       if (
         !confirm(
-          "Are you sure you want to regenerate your API key? This will invalidate your current key."
+          "Apakah Anda yakin ingin meregenerasi kunci API Anda? Ini akan membatalkan kunci Anda saat ini."
         )
       ) {
         return;
@@ -1403,46 +1700,51 @@
         });
         const data = await response.json();
         if (data.success) {
-          apiKeyValue.innerHTML = `
+          apiKeyValueEl.innerHTML = `
             ${data.newApiKey}
             <button
               class="copy-button"
               type="button"
-              aria-label="Copy API key"
+              aria-label="Salin kunci API"
             >
-              <i class="far fa-copy"></i> Copy
+              <i class="far fa-copy"></i> Salin
             </button>
           `;
-          currentUserData.apiKey = data.newApiKey;
-          showNotification("API Key regenerated successfully", "success");
+          if(currentUserData) currentUserData.apiKey = data.newApiKey;
+          showNotification("Kunci API berhasil diregenerasi", "success");
         } else {
-          showNotification(data.message || "Failed to regenerate API Key", "error");
+          showNotification(data.message || "Gagal meregenerasi Kunci API", "error");
         }
       } catch (error) {
         console.error("Error:", error);
-        showNotification("Failed to regenerate API Key", "error");
+        showNotification("Gagal meregenerasi Kunci API", "error");
       } finally {
         setLoading(regenerateKeyBtn, false);
       }
     });
+
     refreshKeyBtn.addEventListener("click", async () => {
       await loadUserData();
-      showNotification("API Key information refreshed", "success");
+      showNotification("Informasi Kunci API berhasil disegarkan", "success");
     });
-    apiKeyValue.addEventListener("click", (e) => {
-      if (e.target.closest("button")) {
-        const apiKeyText = apiKeyValue.textContent.split(' Copy')[0].trim();
-        navigator.clipboard
-          .writeText(apiKeyText)
-          .then(() => {
-            showNotification("API Key copied to clipboard", "success");
-          })
-          .catch((err) => {
-            console.error("Failed to copy:", err);
-            showNotification("Failed to copy API Key", "error");
-          });
-      }
-    });
+
+    if (apiKeyValueEl) {
+        apiKeyValueEl.addEventListener("click", (e) => {
+          if (e.target.closest("button.copy-button")) {
+            const apiKeyText = apiKeyValueEl.textContent.split(' Salin')[0].trim();
+            navigator.clipboard
+              .writeText(apiKeyText)
+              .then(() => {
+                showNotification("Kunci API disalin ke clipboard", "success");
+              })
+              .catch((err) => {
+                console.error("Failed to copy:", err);
+                showNotification("Gagal menyalin Kunci API", "error");
+              });
+          }
+        });
+    }
+
     verifyEmailBtn.addEventListener("click", async () => {
       try {
         setLoading(verifyEmailBtn, true);
@@ -1452,24 +1754,22 @@
         });
         const data = await response.json();
         if (data.success) {
-          showNotification("OTP sent to your email", "success");
+          showNotification("OTP dikirim ke email Anda", "success");
           otpInlineForm.classList.remove("hidden");
-          otpInlineInput.value = "";
-          for (const input of otpInputs) input.value = '';
           otpInputs[0].focus();
-          otpInlineError.classList.add("hidden");
           otpInputs[0].classList.add('pulse');
           setTimeout(() => otpInputs[0].classList.remove('pulse'), 1500);
         } else {
-          showNotification(data.message || "Failed to send OTP", "error");
+          showNotification(data.message || "Gagal mengirim OTP", "error");
         }
       } catch (error) {
         console.error("Error sending OTP:", error);
-        showNotification("Failed to send OTP", "error");
+        showNotification("Gagal mengirim OTP", "error");
       } finally {
         setLoading(verifyEmailBtn, false);
       }
     });
+
     resendOtpBtn.addEventListener("click", async () => {
       try {
         setLoading(resendOtpBtn, true);
@@ -1479,27 +1779,29 @@
         });
         const data = await response.json();
         if (data.success) {
-          showNotification("New OTP sent to your email", "success");
+          showNotification("OTP baru dikirim ke email Anda", "success");
           for (const input of otpInputs) input.value = '';
           otpInlineInput.value = '';
           otpInputs[0].focus();
           otpInlineError.classList.add("hidden");
         } else {
-          showNotification(data.message || "Failed to resend OTP", "error");
+          showNotification(data.message || "Gagal mengirim ulang OTP", "error");
         }
       } catch (error) {
         console.error("Error resending OTP:", error);
-        showNotification("Failed to resend OTP", "error");
+        showNotification("Gagal mengirim ulang OTP", "error");
       } finally {
         setLoading(resendOtpBtn, false);
       }
     });
+
     otpInlineCancelBtn.addEventListener("click", () => {
       otpInlineForm.classList.add("hidden");
       otpInlineInput.value = "";
       for (const input of otpInputs) input.value = '';
       otpInlineError.classList.add("hidden");
     });
+
     otpInlineForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const otp = otpInlineInput.value.trim();
@@ -1519,14 +1821,12 @@
         });
         const data = await response.json();
         if (data.success) {
-          showNotification("Email successfully verified", "success");
+          showNotification("Email berhasil diverifikasi", "success");
           otpInlineForm.classList.add("hidden");
-          otpInlineInput.value = "";
-          for (const input of otpInputs) input.value = '';
           await loadUserData();
         } else {
-          showNotification(data.message || "Invalid OTP", "error");
-          otpInlineError.textContent = data.message || "Invalid OTP";
+          showNotification(data.message || "OTP tidak valid", "error");
+          otpInlineError.textContent = data.message || "OTP tidak valid";
           otpInlineError.classList.remove("hidden");
           otpInputs[0].focus();
           for (const input of otpInputs) {
@@ -1536,17 +1836,140 @@
         }
       } catch (error) {
         console.error("Error verifying OTP:", error);
-        showNotification("Failed to verify OTP", "error");
+        showNotification("Gagal memverifikasi OTP", "error");
       } finally {
         setLoading(otpInlineSubmitBtn, false);
       }
     });
+
     backToDashboardBtn.addEventListener("click", () => {
       window.location.href = "/dashboard";
     });
+
+    ipWhitelistManagementForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const ipsString = ipWhitelistInput.value.trim();
+        const ipsArray = ipsString.split(',').map(ip => ip.trim()).filter(ip => ip.length > 0);
+
+        try {
+            setLoading(saveIpWhitelistBtn, true);
+            const payloadIps = ipsArray.length > 0 ? ipsArray : ['0.0.0.0'];
+
+            const response = await fetch('/profile/whitelist-ip/set', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ips: payloadIps }),
+                credentials: "include"
+            });
+            const data = await response.json();
+            if (data.success) {
+                showNotification('Daftar IP Whitelist berhasil diperbarui', 'success', "ipWhitelistNotification");
+                const updatedIpArrayFromServer = data.whitelistIp || ['0.0.0.0'];
+
+                if (currentUserData) {
+                    currentUserData.whitelistIp = updatedIpArrayFromServer;
+                }
+                renderCurrentIpWhitelist(updatedIpArrayFromServer);
+                ipWhitelistInput.value = updatedIpArrayFromServer.join(', ');
+            } else {
+                showNotification(data.message || 'Gagal memperbarui Daftar IP Whitelist', 'error', "ipWhitelistNotification");
+            }
+        } catch (error) {
+            console.error('Error updating IP Whitelist:', error);
+            showNotification('Gagal memperbarui Daftar IP Whitelist', 'error', "ipWhitelistNotification");
+        } finally {
+            setLoading(saveIpWhitelistBtn, false);
+        }
+    });
+
+    coinAmountInput.addEventListener('input', () => {
+        const coinAmount = parseInt(coinAmountInput.value);
+        if (isNaN(coinAmount) || coinAmount <= 0) {
+            saldoResult.value = formatCurrency(0);
+        } else {
+            const calculatedSaldo = Math.floor(coinAmount / 10);
+            saldoResult.value = formatCurrency(calculatedSaldo);
+        }
+    });
+
+    coinExchangeForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        setLoading(exchangeButton, true);
+
+        const coinAmount = parseInt(coinAmountInput.value);
+
+        if (!coinAmount || isNaN(coinAmount) || coinAmount <= 0) {
+            showNotification("Jumlah coin harus lebih besar dari 0 dan berupa angka", "error", "exchangeNotification");
+            setLoading(exchangeButton, false);
+            return;
+        }
+
+        if (coinAmount % 10 !== 0) {
+            showNotification("Jumlah coin harus kelipatan 10.", "error", "exchangeNotification");
+            setLoading(exchangeButton, false);
+            return;
+        }
+
+        try {
+            const response = await fetch("/exchange/coin-to-saldo", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ coinAmount }),
+                credentials: "include",
+            });
+            const data = await response.json();
+            if (data.success) {
+                showNotification(data.message, "success", "exchangeNotification");
+                if (currentUserData) {
+                    currentUserData.coin = data.data.sisaCoin;
+                    currentUserData.saldo = data.data.totalSaldo;
+                    populateFormAndDetails(currentUserData);
+                    currentCoinExchange.textContent = currentUserData.coin;
+                    currentSaldoExchange.textContent = formatCurrency(currentUserData.saldo);
+                }
+                coinAmountInput.value = '';
+                saldoResult.value = formatCurrency(0);
+            } else {
+                showNotification(data.message || "Gagal melakukan penukaran", "error", "exchangeNotification");
+            }
+        } catch (error) {
+            console.error("Error exchanging coin:", error);
+            showNotification("Terjadi kesalahan saat menukar coin.", "error", "exchangeNotification");
+        } finally {
+            setLoading(exchangeButton, false);
+        }
+    });
+
+    doUpgradeBtn.addEventListener('click', async () => {
+        setLoading(doUpgradeBtn, true);
+        try {
+            const response = await fetch("/upgrade/reseller", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            });
+            const data = await response.json();
+            if (data.success) {
+                showNotification(data.message, "success", "upgradeNotification");
+                if (currentUserData) {
+                    currentUserData.role = data.data.role;
+                    currentUserData.saldo = data.data.sisaSaldo;
+                    populateFormAndDetails(currentUserData);
+                }
+            } else {
+                showNotification(data.message || "Gagal upgrade ke reseller", "error", "upgradeNotification");
+            }
+        } catch (error) {
+            console.error("Error during upgrade:", error);
+            showNotification("Terjadi kesalahan saat mencoba upgrade ke reseller.", "error", "upgradeNotification");
+        } finally {
+            setLoading(doUpgradeBtn, false);
+        }
+    });
+
     document.addEventListener("DOMContentLoaded", () => {
       loadUserData();
-      switchTab("profile");
+      switchTab("profileOverview");
     });
   </script>
 </body>

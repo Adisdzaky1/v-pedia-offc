@@ -13,9 +13,8 @@ const axios = require('axios');
 const path = require('path');
 const app = express();
 
-const ATLAN_API_KEY = 'MDlxwzA4M6SCRU6StAUO0oskykfxOjHSeheeoHUpOkEAhlhr52aRdptTGt7V2jzWGseeAGoLPmwFAL1AU4Jw64BnVx8vnRnmFRG9';
+const ATLAN_API_KEY = process.env.ATLAN_API_KEY; 
 const BASE_URL = 'https://atlantich2h.com';
-const UNTUNG_PERSEN = 100;
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/appdb');
 const db = mongoose.connection;
@@ -35,13 +34,17 @@ const userSchema = new mongoose.Schema({
   isVerified: Boolean,
   lastLogin: Date,
   referralCode: String,
+  whitelistIp: {
+    type: [String],
+  },
   history: [{
     aktivitas: String,
     nominal: Number,
     status: String,
     code: String,
     tanggal: Date
-  }]
+  }],
+  isLocked: { type: Boolean, default: false } 
 });
 
 const User = mongoose.model('User', userSchema);
@@ -125,7 +128,8 @@ app.post('/auth/register', async (req, res) => {
       isVerified: false,
       lastLogin: new Date(),
       referralCode: generateReferralCode(req.body.username),
-      history: []
+      history: [],
+      isLocked: false
     });
 
     await newUser.save();
@@ -196,7 +200,27 @@ app.get('/profile', requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 
-app.get('/docs', requireLogin, (req, res) => {
+app.get('/deposit', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'deposit.html'));
+});
+
+app.get('/price-list', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'price-list.html'));
+});
+
+app.get('/mutation', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'mutation.html'));
+});
+
+app.get('/topup', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'topup.html'));
+});
+
+app.get('/api-key-page', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'api-key-page.html'));
+});
+
+app.get('/docs', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'docs.html'));
 });
 
@@ -244,7 +268,8 @@ app.get('/profile/users', requireLogin, async (req, res) => {
         isVerified: user.isVerified,
         lastLogin: user.lastLogin,
         referralCode: user.referralCode,
-        history: user.history
+        history: user.history,
+        whitelistIp: user.whitelistIp
       }
     });
   } catch (error) {
@@ -256,7 +281,7 @@ app.get('/profile/users', requireLogin, async (req, res) => {
   }
 });
 
-const uploadMemory = multer({ storage: multer.memoryStorage() }); // ⏳ langsung memory
+const uploadMemory = multer({ storage: multer.memoryStorage() }); 
 
 async function CatBox(buffer, originalname) {
   const data = new FormData();
@@ -501,7 +526,7 @@ app.post('/profile/change-fullname', requireLogin, async (req, res) => {
   }
 
   try {
-    user.fullname = newFullname; // Mengubah fullname
+    user.fullname = newFullname; 
     await user.save();
 
     return res.status(200).json({
@@ -640,7 +665,7 @@ app.post('/profile/change-password', requireLogin, async (req, res) => {
   }
 });
 
-app.get('/data/users', async (req, res) => {
+app.get('/data/users', requireAdmin, async (req, res) => {
   try {
     const users = await User.find({}, '-password -__v');
     res.json(users);
@@ -648,6 +673,51 @@ app.get('/data/users', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
+app.post('/admin/verify-user', requireAdmin, async (req, res) => {
+  const { username } = req.body;
+
+  if (!username) {
+    return res.status(400).json({
+      success: false,
+      message: 'Parameter username wajib diisi'
+    });
+  }
+
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User tidak ditemukan'
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'User sudah terverifikasi sebelumnya'
+      });
+    }
+
+    user.isVerified = true;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `User ${username} berhasil diverifikasi`
+    });
+
+  } catch (err) {
+    console.error('Error saat memverifikasi user:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan pada server'
+    });
+  }
+});
+
 
 app.post('/profile/send-verification-otp', requireLogin, async (req, res) => {
   try {
@@ -661,7 +731,7 @@ app.post('/profile/send-verification-otp', requireLogin, async (req, res) => {
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expires = Date.now() + 10 * 60 * 1000; // OTP berlaku selama 10 menit
+    const expires = Date.now() + 10 * 60 * 1000; 
 
     otpStore[`verify-email:${user.email}`] = { otp, expires };
 
@@ -738,105 +808,6 @@ app.post('/profile/verify-email', requireLogin, async (req, res) => {
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
-
-app.post('/check-user', requireLogin, async (req, res) => {
-  const { username } = req.body;
-  if (!username) {
-    return res.status(400).json({ success: false, message: 'Username is required' });
-  }
-  try {
-    const user = await User.findOne({ username }, 'fullname username profileUrl');
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-    return res.status(200).json({
-      success: true,
-      user: {
-        fullname: user.fullname,
-        username: user.username,
-        profileUrl: user.profileUrl
-      }
-    });
-  } catch (error) {
-    console.error('Error checking user:', error);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-});
-
-app.post('/transfer-saldo', requireLogin, async (req, res) => {
-  const { recipientUsername, amount } = req.body;
-  if (!recipientUsername || !amount || amount <= 0) {
-    return res.status(400).json({ success: false, message: 'Invalid recipient or amount' });
-  }
-  try {
-    const sender = await User.findById(req.session.userId);
-    if (!sender) {
-      return res.status(404).json({ success: false, message: 'Sender not found' });
-    }
-    if (sender.saldo < amount) {
-      // Tambahkan history gagal untuk pengirim
-      sender.history.push({
-        aktivitas: 'Transfer',
-        nominal: amount,
-        status: 'Gagal - Insufficient balance',
-        code: 'TRX-FAILED',
-        tanggal: new Date()
-      });
-      await sender.save();
-      return res.status(400).json({ success: false, message: 'Insufficient balance' });
-    }
-    const recipient = await User.findOne({ username: recipientUsername });
-    if (!recipient) {
-      // Tambahkan history gagal untuk pengirim
-      sender.history.push({
-        aktivitas: 'Transfer',
-        nominal: amount,
-        status: 'Gagal - Recipient not found',
-        code: 'TRX-FAILED',
-        tanggal: new Date()
-      });
-      await sender.save();
-      return res.status(404).json({ success: false, message: 'Recipient not found' });
-    }
-
-    const refId = 'TRX-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-    const transactionDate = new Date();
-
-    sender.saldo -= amount;
-    recipient.saldo += amount;
-
-    sender.history.push({
-      aktivitas: `Transfer - From ${sender.username}`,
-      nominal: amount,
-      status: `Sukses`,
-      code: refId,
-      tanggal: transactionDate
-    });
-
-    recipient.history.push({
-      aktivitas: `Receive  - From ${sender.username}`,
-      nominal: amount,
-      status: `Sukses`,
-      code: refId,
-      tanggal: transactionDate
-    });
-
-    await sender.save();
-    await recipient.save();
-
-    return res.status(200).json({
-      success: true,
-      message: 'Transfer successful',
-      newBalance: sender.saldo,
-      referenceId: refId,
-      transactionDate: transactionDate
-    });
-  } catch (error) {
-    console.error('Error transferring saldo:', error);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
-  }
-});
-
 app.get('/history/all', requireLogin, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
@@ -860,47 +831,258 @@ app.get('/history/all', requireLogin, async (req, res) => {
   }
 });
 
-//=====[ PRODUCT ENDPOINT ]=====//
+app.post('/deposit/create', requireLogin, async (req, res) => {
+  try {
+    const { nominal } = req.body;
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    if (!nominal) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter nominal is required'
+      });
+    }
 
-function validateApiKey(req, res, next) {
-  const apiKey = req.query.apikey;
+    const depositAmount = parseInt(nominal);
+    if (isNaN(depositAmount) || depositAmount <= 0) {
+        return res.status(400).json({
+            success: false,
+            message: 'Nominal must be a positive number'
+        });
+    }
 
-  if (!apiKey) {
-    return res.status(400).json({
+    const reff_id = generateReffId();
+    const url = `${BASE_URL}/deposit/create`;
+    const params = new URLSearchParams();
+    params.append("api_key", ATLAN_API_KEY);
+    params.append("reff_id", reff_id);
+    params.append("nominal", depositAmount);
+    params.append("type", "ewallet");
+    params.append("metode", "qrisfast");
+
+    const depositResponse = await axios.post(url, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+    });
+
+    const depositData = depositResponse.data?.data;
+    if (!depositData?.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Failed to create deposit request'
+      });
+    }
+
+
+    res.json({
+      success: true,
+      message: 'Deposit request created',
+      data: {
+        ...depositData,
+        qr_image: depositData.qr_image
+      }
+    });
+
+    const checkDeposit = async () => {
+      const statusUrl = `${BASE_URL}/deposit/status`;
+      const statusParams = new URLSearchParams();
+      statusParams.append("api_key", ATLAN_API_KEY);
+      statusParams.append("id", depositData.id);
+
+      try {
+        const statusResponse = await axios.post(statusUrl, statusParams.toString(), {
+          headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+        });
+
+        const statusData = statusResponse.data?.data;
+        const status = statusData?.status;
+
+        if (status === "success") {
+          let saldoMasuk = parseInt(statusData.get_balance || 0);
+          let coinsEarned = 0;
+          let feePercentage = 0;
+
+          if (user.role === 'user') {
+            feePercentage = 0.02; 
+            coinsEarned = 1;
+          } else if (user.role === 'reseller') {
+            feePercentage = 0.01; 
+            coinsEarned = 2;
+          }
+          
+          const finalSaldo = Math.round(saldoMasuk * (1 - feePercentage)); 
+          user.saldo += finalSaldo;
+          user.coin += coinsEarned;
+
+          user.history.push({
+            aktivitas: 'Deposit',
+            nominal: finalSaldo,
+            status: 'Sukses',
+            code: depositData.id,
+            tanggal: new Date()
+          });
+          await user.save();
+          return;
+        }
+
+        if (status === "failed") {
+          user.history.push({
+            aktivitas: 'Deposit',
+            nominal: depositAmount,
+            status: 'Gagal',
+            code: depositData.id,
+            tanggal: new Date()
+          });
+          await user.save();
+          return;
+        }
+
+        setTimeout(checkDeposit, 5000);
+      } catch (error) {
+        console.error('Error checking deposit status:', error);
+      }
+    };
+
+    checkDeposit();
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
       success: false,
-      message: 'Prameter "apikey" harus di isi'
+      message: 'Internal server error'
     });
   }
+});
 
-  User.findOne({ apiKey })
-    .then(user => {
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          message: 'Invalid API Key'
-        });
-      }
-
-      if (!user.isVerified) {
-        return res.status(403).json({
-          success: false,
-          message: 'Akun belum terverifikasi. Silakan verifikasi akun terlebih dahulu.'
-        });
-      }
-
-      req.user = user;
-      next();
-    })
-    .catch(error => {
-      console.error('Error validating API Key:', error);
-      return res.status(500).json({
+app.post('/deposit/status', requireLogin, async (req, res) => {
+  try {
+    const { trxid } = req.body;
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({
         success: false,
-        message: 'Internal server error'
+        message: 'User not found'
       });
-    });
-}
+    }
+    if (!trxid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter trxid is required'
+      });
+    }
 
-app.get('/h2h/categori', validateApiKey, async (req, res) => {
+    const url = `${BASE_URL}/deposit/status`;
+    const params = new URLSearchParams();
+    params.append("api_key", ATLAN_API_KEY);
+    params.append("id", trxid);
+
+    const statusResponse = await axios.post(url, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+    });
+
+    const statusData = statusResponse.data?.data;
+    if (!statusData) {
+      return res.status(404).json({
+        success: false,
+        message: 'Data not found from external server'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Deposit status found',
+      data: {
+        trxid: statusData.reff_id,
+        status: statusData.status,
+        saldo_masuk: statusData.get_balance || 0
+      }
+    });
+  } catch (error) {
+    console.error('Error checking deposit status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+app.post('/deposit/cancel', requireLogin, async (req, res) => {
+  try {
+    const { trxid } = req.body;
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    if (!trxid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter trxid is required'
+      });
+    }
+
+    const url = `${BASE_URL}/deposit/cancel`;
+    const params = new URLSearchParams();
+    params.append("api_key", ATLAN_API_KEY);
+    params.append("id", trxid);
+
+    const cancelResponse = await axios.post(url, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+    });
+
+    const cancelData = cancelResponse.data?.data;
+    if (!cancelData) {
+      return res.status(404).json({
+        success: false,
+        message: 'Data not found from external server'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Deposit successfully canceled',
+      data: {
+        trxid: cancelData.id,
+        status: cancelData.status,
+        created_at: cancelData.created_at
+      }
+    });
+  } catch (error) {
+    console.error('Error canceling deposit:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+
+app.post('/api/categori', requireLogin, async (req, res) => {
   try {
     const url = `${BASE_URL}/layanan/price_list`;
 
@@ -908,18 +1090,16 @@ app.get('/h2h/categori', validateApiKey, async (req, res) => {
     params.append("api_key", ATLAN_API_KEY);
     params.append("type", "prabayar");
 
-    const response = await fetch(url, {
-      method: 'POST',
+    const response = await axios.post(url, params.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
         'Accept-Language': 'en-US,en;q=0.9',
         'Referer': url,
       },
-      body: params
     });
 
-    const data = await response.json();
+    const data = response.data;
 
     if (!data.status) {
       return res.status(500).json({
@@ -942,10 +1122,714 @@ app.get('/h2h/categori', validateApiKey, async (req, res) => {
     console.error('Error:', error);
     res.status(500).json({
       success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+app.post('/api/providers', requireLogin, async (req, res) => {
+  try {
+    const url = `${BASE_URL}/layanan/price_list`;
+
+    const params = new URLSearchParams();
+    params.append("api_key", ATLAN_API_KEY);
+    params.append("type", "prabayar");
+
+    const response = await axios.post(url, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+    });
+
+    const data = response.data;
+
+    if (!data.status) {
+      return res.status(500).json({
+        success: false,
+        message: 'Server maintenance',
+        maintenance: true,
+        ip_message: data.message.replace(/[^0-9.]+/g, '')
+      });
+    }
+
+    const providers = [...new Set(data.data.map(item => item.provider))];
+
+    res.json({
+      success: true,
+      data: providers,
+      message: 'Data provider berhasil didapatkan'
+    });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+      success: false,
       message: 'Terjadi kesalahan pada server'
     });
   }
 });
+
+app.post('/api/price-list', requireLogin, async (req, res) => {
+  try {
+    const { category, provider } = req.body;
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const url = `${BASE_URL}/layanan/price_list`;
+
+    const params = new URLSearchParams();
+    params.append("api_key", ATLAN_API_KEY);
+    params.append("type", "prabayar");
+
+    const response = await axios.post(url, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+    });
+
+    const result = response.data;
+
+    if (!result.status) {
+      throw new Error('Server maintenance');
+    }
+
+    let data = result.data || [];
+
+    data.sort(regeXcomp);
+
+    if (category) {
+      data = data.filter(i => 
+        i.category && i.category.toLowerCase() === category.toLowerCase()
+      );
+    }
+
+    if (provider) {
+      data = data.filter(i =>
+        i.provider && i.provider.toLowerCase() === provider.toLowerCase()
+      );
+    }
+
+    const priceMarkup = user.role === 'user' ? 0.08 : (user.role === 'reseller' ? 0.04 : 0);
+
+    const formattedData = data.map(i => {
+      const cleanPrice = Number(i.price.toString().replace(/[^0-9.-]+/g, ""));
+      const finalPrice = Math.round(cleanPrice * (1 + priceMarkup));
+      return {
+        code: i.code,
+        name: i.name,
+        category: i.category,
+        type: i.type,
+        provider: i.provider,
+        brand_status: i.brand_status,
+        note: i.note,
+        status: i.status,
+        img_url: i.img_url,
+        final_price: finalPrice,
+        price_formatted: `Rp ${toRupiah(finalPrice)}`,
+        status_emoji: i.status === "available" ? "✅" : "❎"
+      };
+    });
+
+    res.json({
+      success: true,
+      data: formattedData,
+      message: 'Data produk berhasil didapatkan'
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Terjadi kesalahan pada server'
+    });
+  }
+});
+
+app.post("/order/create", requireLogin, async (req, res) => {
+  try {
+    const { code, target } = req.body; 
+    const user = await User.findById(req.session.userId); 
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    if (!code) {
+      return res.status(400).json({
+        success: false,
+        message: "Code produk harus diisi",
+      });
+    }
+
+    if (!target) {
+      return res.status(400).json({
+        success: false,
+        message: "Target harus diisi",
+      });
+    }
+
+    const priceListUrl = `${BASE_URL}/layanan/price_list`;
+    const priceParams = new URLSearchParams();
+    priceParams.append("api_key", ATLAN_API_KEY);
+    priceParams.append("type", "prabayar");
+
+    const priceResponse = await axios.post(priceListUrl, priceParams.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': priceListUrl,
+      },
+    });
+
+    if (!priceResponse.data.status) {
+      return res.status(500).json({
+        success: false,
+        message: "Server maintenance",
+        maintenance: true,
+        ip_message: priceResponse.data.message.replace(/[^0-9.]+/g, ""),
+      });
+    }
+
+    const product = priceResponse.data.data.find((item) => item.code === code);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Produk tidak ditemukan",
+      });
+    }
+
+    const productPrice = parseInt(product.price);
+    const priceMarkup = user.role === 'user' ? 0.08 : (user.role === 'reseller' ? 0.04 : 0);
+    const hargaTotal = Math.round(productPrice * (1 + priceMarkup));
+
+    if (user.saldo < hargaTotal) {
+      user.history.push({
+        aktivitas: "Order",
+        nominal: hargaTotal,
+        status: "Gagal - Saldo tidak mencukupi",
+        code: generateReffId(),
+        tanggal: new Date(),
+      });
+      await user.save();
+      return res.status(400).json({
+        success: false,
+        message: "Saldo tidak mencukupi",
+      });
+    }
+
+    const reff_id = generateReffId();
+    const createTransactionUrl = `${BASE_URL}/transaksi/create`;
+    const transactionParams = new URLSearchParams();
+    transactionParams.append("api_key", ATLAN_API_KEY);
+    transactionParams.append("code", code);
+    transactionParams.append("reff_id", reff_id);
+    transactionParams.append("target", target);
+
+    const transactionResponse = await axios.post(
+      createTransactionUrl,
+      transactionParams.toString(),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "User-Agent": "MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)",
+          "Accept-Language": "en-US,en;q=0.9",
+          "Referer": createTransactionUrl,
+        },
+      }
+    );
+
+    const trx = transactionResponse.data?.data;
+    if (!trx?.id || !trx?.price) {
+      user.history.push({
+        aktivitas: "Order",
+        nominal: hargaTotal,
+        status: "Gagal - Data transaksi tidak lengkap",
+        code: reff_id,
+        tanggal: new Date(),
+      });
+      await user.save();
+      return res.status(500).json({
+        success: false,
+        message: "Gagal membuat transaksi: ID atau harga kosong",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Transaksi berhasil dibuat",
+      data: {
+        ...trx,
+        price: hargaTotal,
+      },
+    });
+
+    const checkStatus = async () => {
+      const statusUrl = `${BASE_URL}/transaksi/status`;
+      const statusParams = new URLSearchParams();
+      statusParams.append("api_key", ATLAN_API_KEY);
+      statusParams.append("id", trx.id);
+      statusParams.append("type", "prabayar");
+
+      const statusResponse = await axios.post(statusUrl, statusParams.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Referer': statusUrl,
+        },
+      });
+
+      const status = statusResponse.data.data?.status;
+
+      if (status === "success") {
+        user.saldo -= hargaTotal;
+        user.history.push({
+          aktivitas: `Order - ${product.name} (${code}) - ${target}`,
+          nominal: hargaTotal,
+          status: "Sukses",
+          code: trx.id,
+          tanggal: new Date(),
+        });
+        await user.save();
+        return;
+      }
+
+      if (status === "failed") {
+        user.history.push({
+          aktivitas: `Order - ${product.name} (${code}) - ${target}`,
+          nominal: hargaTotal,
+          status: "Gagal",
+          code: trx.id,
+          tanggal: new Date(),
+        });
+        await user.save();
+        return;
+      }
+
+      setTimeout(checkStatus, 5000);
+    };
+
+    checkStatus();
+  } catch (error) {
+    console.error("Error:", error.response?.data || error.message);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan pada server",
+    });
+  }
+});
+
+app.get("/order/check", requireLogin, async (req, res) => {
+  try {
+    const { trxid } = req.query;
+    const user = await User.findById(req.session.userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!trxid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter "trxid" harus diisi',
+      });
+    }
+
+    const statusUrl = `${BASE_URL}/transaksi/status`;
+    const statusParams = new URLSearchParams();
+    statusParams.append("api_key", ATLAN_API_KEY);
+    statusParams.append("id", trxid);
+    statusParams.append("type", "prabayar");
+
+    const response = await axios.post(statusUrl, statusParams.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': statusUrl,
+      },
+    });
+
+    const status = response.data?.data?.status;
+
+    if (!status) {
+      return res.status(404).json({
+        success: false,
+        message: "Transaksi tidak ditemukan atau gagal mendapatkan status",
+      });
+    }
+
+    let statusMessage;
+    if (status === "success") {
+      statusMessage = "Transaksi berhasil";
+    } else if (status === "pending") {
+      statusMessage = "Transaksi sedang diproses";
+    } else if (status === "failed") {
+      statusMessage = "Transaksi gagal";
+    } else {
+      statusMessage = "Status transaksi tidak diketahui";
+    }
+
+    res.json({
+      success: true,
+      message: statusMessage,
+      data: {
+        trxid: trxid,
+        status: status,
+      },
+    });
+  } catch (error) {
+    console.error("Error:", error.response?.data || error.message);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan pada server",
+    });
+  }
+});
+
+async function getServerPublicIp() {
+  try {
+    const response = await axios.get('https://api.ipify.org?format=json');
+    return response.data.ip;
+  } catch (error) {
+    return null;
+  }
+}
+
+function validateApiKey(req, res, next) {
+  const apiKey = req.query.apikey;
+
+  if (!apiKey) {
+    return res.status(400).json({
+      success: false,
+      message: 'Parameter "apikey" harus diisi',
+    });
+  }
+
+  User.findOne({ apiKey })
+    .then(async (user) => {
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid API Key",
+        });
+      }
+
+      if (user.isLocked) {
+        return res.status(429).json({
+          success: false,
+          message: "Anda harus menunggu 5 detik sebelum melakukan request lagi.",
+        });
+      }
+
+      user.isLocked = true;
+      await user.save();
+
+      const requestIp =
+        req.headers['x-forwarded-for']?.split(',').shift().trim() ||
+        req.ip ||
+        req.connection.remoteAddress;
+
+      const detectedIp = ['::1', '127.0.0.1'].includes(requestIp)
+        ? await getServerPublicIp()
+        : requestIp;
+
+      const whitelistIpArray = Array.isArray(user.whitelistIp)
+        ? user.whitelistIp
+        : user.whitelistIp.split(',').map(ip => ip.trim());
+
+      if (whitelistIpArray.length > 0 && !whitelistIpArray.includes('0.0.0.0')) {
+        if (!detectedIp || !whitelistIpArray.includes(detectedIp)) {
+          user.isLocked = false;
+          await user.save();
+          return res.status(403).json({
+            success: false,
+            message: "IP Anda saat ini tidak diizinkan untuk menggunakan API Key ini.",
+            your_ip: detectedIp
+          });
+        }
+      }
+
+      setTimeout(async () => {
+        try {
+          if (!user.isVerified) {
+            user.isLocked = false;
+            await user.save();
+            return res.status(403).json({
+              success: false,
+              message: "Akun belum terverifikasi. Silakan verifikasi akun terlebih dahulu.",
+            });
+          }
+
+          req.user = user;
+          next();
+        } catch (error) {
+          console.error("Error during API Key validation timeout:", error);
+          user.isLocked = false;
+          await user.save();
+          return res.status(500).json({
+            success: false,
+            message: "Internal server error during validation",
+          });
+        } finally {
+          user.isLocked = false;
+          try {
+            await user.save();
+          } catch (saveError) {
+            console.error("Error saving user after unlocking in validateApiKey:", saveError);
+          }
+        }
+      }, 5000);
+    })
+    .catch((error) => {
+      console.error("Error validating API Key (DB query):", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    });
+}
+
+const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+function isValidIp(ip) {
+  return ip === '0.0.0.0' || ipRegex.test(ip);
+}
+
+app.post('/profile/whitelist-ip/add', requireLogin, async (req, res) => {
+  const { ip } = req.body;
+
+  if (!ip) {
+    return res.status(400).json({ success: false, message: 'Alamat IP diperlukan' });
+  }
+
+  if (!isValidIp(ip)) {
+    return res.status(400).json({ success: false, message: 'Format alamat IP tidak valid' });
+  }
+
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+    }
+
+    if (user.whitelistIp.includes('0.0.0.0') && ip !== '0.0.0.0' && user.whitelistIp.length === 1) {
+      user.whitelistIp = [];
+    }
+
+    if (user.whitelistIp.includes(ip)) {
+      return res.status(400).json({ success: false, message: 'Alamat IP sudah ada di whitelist' });
+    }
+
+    user.whitelistIp.push(ip);
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Alamat IP berhasil ditambahkan ke whitelist',
+      whitelistIp: user.whitelistIp
+    });
+
+  } catch (error) {
+    console.error('Error adding IP to whitelist:', error);
+    return res.status(500).json({ success: false, message: 'Kesalahan server internal' });
+  }
+});
+
+app.post('/profile/whitelist-ip/remove', requireLogin, async (req, res) => {
+  const { ip } = req.body;
+
+  if (!ip) {
+    return res.status(400).json({ success: false, message: 'Alamat IP diperlukan' });
+  }
+
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+    }
+
+    const index = user.whitelistIp.indexOf(ip);
+    if (index === -1) {
+      return res.status(400).json({ success: false, message: 'Alamat IP tidak ditemukan di whitelist' });
+    }
+
+    user.whitelistIp.splice(index, 1);
+
+    if (user.whitelistIp.length === 0) {
+      user.whitelistIp.push('0.0.0.0');
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Alamat IP berhasil dihapus dari whitelist',
+      whitelistIp: user.whitelistIp
+    });
+
+  } catch (error) {
+    console.error('Error removing IP from whitelist:', error);
+    return res.status(500).json({ success: false, message: 'Kesalahan server internal' });
+  }
+});
+
+app.post('/profile/whitelist-ip/set', requireLogin, async (req, res) => {
+  const { ips } = req.body;
+
+  if (!Array.isArray(ips)) {
+    return res.status(400).json({ success: false, message: 'Input "ips" harus berupa array' });
+  }
+
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+    }
+
+    if (ips.length === 0) {
+      user.whitelistIp = ['0.0.0.0'];
+    } else {
+      for (const singleIp of ips) {
+        if (typeof singleIp !== 'string' || !isValidIp(singleIp)) {
+          return res.status(400).json({ success: false, message: `Format alamat IP tidak valid: ${singleIp}` });
+        }
+      }
+      const uniqueIps = [...new Set(ips)];
+      user.whitelistIp = uniqueIps;
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Whitelist IP berhasil diatur ulang',
+      whitelistIp: user.whitelistIp
+    });
+
+  } catch (error) {
+    console.error('Error setting IP whitelist:', error);
+    return res.status(500).json({ success: false, message: 'Kesalahan server internal' });
+  }
+});
+
+app.get("/h2h/profile", validateApiKey, async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const userData = {
+      fullname: user.fullname,
+      username: user.username,
+      nomor: user.nomor,
+      email: user.email,
+      profileUrl: user.profileUrl,
+      saldo: user.saldo,
+      coin: user.coin,
+      apiKey: user.apiKey,
+      tanggalDaftar: user.tanggalDaftar,
+      role: user.role,
+      isVerified: user.isVerified,
+      lastLogin: user.lastLogin,
+      referralCode: user.referralCode,
+      history: user.history.slice(-5).reverse(),
+    };
+
+    res.json({
+      success: true,
+      message: "Profile data retrieved successfully",
+      data: userData,
+    });
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+});
+
+app.get("/h2h/mutasi", validateApiKey, async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      history: user.history,
+    });
+  } catch (error) {
+    console.error("Error fetching history:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+});
+
+app.get('/h2h/categori', validateApiKey, async (req, res) => {
+  try {
+    const url = `${BASE_URL}/layanan/price_list`;
+
+    const params = new URLSearchParams();
+    params.append("api_key", ATLAN_API_KEY);
+    params.append("type", "prabayar");
+
+    const response = await axios.post(url, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
+    });
+
+    const data = response.data;
+
+    if (!data.status) {
+      return res.status(500).json({
+        success: false,
+        message: 'Server maintenance',
+        maintenance: true,
+        ip_message: data.message.replace(/[^0-9.]+/g, '')
+      });
+    }
+
+    const categories = [...new Set(data.data.map(item => item.category))];
+
+    res.json({
+      success: true,
+      data: categories,
+      message: 'Data kategori berhasil didapatkan'
+    });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
 
 app.get('/h2h/providers', validateApiKey, async (req, res) => {
   try {
@@ -955,18 +1839,16 @@ app.get('/h2h/providers', validateApiKey, async (req, res) => {
     params.append("api_key", ATLAN_API_KEY);
     params.append("type", "prabayar");
 
-    const response = await fetch(url, {
-      method: 'POST',
+    const response = await axios.post(url, params.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
         'Accept-Language': 'en-US,en;q=0.9',
         'Referer': url,
       },
-      body: params
     });
 
-    const data = await response.json();
+    const data = response.data;
 
     if (!data.status) {
       return res.status(500).json({
@@ -997,6 +1879,7 @@ app.get('/h2h/providers', validateApiKey, async (req, res) => {
 app.get('/h2h/price-list', validateApiKey, async (req, res) => {
   try {
     const { category, provider } = req.query;
+    const user = req.user;
 
     const url = `${BASE_URL}/layanan/price_list`;
 
@@ -1004,18 +1887,16 @@ app.get('/h2h/price-list', validateApiKey, async (req, res) => {
     params.append("api_key", ATLAN_API_KEY);
     params.append("type", "prabayar");
 
-    const response = await fetch(url, {
-      method: 'POST',
+    const response = await axios.post(url, params.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
         'Accept-Language': 'en-US,en;q=0.9',
         'Referer': url,
       },
-      body: params
     });
 
-    const result = await response.json();
+    const result = response.data;
 
     if (!result.status) {
       throw new Error('Server maintenance');
@@ -1023,25 +1904,25 @@ app.get('/h2h/price-list', validateApiKey, async (req, res) => {
 
     let data = result.data || [];
 
-    // Sort by price ascending
     data.sort(regeXcomp);
 
-    // Filter by category if provided
     if (category) {
       data = data.filter(i => 
         i.category && i.category.toLowerCase() === category.toLowerCase()
       );
     }
 
-    // Filter by provider if provided
     if (provider) {
       data = data.filter(i =>
         i.provider && i.provider.toLowerCase() === provider.toLowerCase()
       );
     }
 
+    const priceMarkup = user.role === 'user' ? 0.08 : (user.role === 'reseller' ? 0.04 : 0);
+
     const formattedData = data.map(i => {
-      const finalPrice = calculateFinalPrice(i.price);
+      const cleanPrice = Number(i.price.toString().replace(/[^0-9.-]+/g, ""));
+      const finalPrice = Math.round(cleanPrice * (1 + priceMarkup));
       return {
         code: i.code,
         name: i.name,
@@ -1050,7 +1931,7 @@ app.get('/h2h/price-list', validateApiKey, async (req, res) => {
         provider: i.provider,
         brand_status: i.brand_status,
         status: i.status,
-        img_url: customImageUrl,
+        img_url: i.img_url,
         final_price: finalPrice,
         price_formatted: `Rp ${toRupiah(finalPrice)}`,
         status_emoji: i.status === "available" ? "✅" : "❎"
@@ -1080,129 +1961,9 @@ const regeXcomp = (a, b) => {
   return aPrice - bPrice;
 };
 
-const calculateFinalPrice = (price) => {
-  const cleanPrice = Number(price.toString().replace(/[^0-9.-]+/g, ""));
-  const markup = cleanPrice * 0.02; // 2% dari harga
-  return Math.round(cleanPrice + markup); // dibulatkan biar rapi
-};
-
-
 const toRupiah = (value) => {
   return value.toLocaleString('id-ID');
 };
-
-const getProductsByProvider = async (provider) => {
-  const url = `${BASE_URL}/layanan/price_list`;
-
-  const params = new URLSearchParams();
-  params.append("api_key", ATLAN_API_KEY);
-  params.append("type", "prabayar");
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept-Language': 'en-US,en;q=0.9',
-      'Referer': url,
-    },
-    body: params
-  });
-
-  const data = await response.json();
-  
-  if (!data.status) {
-    throw new Error('Server maintenance');
-  }
-
-  data.data.sort(regeXcomp);
-
-  return data.data
-    .filter(i => i.provider === provider)
-    .map(i => {
-      const finalPrice = calculateFinalPrice(i.price);
-      return {
-        code: i.code,
-        name: i.name,
-        category: i.category,
-        type: i.type,
-        provider: i.provider,
-        brand_status: i.brand_status,
-        status: i.status,
-        img_url: customImageUrl,
-        final_price: finalPrice,
-        price_formatted: `Rp ${toRupiah(finalPrice)}`,
-        status_emoji: i.status === "available" ? "✅" : "❎"
-      };
-    });
-};
-
-app.get('/h2h/ewalet/dana', validateApiKey, async (req, res) => {
-  try {
-    const danaProducts = await getProductsByProvider("DANA");
-    res.json({
-      success: true,
-      data: danaProducts,
-      message: 'Data produk DANA berhasil didapatkan'
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Terjadi kesalahan pada server'
-    });
-  }
-});
-
-app.get('/h2h/ewalet/ovo', validateApiKey, async (req, res) => {
-  try {
-    const ovoProducts = await getProductsByProvider("OVO");
-    res.json({
-      success: true,
-      data: ovoProducts,
-      message: 'Data produk OVO berhasil didapatkan'
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Terjadi kesalahan pada server'
-    });
-  }
-});
-
-app.get('/h2h/ewalet/gopay', validateApiKey, async (req, res) => {
-  try {
-    const gopayProducts = await getProductsByProvider("GO PAY");
-    res.json({
-      success: true,
-      data: gopayProducts,
-      message: 'Data produk Gopay berhasil didapatkan'
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Terjadi kesalahan pada server'
-    });
-  }
-});
-
-app.get('/h2h/game/mobile-legends', validateApiKey, async (req, res) => {
-  const result = await fetchProducts('MOBILE LEGENDS');
-  if (result.success === false) {
-    return res.status(500).json(result);
-  }
-  res.json({ success: true, data: result, message: 'Data produk MOBILE LEGENDS berhasil didapatkan' });
-});
-
-app.get('/h2h/game/free-fire', validateApiKey, async (req, res) => {
-  const result = await fetchProducts('FREE FIRE');
-  if (result.success === false) {
-    return res.status(500).json(result);
-  }
-  res.json({ success: true, data: result, message: 'Data produk Free Fire berhasil didapatkan' });
-});
 
 app.get('/h2h/order/create', validateApiKey, async (req, res) => {
   try {
@@ -1225,15 +1986,16 @@ app.get('/h2h/order/create', validateApiKey, async (req, res) => {
 
     const priceListUrl = `${BASE_URL}/layanan/price_list`;
 
-    // Fetch harga produk
     const priceParams = new URLSearchParams();
     priceParams.append("api_key", ATLAN_API_KEY);
     priceParams.append("type", "prabayar");
 
-    const priceResponse = await axios.post(priceListUrl, priceParams, {
+    const priceResponse = await axios.post(priceListUrl, priceParams.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': req.originalUrl
       }
     });
 
@@ -1255,7 +2017,8 @@ app.get('/h2h/order/create', validateApiKey, async (req, res) => {
     }
 
     const productPrice = parseInt(product.price);
-    const hargaTotal = Math.round(productPrice * 1.02); // naik 2%
+    const priceMarkup = user.role === 'user' ? 0.08 : (user.role === 'reseller' ? 0.04 : 0);
+    const hargaTotal = Math.round(productPrice * (1 + priceMarkup));
 
     if (user.saldo < hargaTotal) {
       user.history.push({
@@ -1281,10 +2044,12 @@ app.get('/h2h/order/create', validateApiKey, async (req, res) => {
     transactionParams.append("reff_id", reff_id);
     transactionParams.append("target", target);
 
-    const transactionResponse = await axios.post(createTransactionUrl, transactionParams, {
+    const transactionResponse = await axios.post(createTransactionUrl, transactionParams.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': req.originalUrl
       }
     });
 
@@ -1320,42 +2085,39 @@ app.get('/h2h/order/create', validateApiKey, async (req, res) => {
       statusParams.append("id", trx.id);
       statusParams.append("type", "prabayar");
 
-      const statusResponse = await axios.post(statusUrl, statusParams, {
+      const statusResponse = await axios.post(statusUrl, statusParams.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        }
+          'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Referer': statusUrl,
+        },
       });
 
       const status = statusResponse.data.data?.status;
 
       if (status === "success") {
         user.saldo -= hargaTotal;
-        if (user.role === 'agen') {
-          user.coin += Math.floor(hargaTotal * 0.01);
-        }
         user.history.push({
-          aktivitas: `Order - ${code} - ${target}`,
+          aktivitas: `Order - ${product.name} (${code}) - ${target}`,
           nominal: hargaTotal,
           status: 'Sukses',
           code: trx.id,
           tanggal: new Date()
         });
         await user.save();
-        console.log(`✅ Transaksi ${trx.id} sukses dan saldo dipotong`);
         return;
       }
 
       if (status === "failed") {
         user.history.push({
-          aktivitas: `Order - ${code} - ${target}`,
+          aktivitas: `Order - ${product.name} (${code}) - ${target}`,
           nominal: hargaTotal,
           status: 'Gagal',
           code: trx.id,
           tanggal: new Date()
         });
         await user.save();
-        console.log(`❌ Transaksi ${trx.id} gagal`);
         return;
       }
 
@@ -1365,7 +2127,7 @@ app.get('/h2h/order/create', validateApiKey, async (req, res) => {
     checkStatus();
 
   } catch (error) {
-    console.error('❌ Error:', error.response?.data || error.message);
+    console.error('Error:', error.response?.data || error.message);
     res.status(500).json({
       success: false,
       message: 'Terjadi kesalahan pada server'
@@ -1402,12 +2164,13 @@ app.get('/h2h/order/check', async (req, res) => {
     statusParams.append("id", trxid);
     statusParams.append("type", "prabayar");
 
-    // Menggunakan axios untuk mendapatkan status transaksi
-    const response = await axios.post(statusUrl, statusParams, {
+    const response = await axios.post(statusUrl, statusParams.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      }
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': statusUrl,
+      },
     });
 
     const status = response.data?.data?.status;
@@ -1440,7 +2203,7 @@ app.get('/h2h/order/check', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error:', error.response?.data || error.message);
+    console.error('Error:', error.response?.data || error.message);
     res.status(500).json({
       success: false,
       message: 'Terjadi kesalahan pada server'
@@ -1461,20 +2224,8 @@ async function uploadToCloudMini(buffer, fileName) {
           expired: expiry_time
       };
   } catch (err) {
-      console.error('🚫 Upload to CloudMini Failed:', err);
+      console.error('Upload to CloudMini Failed:', err);
       throw err;
-  }
-}
-
-async function generateQRAndUpload(data) {
-  try {
-      const qrBuffer = await qrcode.toBuffer(data, { type: 'png' });
-      const filename = `v-pedia-${Math.random().toString(36).substring(2, 8)}.png`;
-      const { url } = await uploadToCloudMini(qrBuffer, filename);
-      return url;
-  } catch (error) {
-      console.error('❌ Error saat membuat/upload QR:', error);
-      throw error;
   }
 }
 
@@ -1490,21 +2241,31 @@ app.get('/h2h/deposit/create', validateApiKey, async (req, res) => {
           });
       }
 
+      const depositAmount = parseInt(nominal);
+      if (isNaN(depositAmount) || depositAmount <= 0) {
+          return res.status(400).json({
+              success: false,
+              message: 'Nominal must be a positive number'
+          });
+      }
+
       const reff_id = generateReffId();
       const url = `${BASE_URL}/deposit/create`;
 
       const params = new URLSearchParams();
       params.append("api_key", ATLAN_API_KEY);
       params.append("reff_id", reff_id);
-      params.append("nominal", nominal);
+      params.append("nominal", depositAmount);
       params.append("type", "ewallet");
       params.append("metode", "qrisfast");
 
       const depositResponse = await axios.post(url, params.toString(), {
           headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-          }
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': url,
+          },
       });
 
       const depositData = depositResponse.data?.data;
@@ -1514,15 +2275,13 @@ app.get('/h2h/deposit/create', validateApiKey, async (req, res) => {
               message: 'Gagal membuat permintaan deposit'
           });
       }
-
-      const qrUrl = await generateQRAndUpload(depositData.qr_string);
-
+    
       res.json({
           success: true,
           message: 'Permintaan deposit dibuat',
           data: {
               ...depositData,
-              qr_image: qrUrl
+              qr_image: depositData.qr_image
           }
       });
 
@@ -1532,51 +2291,69 @@ app.get('/h2h/deposit/create', validateApiKey, async (req, res) => {
           statusParams.append("api_key", ATLAN_API_KEY);
           statusParams.append("id", depositData.id);
 
-          const statusResponse = await axios.post(statusUrl, statusParams.toString(), {
-              headers: {
+          try {
+            const statusResponse = await axios.post(statusUrl, statusParams.toString(), {
+                headers: {
                   'Content-Type': 'application/x-www-form-urlencoded',
-                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-              }
-          });
+                  'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+                  'Accept-Language': 'en-US,en;q=0.9',
+                  'Referer': url,
+                },
+            });
 
-          const statusData = statusResponse.data?.data;
-          const status = statusData?.status;
+            const statusData = statusResponse.data?.data;
+            const status = statusData?.status;
 
-          if (status === "success") {
-              const saldoMasuk = parseInt(statusData.get_balance || 0);
-              user.saldo += saldoMasuk;
-              user.history.push({
-                  aktivitas: 'Deposit',
-                  nominal: saldoMasuk,
-                  status: 'Sukses',
-                  code: depositData.id,
-                  tanggal: new Date()
-              });
-              await user.save();
-              console.log(`✅ Deposit sukses: ${saldoMasuk} untuk ${user.username}`);
-              return;
+            if (status === "success") {
+                let saldoMasuk = parseInt(statusData.get_balance || 0);
+                let coinsEarned = 0;
+                let feePercentage = 0;
+
+                if (user.role === 'user') {
+                  feePercentage = 0.02; 
+                  coinsEarned = 1;
+                } else if (user.role === 'reseller') {
+                  feePercentage = 0.01; 
+                  coinsEarned = 2;
+                }
+                
+                const finalSaldo = Math.round(saldoMasuk * (1 - feePercentage)); 
+                user.saldo += finalSaldo;
+                user.coin += coinsEarned;
+
+                user.history.push({
+                    aktivitas: 'Deposit (H2H)',
+                    nominal: finalSaldo,
+                    status: 'Sukses',
+                    code: depositData.id,
+                    tanggal: new Date()
+                });
+                await user.save();
+                return;
+            }
+
+            if (status === "failed") {
+                user.history.push({
+                    aktivitas: 'Deposit (H2H)',
+                    nominal: depositAmount,
+                    status: 'Gagal',
+                    code: depositData.id,
+                    tanggal: new Date()
+                });
+                await user.save();
+                return;
+            }
+
+            setTimeout(checkDeposit, 5000);
+          } catch (error) {
+            console.error('Error checking H2H deposit status:', error);
           }
-
-          if (status === "failed") {
-              user.history.push({
-                  aktivitas: 'Deposit',
-                  nominal: parseInt(nominal),
-                  status: 'Gagal',
-                  code: depositData.id,
-                  tanggal: new Date()
-              });
-              await user.save();
-              console.log(`❌ Deposit gagal untuk ${user.username}`);
-              return;
-          }
-
-          setTimeout(checkDeposit, 5000);
       };
 
       checkDeposit();
 
   } catch (error) {
-      console.error('❌ Error:', error);
+      console.error('Error:', error);
       res.status(500).json({
           success: false,
           message: 'Terjadi kesalahan pada server'
@@ -1586,7 +2363,6 @@ app.get('/h2h/deposit/create', validateApiKey, async (req, res) => {
 
 app.get('/h2h/deposit/status', validateApiKey, async (req, res) => {
   const { trxid } = req.query;
-  const user = req.user;
 
   if (!trxid) {
     return res.status(400).json({
@@ -1601,12 +2377,13 @@ app.get('/h2h/deposit/status', validateApiKey, async (req, res) => {
     params.append("api_key", ATLAN_API_KEY);
     params.append("id", trxid);
 
-    // Menggunakan axios untuk mengirim permintaan status deposit
     const statusResponse = await axios.post(url, params.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
     });
 
     const statusData = statusResponse.data?.data;
@@ -1628,7 +2405,7 @@ app.get('/h2h/deposit/status', validateApiKey, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error saat cek status deposit:', error);
+    console.error('Error saat cek status deposit:', error);
     res.status(500).json({
       success: false,
       message: 'Terjadi kesalahan pada server'
@@ -1638,7 +2415,6 @@ app.get('/h2h/deposit/status', validateApiKey, async (req, res) => {
 
 app.get('/h2h/deposit/cancel', validateApiKey, async (req, res) => {
   const { trxid } = req.query;
-  const user = req.user;
 
   if (!trxid) {
     return res.status(400).json({
@@ -1653,12 +2429,13 @@ app.get('/h2h/deposit/cancel', validateApiKey, async (req, res) => {
     params.append("api_key", ATLAN_API_KEY);
     params.append("id", trxid);
 
-    // Menggunakan axios untuk mengirim permintaan cancel deposit
     const cancelResponse = await axios.post(url, params.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
+        'User-Agent': 'MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': url,
+      },
     });
 
     const cancelData = cancelResponse.data?.data;
@@ -1680,9 +2457,8 @@ app.get('/h2h/deposit/cancel', validateApiKey, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error saat membatalkan deposit:', error);
+    console.error('Error saat membatalkan deposit:', error);
     
-    // Handle error response dari API eksternal jika ada
     if (error.response && error.response.data) {
       return res.status(error.response.status || 500).json({
         success: false,
@@ -1693,6 +2469,371 @@ app.get('/h2h/deposit/cancel', validateApiKey, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Terjadi kesalahan pada server'
+    });
+  }
+});
+
+app.post("/api/v1/buy-panel", validateApiKey, async (req, res) => {
+  const { username, paket } = req.body; 
+  const user = req.user; 
+
+  const availablePackets = ["1gb", "2gb", "3gb", "4gb", "5gb", "6gb", "7gb", "8gb", "9gb", "10gb", "unli"];
+
+  if (!username) {
+    return res.status(400).json({
+      success: false,
+      message: "Parameter 'username' harus diisi",
+    });
+  }
+  if (!paket || !availablePackets.includes(paket.toLowerCase())) {
+    return res.status(400).json({
+      success: false,
+      message: `Paket tidak valid. Paket yang tersedia: ${availablePackets.join(", ")}`,
+    });
+  }
+
+  let memo, disk, cpu, harga;
+  switch (paket.toLowerCase()) {
+    case "1gb":
+      memo = 1024;
+      disk = 1024;
+      cpu = 50;
+      harga = 1000;
+      break;
+    case "2gb":
+      memo = 2048;
+      disk = 2048;
+      cpu = 100;
+      harga = 2000;
+      break;
+    case "3gb":
+      memo = 3072;
+      disk = 3072;
+      cpu = 150;
+      harga = 3000;
+      break;
+    case "4gb":
+      memo = 4096;
+      disk = 4096;
+      cpu = 200;
+      harga = 4000;
+      break;
+    case "5gb":
+      memo = 5120;
+      disk = 5120;
+      cpu = 250;
+      harga = 5000;
+      break;
+    case "6gb":
+      memo = 6144;
+      disk = 6144;
+      cpu = 300;
+      harga = 6000;
+      break;
+    case "7gb":
+      memo = 7168;
+      disk = 7168;
+      cpu = 350;
+      harga = 7000;
+      break;
+    case "8gb":
+      memo = 8192;
+      disk = 8192;
+      cpu = 400;
+      harga = 8000;
+      break;
+    case "9gb":
+      memo = 9216;
+      disk = 9216;
+      cpu = 450;
+      harga = 9000;
+      break;
+    case "10gb":
+      memo = 10240;
+      disk = 10240;
+      cpu = 500;
+      harga = 10000;
+      break;
+    case "unli":
+      memo = 0;
+      disk = 0;
+      cpu = 0;
+      harga = 15000;
+      break;
+    default:
+      return res.status(400).json({
+        success: false,
+        message: "Paket tidak dikenali",
+      });
+  }
+
+  if (user.saldo < harga) {
+    user.history.push({
+      aktivitas: "Buy Panel",
+      nominal: harga,
+      status: "Gagal - Saldo tidak mencukupi",
+      tanggal: new Date(),
+    });
+    await user.save();
+    return res.status(400).json({
+      success: false,
+      message: "Saldo tidak mencukupi",
+    });
+  }
+
+  try {
+    const headers = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.PTERO_API_KEY}`,
+    };
+
+    const email = `${username}@gmail.com`;
+    const password = `${username}${disk}`; 
+    const createUserResponse = await axios.post(
+      `${process.env.PTERO_DOMAIN}/api/application/users`,
+      {
+        email,
+        username,
+        first_name: username,
+        last_name: username,
+        language: "en",
+        password,
+      },
+      { headers }
+    );
+
+    const newUser = createUserResponse.data.attributes;
+
+    const createServerResponse = await axios.post(
+      `${process.env.PTERO_DOMAIN}/api/application/servers`,
+      {
+        name: username,
+        description: "Server dibuat via API Buy Panel",
+        user: newUser.id,
+        egg: 15, 
+        docker_image: "ghcr.io/parkervcp/yolks:nodejs_18",
+        startup: "npm start",
+        environment: {
+          INST: "npm",
+          USER_UPLOAD: "0",
+          AUTO_UPDATE: "0",
+          CMD_RUN: "npm start",
+          JS_FILE: "index.js",
+        },
+        limits: {
+          memory: memo,
+          swap: 0,
+          disk,
+          io: 500,
+          cpu,
+        },
+        feature_limits: {
+          databases: 5,
+          backups: 5,
+          allocations: 5,
+        },
+        deploy: {
+          locations: [1], 
+          dedicated_ip: false,
+          port_range: [],
+        },
+      },
+      { headers }
+    );
+
+    const newServer = createServerResponse.data.attributes;
+
+    user.saldo -= harga;
+    user.history.push({
+      aktivitas: "Buy Panel",
+      nominal: harga,
+      status: "Sukses",
+      tanggal: new Date(),
+    });
+    await user.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Server berhasil dibuat",
+      data: {
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          email,
+          password,
+        },
+        server: {
+          id: newServer.id,
+          name: newServer.name,
+          memory: memo,
+          disk,
+          cpu,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error creating server:", error.response?.data || error.message);
+
+    user.history.push({
+      aktivitas: "Buy Panel",
+      nominal: harga,
+      status: "Gagal - Internal server error",
+      tanggal: new Date(),
+    });
+    await user.save();
+
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat membuat server",
+      error: error.response?.data || error.message,
+    });
+  }
+});
+
+app.post('/api/exchange-coins', requireLogin, async (req, res) => {
+  try {
+    const { amount } = req.body;
+    const user = await User.findById(req.session.userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const exchangeAmount = parseInt(amount);
+
+    if (isNaN(exchangeAmount) || exchangeAmount <= 0) {
+      return res.status(400).json({ success: false, message: 'Amount must be a positive number' });
+    }
+
+    if (exchangeAmount % 10 !== 0) {
+      return res.status(400).json({ success: false, message: 'Amount must be a multiple of 10 coins' });
+    }
+
+    if (user.coin < exchangeAmount) {
+      return res.status(400).json({ success: false, message: 'Insufficient coins' });
+    }
+
+    const saldoToAdd = exchangeAmount / 10;
+    user.saldo += saldoToAdd;
+    user.coin -= exchangeAmount;
+
+    user.history.push({
+      aktivitas: 'Exchange Coins',
+      nominal: saldoToAdd,
+      status: `Sukses - Tukar ${exchangeAmount} koin`,
+      code: `EXCH-${Date.now()}`,
+      tanggal: new Date()
+    });
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully exchanged ${exchangeAmount} coins for Rp ${toRupiah(saldoToAdd)} saldo`,
+      newSaldo: user.saldo,
+      newCoins: user.coin
+    });
+
+  } catch (error) {
+    console.error('Error exchanging coins:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.post('/api/upgrade-to-reseller', requireLogin, async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.role === 'reseller') {
+      return res.status(400).json({ success: false, message: 'You are already a reseller' });
+    }
+    if (user.role === 'admin') {
+      return res.status(400).json({ success: false, message: 'You are an admin and cannot upgrade' });
+    }
+
+    const resellerCount = await User.countDocuments({ role: 'reseller' });
+
+    let upgradePrice;
+    if (resellerCount < 100) {
+      upgradePrice = 20000;
+    } else if (resellerCount >= 200) {
+      upgradePrice = 50000;
+    } else {
+      upgradePrice = 20000; 
+    }
+
+    if (user.saldo < upgradePrice) {
+      user.history.push({
+        aktivitas: 'Upgrade to Reseller',
+        nominal: upgradePrice,
+        status: 'Gagal - Saldo tidak mencukupi',
+        code: `UPG-${Date.now()}`,
+        tanggal: new Date()
+      });
+      await user.save();
+      return res.status(400).json({ success: false, message: 'Insufficient balance to upgrade' });
+    }
+
+    user.saldo -= upgradePrice;
+    user.role = 'reseller';
+
+    user.history.push({
+      aktivitas: 'Upgrade to Reseller',
+      nominal: upgradePrice,
+      status: 'Sukses',
+      code: `UPG-${Date.now()}`,
+      tanggal: new Date()
+    });
+
+    await user.save();
+    req.session.role = 'reseller'; 
+
+    return res.status(200).json({
+      success: true,
+      message: 'Successfully upgraded to reseller!',
+      newRole: user.role,
+      newSaldo: user.saldo
+    });
+
+  } catch (error) {
+    console.error('Error upgrading to reseller:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+app.get('/rest/block', requireAdmin, async (req, res) => {
+  try {
+    // Update semua user yang isLocked = true menjadi false
+    const result = await User.updateMany(
+      { isLocked: true },
+      { $set: { isLocked: false } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'Tidak ada user yang terkunci (isLocked = true)',
+        modifiedCount: 0
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Berhasil membuka kunci ${result.modifiedCount} user`,
+      modifiedCount: result.modifiedCount
+    });
+
+  } catch (error) {
+    console.error('Error unlocking users:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal membuka kunci user',
+      error: error.message
     });
   }
 });

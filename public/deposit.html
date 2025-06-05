@@ -1,182 +1,233 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VPedia - Deposit System</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <meta name="description" content="Layanan Kebutuhan Digital & Integrasi H2H Terbaru Di Indonesia.">
-  <meta name="keywords" content="Layanan Kebutuhan Digital & Integrasi H2H Terbaru Di Indonesia.">
-  <meta name="author" content="Rerezz Official">
-  <meta property="og:title" content="TopUp H2H - Rerezz">
-  <meta property="og:description" content="Layanan Kebutuhan Digital & Integrasi H2H Terbaru Di Indonesia.">
-  <meta property="og:type" content="website">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   Deposit Saldo - Dashboard
+  </title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
   <link rel="stylesheet" href="/style/deposit/deposit.css">
-  <meta property="og:url" content="https://www.v-pedia.web.id/">
-  <meta property="og:image" content="https://files.catbox.moe/oj984n.png">
-
-</head>
-<body>
-  <!-- Floating Background Elements -->
-  <div class="bg-elements">
-    <div class="bg-circle circle-1"></div>
-    <div class="bg-circle circle-2"></div>
-    <div class="bg-circle circle-3"></div>
+ </head>
+ <body>
+  <header aria-label="Header navigasi utama" role="banner">
+   <div class="header-left">
+    <a aria-label="Kembali ke dashboard" href="/dashboard" title="Kembali ke dashboard">
+     <i aria-hidden="true" class="fas fa-arrow-left">
+     </i>
+     Dashboard
+    </a>
+   </div>
+   <div class="header-right">
+    <button aria-controls="pendingPopup" aria-expanded="false" aria-haspopup="true" aria-label="Daftar deposit pending, klik untuk melihat" class="pending-button" id="pendingBtn" title="Deposit Pending">
+     <i aria-hidden="true" class="fas fa-shopping-cart">
+     </i>
+     <span id="pendingCount" style="min-width: 18px; text-align: center; font-weight: 700; user-select:none;">
+      0
+     </span>
+     <i aria-hidden="true" class="fas fa-chevron-down">
+     </i>
+    </button>
+    <button aria-controls="profilePopup" aria-expanded="false" aria-haspopup="true" aria-label="Profil pengguna, klik untuk melihat detail" class="profile-button" id="profileBtn" title="Profil Pengguna">
+     <img alt="Foto profil pengguna" height="40" src="https://storage.googleapis.com/a1aa/image/93fc8d3c-570c-4916-354c-d509a45128d3.jpg" width="40"/>
+     <span id="profileUsername">
+      User
+     </span>
+     <i aria-hidden="true" class="fas fa-chevron-down">
+     </i>
+    </button>
+    <div aria-labelledby="profileTitle" aria-modal="true" class="profile-popup" id="profilePopup" role="dialog" tabindex="-1">
+     <h3 id="profileTitle">
+      <i aria-hidden="true" class="fas fa-user-circle">
+      </i>
+      Profil Pengguna
+     </h3>
+     <div class="profile-row">
+      <div class="profile-label">
+       Nama Lengkap
+      </div>
+      <div class="profile-value" id="profileFullname">
+       -
+      </div>
+     </div>
+     <div class="profile-row">
+      <div class="profile-label">
+       Username
+      </div>
+      <div class="profile-value" id="profileUsernamePopup">
+       -
+      </div>
+     </div>
+     <div class="profile-row">
+      <div class="profile-label">
+       Saldo
+      </div>
+      <div class="profile-value" id="profileSaldo">
+       -
+      </div>
+     </div>
+     <div class="profile-row">
+      <div class="profile-label">
+       Coin
+      </div>
+      <div class="profile-value" id="profileCoin">
+       -
+      </div>
+     </div>
+    </div>
+    <div aria-labelledby="pendingTitle" aria-modal="true" class="pending-popup" id="pendingPopup" role="dialog" tabindex="-1">
+     <h3 id="pendingTitle">
+      <i aria-hidden="true" class="fas fa-shopping-cart">
+      </i>
+      Deposit Pending
+     </h3>
+     <div id="pendingListContainer">
+      <p class="empty-message">
+       Tidak ada deposit pending saat ini.
+      </p>
+     </div>
+    </div>
+   </div>
+  </header>
+  <main aria-label="Formulir Deposit Saldo" class="container" role="main">
+   <h1>
+    <i aria-hidden="true" class="fas fa-wallet">
+    </i>
+    Deposit Saldo
+   </h1>
+   <form aria-describedby="formDescription" id="depositForm" novalidate="">
+    <p id="formDescription" style="font-weight:600; color:#475569;">
+     Pilih jenis dan metode deposit, lalu masukkan nominal untuk membuat permintaan deposit baru.
+    </p>
+    <div>
+     <label for="depositType">
+      <i aria-hidden="true" class="fas fa-list-alt">
+      </i>
+      Jenis Deposit
+     </label>
+     <select aria-describedby="typeHelp" aria-label="Pilih jenis deposit" aria-required="true" id="depositType" name="type" required="">
+      <option selected="" value="ewallet">
+       E-Wallet
+      </option>
+      <option value="va">
+       Virtual Account
+      </option>
+      <option value="bank">
+       Bank Transfer
+      </option>
+     </select>
+     <small id="typeHelp" style="color:#64748b; font-size:0.85rem; user-select:text;">
+      Pilih jenis metode pembayaran
+     </small>
+    </div>
+    <div>
+     <label for="depositMethod">
+      <i aria-hidden="true" class="fas fa-credit-card">
+      </i>
+      Metode Deposit
+     </label>
+     <div aria-label="Daftar metode deposit" class="methods-list" id="methodsList" role="list">
+      <p style="color:#64748b; font-style:italic; text-align:center; margin-top: 12px; user-select:none;">
+       Memuat metode deposit...
+      </p>
+     </div>
+    </div>
+    <div>
+     <label for="nominalInput">
+      <i aria-hidden="true" class="fas fa-coins">
+      </i>
+      Nominal Deposit (Rp)
+     </label>
+     <input aria-describedby="nominalHelp" aria-label="Masukkan nominal deposit dalam rupiah" aria-required="true" autocomplete="off" id="nominalInput" inputmode="numeric" min="500" name="nominal" pattern="[0-9]*" placeholder="Masukkan nominal deposit" required="" step="100" type="number"/>
+     <small id="nominalHelp" style="color:#64748b; font-size:0.85rem; user-select:text;">
+      Minimal deposit Rp 500
+     </small>
+    </div>
+    <button aria-busy="false" aria-live="polite" class="btn-primary" disabled="" type="submit">
+     <i aria-hidden="true" class="fas fa-paper-plane btn-icon">
+     </i>
+     Buat Permintaan Deposit
+    </button>
+   </form>
+   <div id="depositResult" style="display:none; margin-top:32px;"></div>
+  </main>
+  <div aria-label="Informasi deposit sedang berlangsung" aria-modal="true" class="deposit-timer-overlay" id="depositTimerOverlay" role="dialog" style="display:none;">
+   <div class="deposit-timer-box" role="document" tabindex="0">
+    <button aria-label="Tutup informasi deposit" class="deposit-timer-close" id="closeTimerBtn" title="Tutup">
+     ×
+    </button>
+    <h2>
+     <i aria-hidden="true" class="fas fa-hourglass-half">
+     </i>
+     Deposit Sedang Berlangsung
+    </h2>
+    <div class="deposit-timer-details">
+     <dl>
+      <dt>
+       Metode Pembayaran
+      </dt>
+      <dd id="timerMethodName">
+      </dd>
+      <dt>
+       Nominal Deposit
+      </dt>
+      <dd id="timerAmount">
+      </dd>
+      <dt>
+       Biaya Admin
+      </dt>
+      <dd id="timerFee">
+      </dd>
+      <dt>
+       Saldo Masuk (Est.)
+      </dt>
+      <dd id="timerGetBalance">
+      </dd>
+      <dt id="timerBankLabel" style="display:none;">
+      </dt>
+      <dd id="timerBankValue" style="display:none;">
+      </dd>
+      <dt id="timerAccountLabel" style="display:none;">
+      </dt>
+      <dd id="timerAccountValue" style="display:none;">
+      </dd>
+      <dt id="timerNameLabel" style="display:none;">
+      </dt>
+      <dd id="timerNameValue" style="display:none;">
+      </dd>
+      <dt>
+       Waktu Dibuat
+      </dt>
+      <dd id="timerCreatedAt">
+      </dd>
+      <dt>
+       Waktu Kedaluwarsa
+      </dt>
+      <dd id="timerExpiredAt">
+      </dd>
+     </dl>
+    </div>
+    <div class="deposit-timer-status" id="timerStatus">
+    </div>
+    <div class="deposit-timer-countdown" id="timerCountdown">
+    </div>
+    <div class="deposit-timer-qr" id="timerQrContainer">
+    </div>
+    <div class="deposit-timer-buttons">
+     <button class="btn-cancel-deposit" id="cancelDepositBtn" title="Batalkan deposit">
+      <i class="fas fa-times-circle">
+      </i>
+      Batalkan Deposit
+     </button>
+     <button class="btn-close-timer" id="closeDepositBtn" title="Tutup informasi deposit">
+      <i class="fas fa-check-circle">
+      </i>
+      Selesai
+     </button>
+    </div>
+   </div>
   </div>
-
-  <!-- QR Popup -->
-  <div class="qr-popup" id="qrPopup">
-    <div class="qr-popup-content">
-      <div class="qr-popup-close" id="closePopup">
-        <i class="fas fa-times"></i>
-      </div>
-      <img src="" alt="QR Code" class="qr-popup-img" id="popupQrImage">
-      <p>Scan QR Code untuk melakukan pembayaran</p>
-    </div>
-  </div>
-
-  <!-- Main Card -->
-  <div class="card">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-icon">
-        <i class="fas fa-wallet"></i>
-      </div>
-      <h1>Top Up Saldo</h1>
-      <p>Lengkapi form berikut untuk melakukan deposit</p>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Deposit Form -->
-      <div class="deposit-form-container">
-        <div class="section-title">
-          <div class="section-icon">
-            <i class="fas fa-coins"></i>
-          </div>
-          <h2>Buat Deposit</h2>
-        </div>
-        
-        <form id="createDepositForm">
-          <div class="form-group">
-            <label for="nominal">Nominal Deposit</label>
-            <div class="input-container">
-              <span class="prefix">Rp</span>
-              <input type="number" id="nominal" class="form-control" placeholder="Contoh: 100000" min="500" step="100" required>
-            </div>
-          </div>
-          
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-credit-card"></i> Lakukan Deposit
-          </button>
-        </form>
-        
-        <!-- Response Container -->
-        <div id="createDepositResponse" class="response-container">
-          <div class="response-message">
-            <div class="response-icon">
-              <i class="fas fa-check"></i>
-            </div>
-            <div class="response-text">Message will appear here</div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Deposit Guide -->
-      <div class="guide-container">
-        <div class="section-title">
-          <div class="section-icon">
-            <i class="fas fa-question-circle"></i>
-          </div>
-          <h2>Panduan Deposit</h2>
-        </div>
-        
-        <div class="guide-item">
-          <div class="guide-number">1</div>
-          <div class="guide-text">Masukkan nominal deposit yang diinginkan (minimal Rp500)</div>
-        </div>
-        
-        <div class="guide-item">
-          <div class="guide-number">2</div>
-          <div class="guide-text">Klik tombol "Lakukan Deposit"</div>
-        </div>
-        
-        <div class="guide-item">
-          <div class="guide-number">3</div>
-          <div class="guide-text">Lakukan pembayaran sesuai instruksi</div>
-        </div>
-        
-        <div class="guide-item">
-          <div class="guide-number">4</div>
-          <div class="guide-text">Saldo akan otomatis masuk dalam 1-5 menit</div>
-        </div>
-        
-        <div class="note">
-          <i class="fas fa-info-circle"></i>
-          <span>Minimal deposit Rp500 tanpa biaya tambahan</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Deposit Status Section -->
-    <div class="status-section" id="statusSection">
-      <div class="section-title">
-        <div class="section-icon">
-          <i class="fas fa-spinner fa-spin"></i>
-        </div>
-        <h2>Status Deposit</h2>
-      </div>
-      
-      <div class="status-grid">
-        <div class="status-item">
-          <p>Trx ID</p>
-          <p id="trxId">-</p>
-        </div>
-        <div class="status-item">
-          <p>Ref ID</p>
-          <p id="refId">-</p>
-        </div>
-        <div class="status-item">
-          <p>Nominal</p>
-          <p id="amount">-</p>
-        </div>
-        <div class="status-item">
-          <p>Status</p>
-          <p>
-            <span class="status-badge status-pending" id="statusText">
-              <i class="fas fa-spinner fa-spin"></i> Loading...
-            </span>
-          </p>
-        </div>
-      </div>
-      
-      <div class="qr-section" id="qrContainer">
-        <p class="qr-title">QR Code Pembayaran</p>
-        <div class="qr-container" id="qrClickable">
-          <img id="qrImage" src="" alt="QR Code" class="qr-image">
-        </div>
-        <p class="qr-note">Klik QR code untuk memperbesar</p>
-      </div>
-      
-      <!-- Payment Completed Section (hidden initially) -->
-      <div class="payment-completed" id="paymentCompleted">
-        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-          <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-          <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-        </svg>
-        <h3>Pembayaran Berhasil!</h3>
-        <p>Saldo akan segera ditambahkan ke akun Anda</p>
-      </div>
-      
-      <div class="status-footer">
-        <p id="statusFooterText">Pemeriksaan otomatis setiap 5 detik</p>
-        <button class="btn btn-danger" id="cancelButton">
-          <i class="fas fa-times"></i> Batalkan Deposit
-        </button>
-      </div>
-    </div>
-  </div>
-
-<script src="/style/deposit/deposit.js"></script>
-</body>
+  <script src="/style/deposit/deposit.js"></script>
+ </body>
 </html>

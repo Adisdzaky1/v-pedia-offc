@@ -13,7 +13,7 @@ const axios = require('axios');
 const path = require('path');
 const app = express();
 
-const ATLAN_API_KEY = 'MDlxwzA4M6SCRU6StAUO0oskykfxOjHSeheeoHUpOkEAhlhr52aRdptTGt7V2jzWGseeAGoLPmwFAL1AU4Jw64BnVx8vnRnmFRG9';
+const ATLAN_API_KEY = 'vszNSKtXiAmeRtYHE17FF8agX1Zks1SqvRNad7tEPGGaePBd19Zrm5tZvFmV8p7Z1ZNEXbqFgstIYrCbQqSkXoT2qV1IdrVJu87N';
 const BASE_URL = 'https://atlantich2h.com';
 const UNTUNG_PERSEN = 100;
 
@@ -35,6 +35,9 @@ const userSchema = new mongoose.Schema({
   isVerified: Boolean,
   lastLogin: Date,
   referralCode: String,
+  whitelistIp: {
+    type: [String],
+  },
   history: [{
     aktivitas: String,
     nominal: Number,
@@ -264,7 +267,8 @@ app.get('/profile/users', requireLogin, async (req, res) => {
         isVerified: user.isVerified,
         lastLogin: user.lastLogin,
         referralCode: user.referralCode,
-        history: user.history
+        history: user.history,
+        whitelistIp: user.whitelistIp
       }
     });
   } catch (error) {
@@ -669,6 +673,51 @@ app.get('/data/users', requireAdmin, async (req, res) => {
   }
 });
 
+app.post('/admin/verify-user', requireAdmin, async (req, res) => {
+  const { username } = req.body;
+
+  if (!username) {
+    return res.status(400).json({
+      success: false,
+      message: 'Parameter username wajib diisi'
+    });
+  }
+
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User tidak ditemukan'
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'User sudah terverifikasi sebelumnya'
+      });
+    }
+
+    user.isVerified = true;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `User ${username} berhasil diverifikasi`
+    });
+
+  } catch (err) {
+    console.error('❌ Error saat memverifikasi user:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan pada server'
+    });
+  }
+});
+
+
 app.post('/profile/send-verification-otp', requireLogin, async (req, res) => {
   try {
     const user = await User.findById(req.session.userId);
@@ -959,14 +1008,13 @@ app.post('/deposit/create', requireLogin, async (req, res) => {
       });
     }
 
-    const qrUrl = await generateQRAndUpload(depositData.qr_string);
 
     res.json({
       success: true,
       message: 'Deposit request created',
       data: {
         ...depositData,
-        qr_image: qrUrl
+        qr_image: depositData.qr_image
       }
     });
 
@@ -1547,6 +1595,15 @@ app.get("/order/check", requireLogin, async (req, res) => {
 
 //=====[ PRODUCT ENDPOINT ]=====//
 
+async function getServerPublicIp() {
+  try {
+    const response = await axios.get('https://api.ipify.org?format=json');
+    return response.data.ip;
+  } catch (error) {
+    return null;
+  }
+}
+
 function validateApiKey(req, res, next) {
   const apiKey = req.query.apikey;
 
@@ -1566,11 +1623,38 @@ function validateApiKey(req, res, next) {
         });
       }
 
+      // Mendapatkan IP klien dari berbagai sumber
+      const requestIp =
+        req.headers['x-forwarded-for']?.split(',').shift().trim() || // Proxy headers
+        req.ip || // Express built-in IP detection
+        req.connection.remoteAddress; // Fallback
+
+      // Jika IP klien adalah localhost (::1 atau 127.0.0.1), gunakan IP publik server
+      const detectedIp = ['::1', '127.0.0.1'].includes(requestIp)
+        ? await getServerPublicIp()
+        : requestIp;
+
+      // Pisahkan whitelistIp menjadi array jika berupa string dengan koma
+      const whitelistIpArray = Array.isArray(user.whitelistIp)
+        ? user.whitelistIp
+        : user.whitelistIp.split(',').map(ip => ip.trim());
+
+      // Gunakan IP yang terdeteksi untuk validasi whitelist
+      if (whitelistIpArray.length > 0 && !whitelistIpArray.includes('0.0.0.0')) {
+        if (!detectedIp || !whitelistIpArray.includes(detectedIp)) {
+          console.warn(`Unauthorized API access from IP ${detectedIp} for user ${user.username}. IP not in whitelist: [${whitelistIpArray.join(', ')}]`);
+          return res.status(403).json({
+            success: false,
+            message: "IP Anda saat ini tidak diizinkan untuk menggunakan API Key ini.",
+            your_ip: detectedIp
+          });
+        }
+      }
+
       if (user.isLocked) {
         return res.status(429).json({
           success: false,
-          message:
-            "Anda harus menunggu 5 detik sebelum melakukan request lagi.",
+          message: "Anda harus menunggu 5 detik sebelum melakukan request lagi.",
         });
       }
 
@@ -1582,33 +1666,159 @@ function validateApiKey(req, res, next) {
           if (!user.isVerified) {
             return res.status(403).json({
               success: false,
-              message:
-                "Akun belum terverifikasi. Silakan verifikasi akun terlebih dahulu.",
+              message: "Akun belum terverifikasi. Silakan verifikasi akun terlebih dahulu.",
             });
           }
 
           req.user = user;
           next();
         } catch (error) {
-          console.error("Error validating API Key:", error);
+          console.error("Error during API Key validation timeout:", error);
           return res.status(500).json({
             success: false,
-            message: "Internal server error",
+            message: "Internal server error during validation",
           });
         } finally {
           user.isLocked = false;
-          await user.save();
+          try {
+            await user.save();
+          } catch (saveError) {
+            console.error("Error saving user after unlocking in validateApiKey:", saveError);
+          }
         }
-      }, 5000); // Delay 5 detik
+      }, 5000);
     })
     .catch((error) => {
-      console.error("Error validating API Key:", error);
+      console.error("Error validating API Key (DB query):", error);
       return res.status(500).json({
         success: false,
         message: "Internal server error",
       });
     });
 }
+
+const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+function isValidIp(ip) {
+  return ip === '0.0.0.0' || ipRegex.test(ip);
+}
+
+app.get('/profile/whitelist-ip/add', requireLogin, async (req, res) => {
+  const { ip } = req.body;
+
+  if (!ip) {
+    return res.status(400).json({ success: false, message: 'Alamat IP diperlukan' });
+  }
+
+  if (!isValidIp(ip)) {
+    return res.status(400).json({ success: false, message: 'Format alamat IP tidak valid' });
+  }
+
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+    }
+
+    if (user.whitelistIp.includes('0.0.0.0') && ip !== '0.0.0.0' && user.whitelistIp.length === 1) {
+      user.whitelistIp = [];
+    }
+
+    if (user.whitelistIp.includes(ip)) {
+      return res.status(400).json({ success: false, message: 'Alamat IP sudah ada di whitelist' });
+    }
+
+    user.whitelistIp.push(ip);
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Alamat IP berhasil ditambahkan ke whitelist',
+      whitelistIp: user.whitelistIp.join(',')
+    });
+
+  } catch (error) {
+    console.error('Error adding IP to whitelist:', error);
+    return res.status(500).json({ success: false, message: 'Kesalahan server internal' });
+  }
+});
+
+app.post('/profile/whitelist-ip/remove', requireLogin, async (req, res) => {
+  const { ip } = req.body;
+
+  if (!ip) {
+    return res.status(400).json({ success: false, message: 'Alamat IP diperlukan' });
+  }
+
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+    }
+
+    const index = user.whitelistIp.indexOf(ip);
+    if (index === -1) {
+      return res.status(400).json({ success: false, message: 'Alamat IP tidak ditemukan di whitelist' });
+    }
+
+    user.whitelistIp.splice(index, 1);
+
+    if (user.whitelistIp.length === 0) {
+      user.whitelistIp.push('0.0.0.0');
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Alamat IP berhasil dihapus dari whitelist',
+      whitelistIp: user.whitelistIp.join(',')
+    });
+
+  } catch (error) {
+    console.error('Error removing IP from whitelist:', error);
+    return res.status(500).json({ success: false, message: 'Kesalahan server internal' });
+  }
+});
+
+app.post('/profile/whitelist-ip/set', requireLogin, async (req, res) => {
+  const { ips } = req.body;
+
+  if (!Array.isArray(ips)) {
+    return res.status(400).json({ success: false, message: 'Input "ips" harus berupa array' });
+  }
+
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
+    }
+
+    if (ips.length === 0) {
+      user.whitelistIp = ['0.0.0.0'];
+    } else {
+      for (const singleIp of ips) {
+        if (typeof singleIp !== 'string' || !isValidIp(singleIp)) {
+          return res.status(400).json({ success: false, message: `Format alamat IP tidak valid: ${singleIp}` });
+        }
+      }
+      const uniqueIps = [...new Set(ips)];
+      user.whitelistIp = uniqueIps;
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Whitelist IP berhasil diatur ulang',
+      whitelistIp: user.whitelistIp.join(',')
+    });
+
+  } catch (error) {
+    console.error('Error setting IP whitelist:', error);
+    return res.status(500).json({ success: false, message: 'Kesalahan server internal' });
+  }
+});
 
 app.get("/h2h/profile", validateApiKey, async (req, res) => {
   try {
@@ -2219,14 +2429,13 @@ app.get('/h2h/deposit/create', validateApiKey, async (req, res) => {
           });
       }
 
-      const qrUrl = await generateQRAndUpload(depositData.qr_string);
-
+    
       res.json({
           success: true,
           message: 'Permintaan deposit dibuat',
           data: {
               ...depositData,
-              qr_image: qrUrl
+              qr_image: depositData.qr_image
           }
       });
 
@@ -2622,6 +2831,8 @@ case "unli":
     });
   }
 });
+
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

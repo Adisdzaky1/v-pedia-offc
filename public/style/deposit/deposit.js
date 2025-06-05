@@ -1,1 +1,676 @@
-const _0x5d8f94=_0x5b62;(function(_0x3dc74f,_0x2a8af8){const _0x30cea5=_0x5b62,_0x40e6f9=_0x3dc74f();while(!![]){try{const _0x328e6c=-parseInt(_0x30cea5(0xe2))/0x1*(parseInt(_0x30cea5(0xe4))/0x2)+-parseInt(_0x30cea5(0xc1))/0x3+parseInt(_0x30cea5(0xc5))/0x4+parseInt(_0x30cea5(0xab))/0x5*(parseInt(_0x30cea5(0xcc))/0x6)+-parseInt(_0x30cea5(0xe6))/0x7*(-parseInt(_0x30cea5(0xf4))/0x8)+-parseInt(_0x30cea5(0xed))/0x9+-parseInt(_0x30cea5(0xd4))/0xa*(-parseInt(_0x30cea5(0xf6))/0xb);if(_0x328e6c===_0x2a8af8)break;else _0x40e6f9['push'](_0x40e6f9['shift']());}catch(_0x45db28){_0x40e6f9['push'](_0x40e6f9['shift']());}}}(_0x5f39,0x98a24),document[_0x5d8f94(0xad)](_0x5d8f94(0xc0),function(){const _0x52fabb=_0x5d8f94;for(let _0x5217c9=0x0;_0x5217c9<0x5;_0x5217c9++){createFloatingCircle();}document[_0x52fabb(0x9c)](_0x52fabb(0xaf))?.['addEventListener'](_0x52fabb(0xd5),function(){const _0x33bb84=_0x52fabb,_0x5272c3=document[_0x33bb84(0x9c)](_0x33bb84(0xb0))[_0x33bb84(0xd6)];_0x5272c3&&(document[_0x33bb84(0x9c)](_0x33bb84(0xcd))[_0x33bb84(0xd6)]=_0x5272c3,document['getElementById'](_0x33bb84(0x9e))[_0x33bb84(0xce)][_0x33bb84(0xc6)]=_0x33bb84(0xf2));}),document['getElementById']('closePopup')?.[_0x52fabb(0xad)](_0x52fabb(0xd5),function(){const _0x46a87e=_0x52fabb;document[_0x46a87e(0x9c)](_0x46a87e(0x9e))['style'][_0x46a87e(0xc6)]='none';}),document[_0x52fabb(0x9c)](_0x52fabb(0x9e))?.[_0x52fabb(0xad)]('click',function(_0x1a5f83){const _0x132830=_0x52fabb;_0x1a5f83['target']===this&&(this[_0x132830(0xce)][_0x132830(0xc6)]=_0x132830(0xbd));});}));function createFloatingCircle(){const _0x13ce47=_0x5d8f94,_0x1199bf=document[_0x13ce47(0xb8)]('.bg-elements'),_0x4c566e=document[_0x13ce47(0xb1)]('div');_0x4c566e[_0x13ce47(0xaa)]=_0x13ce47(0xf3);const _0x358e7f=Math[_0x13ce47(0xae)](Math['random']()*0x96)+0x64,_0x256634=Math[_0x13ce47(0xae)](Math[_0x13ce47(0xdb)]()*0x64),_0x22cf20=Math[_0x13ce47(0xae)](Math[_0x13ce47(0xdb)]()*0x64),_0x14168c=Math[_0x13ce47(0xae)](Math[_0x13ce47(0xdb)]()*0x5);_0x4c566e[_0x13ce47(0xce)]['width']=_0x358e7f+'px',_0x4c566e['style'][_0x13ce47(0xb3)]=_0x358e7f+'px',_0x4c566e['style'][_0x13ce47(0xb7)]=_0x256634+'%',_0x4c566e[_0x13ce47(0xce)][_0x13ce47(0xa5)]=_0x22cf20+'%',_0x4c566e[_0x13ce47(0xce)]['opacity']=Math[_0x13ce47(0xdb)]()*0.1+0.05,_0x4c566e[_0x13ce47(0xce)][_0x13ce47(0xcb)]=_0x14168c+'s',_0x1199bf[_0x13ce47(0xc2)](_0x4c566e);}let currentTrxId=null,statusInterval=null;async function fetchAPI(_0x23d375,_0x3e898b,_0x53b233){const _0xf3049e=_0x5d8f94;try{const _0x1384f7=document[_0xf3049e(0xb8)](_0xf3049e(0xf0));_0x1384f7&&(_0x1384f7[_0xf3049e(0xb6)]=!![],_0x1384f7[_0xf3049e(0xd8)]=_0xf3049e(0xd9));const _0x55f39e=await fetch(_0x23d375,{'method':_0x3e898b,'headers':{'Content-Type':_0xf3049e(0xb2)},'body':JSON[_0xf3049e(0xbb)](_0x53b233),'credentials':'same-origin'}),_0x2f2652=await _0x55f39e[_0xf3049e(0x9b)]();return _0x2f2652;}catch(_0x268f9d){return console[_0xf3049e(0xb4)]('API\x20Error:',_0x268f9d),{'success':![],'message':'Terjadi\x20kesalahan\x20jaringan'};}finally{const _0x3685ba=document[_0xf3049e(0xb8)](_0xf3049e(0xf0));_0x3685ba&&(_0x3685ba['disabled']=![],_0x3685ba[_0xf3049e(0xd8)]='<i\x20class=\x22fas\x20fa-credit-card\x22></i>\x20Lakukan\x20Deposit');}}document[_0x5d8f94(0x9c)]('createDepositForm')[_0x5d8f94(0xad)]('submit',async function(_0x928881){const _0x176aa6=_0x5d8f94;_0x928881[_0x176aa6(0xe8)]();const _0x54fd55=parseInt(document[_0x176aa6(0x9c)](_0x176aa6(0xe1))[_0x176aa6(0xdd)]);if(!_0x54fd55||_0x54fd55<0x1f4){showResponseMessage(_0x176aa6(0xc3),_0x176aa6(0xb4));return;}const _0x458c55=await fetchAPI(_0x176aa6(0xb9),_0x176aa6(0xca),{'nominal':_0x54fd55});_0x458c55['success']&&_0x458c55[_0x176aa6(0xde)]?(showDepositDetails(_0x458c55[_0x176aa6(0xde)]),currentTrxId=_0x458c55[_0x176aa6(0xde)]['id'],checkStatusAutomatically(_0x458c55[_0x176aa6(0xde)]['id'])):showResponseMessage(_0x458c55['message']||_0x176aa6(0x9a),_0x176aa6(0xb4));});function showDepositDetails(_0x1218aa){const _0x47ff3d=_0x5d8f94;document[_0x47ff3d(0x9c)](_0x47ff3d(0xdf))[_0x47ff3d(0xbf)]=_0x1218aa['id'],document[_0x47ff3d(0x9c)]('refId')['textContent']=_0x1218aa[_0x47ff3d(0xac)]||'-',document[_0x47ff3d(0x9c)](_0x47ff3d(0xa9))[_0x47ff3d(0xbf)]=formatRupiah(_0x1218aa[_0x47ff3d(0xe1)]);const _0x4f2163=document['getElementById']('statusText');_0x4f2163['innerHTML']=_0x47ff3d(0xcf)+(_0x1218aa[_0x47ff3d(0xa0)]||_0x47ff3d(0x9d)),_0x1218aa[_0x47ff3d(0xdc)]?(document[_0x47ff3d(0x9c)](_0x47ff3d(0xb0))[_0x47ff3d(0xd6)]=_0x1218aa[_0x47ff3d(0xdc)],document[_0x47ff3d(0x9c)](_0x47ff3d(0xd3))['style'][_0x47ff3d(0xc6)]=_0x47ff3d(0xc8),document[_0x47ff3d(0x9c)](_0x47ff3d(0xa4))[_0x47ff3d(0xce)][_0x47ff3d(0xc6)]='none'):document['getElementById'](_0x47ff3d(0xd3))[_0x47ff3d(0xce)][_0x47ff3d(0xc6)]='none',document[_0x47ff3d(0x9c)](_0x47ff3d(0xd1))[_0x47ff3d(0xce)][_0x47ff3d(0xc6)]=_0x47ff3d(0xc8),setTimeout(()=>{const _0x359889=_0x47ff3d;document[_0x359889(0x9c)](_0x359889(0xd1))['scrollIntoView']({'behavior':_0x359889(0xe0)});},0x64);}function checkStatusAutomatically(_0x394c95){if(statusInterval)clearInterval(statusInterval);checkStatus(_0x394c95),statusInterval=setInterval(()=>checkStatus(_0x394c95),0x1388);}function _0x5f39(){const _0x1f53fb=['random','qr_image','value','data','trxId','smooth','nominal','276631wYZZiT','btn\x20btn-success','6CCfIGV','status-badge\x20status-pending','56DYDCPL','message','preventDefault','fade-out','statusFooterText','<i\x20class=\x22fas\x20fa-times\x22></i>\x20Batalkan\x20Deposit','Deposit\x20berhasil\x20dibatalkan','1773657sADFHX','.response-icon','<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20Membatalkan...','#createDepositForm\x20button[type=\x22submit\x22]','failed','flex','bg-circle','915808pupBOo','<i\x20class=\x22fas\x20fa-check\x22></i>\x20Selesai','22kWLFot','cancelButton','Apakah\x20Anda\x20yakin\x20ingin\x20membatalkan\x20deposit\x20ini?','add','replace','success','Gagal\x20melakukan\x20deposit','json','getElementById','pending','qrPopup','<i\x20class=\x22fas\x20fa-check\x22></i>','status','Deposit\x20telah\x20dibatalkan','status-badge\x20status-failed','.response-message','paymentCompleted','top','response-container\x20','/deposit/status','/deposit/cancel','amount','className','515iMQHsW','reff_id','addEventListener','floor','qrClickable','qrImage','createElement','application/json','height','error','pointerEvents','disabled','left','querySelector','/deposit/create','statusText','stringify','Pembayaran\x20berhasil\x20diproses','none','<i\x20class=\x22fas\x20fa-ban\x22></i>\x20Dibatalkan','textContent','DOMContentLoaded','946131qveKbN','appendChild','Masukkan\x20nominal\x20minimal\x20Rp500','.response-text','2201744iiNsYi','display','response-icon','block','classList','POST','animationDelay','18570NyyrnM','popupQrImage','style','<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20','status-badge\x20status-success','statusSection','toString','qrContainer','912510GJZSwq','click','src','createDepositResponse','innerHTML','<i\x20class=\x22fas\x20fa-spinner\x20fa-spin\x22></i>\x20Memproses...','Pembayaran\x20gagal\x20diproses'];_0x5f39=function(){return _0x1f53fb;};return _0x5f39();}function _0x5b62(_0x5620a9,_0x4ae6cf){const _0x5f39af=_0x5f39();return _0x5b62=function(_0x5b62c1,_0x329faf){_0x5b62c1=_0x5b62c1-0x96;let _0x1833c3=_0x5f39af[_0x5b62c1];return _0x1833c3;},_0x5b62(_0x5620a9,_0x4ae6cf);}async function checkStatus(_0x1e3d65){const _0x10e41c=_0x5d8f94,_0x31b10e=await fetchAPI(_0x10e41c(0xa7),_0x10e41c(0xca),{'trxid':_0x1e3d65});_0x31b10e[_0x10e41c(0x99)]&&_0x31b10e[_0x10e41c(0xde)]&&updateStatusUI(_0x31b10e[_0x10e41c(0xde)]);}function updateStatusUI(_0x3b9442){const _0x53bd4c=_0x5d8f94,_0x57d337=document[_0x53bd4c(0x9c)](_0x53bd4c(0xba)),_0x23d83f=document[_0x53bd4c(0x9c)](_0x53bd4c(0xd3)),_0x49860f=document['getElementById'](_0x53bd4c(0xa4)),_0x7bf213=document[_0x53bd4c(0x9c)](_0x53bd4c(0xf7)),_0x65ee72=document['getElementById'](_0x53bd4c(0xea));if(_0x3b9442[_0x53bd4c(0xa0)]==='success')_0x57d337[_0x53bd4c(0xd8)]='<i\x20class=\x22fas\x20fa-check-circle\x22></i>\x20Success',_0x57d337[_0x53bd4c(0xaa)]=_0x53bd4c(0xd0),_0x3b9442['saldo_masuk']&&(document['getElementById'](_0x53bd4c(0xa9))['textContent']=formatRupiah(_0x3b9442['saldo_masuk'])),_0x23d83f[_0x53bd4c(0xc9)][_0x53bd4c(0x97)](_0x53bd4c(0xe9)),setTimeout(()=>{const _0x313288=_0x53bd4c;_0x23d83f[_0x313288(0xce)][_0x313288(0xc6)]='none',_0x49860f[_0x313288(0xce)][_0x313288(0xc6)]=_0x313288(0xc8);},0x1f4),clearInterval(statusInterval),_0x7bf213[_0x53bd4c(0xd8)]=_0x53bd4c(0xf5),_0x7bf213[_0x53bd4c(0xaa)]=_0x53bd4c(0xe3),_0x7bf213[_0x53bd4c(0xce)][_0x53bd4c(0xb5)]=_0x53bd4c(0xbd),_0x65ee72[_0x53bd4c(0xbf)]=_0x53bd4c(0xbc);else{if(_0x3b9442['status']===_0x53bd4c(0xf1))_0x57d337[_0x53bd4c(0xd8)]='<i\x20class=\x22fas\x20fa-times-circle\x22></i>\x20Failed',_0x57d337[_0x53bd4c(0xaa)]=_0x53bd4c(0xa2),_0x23d83f['classList'][_0x53bd4c(0x97)](_0x53bd4c(0xe9)),setTimeout(()=>{const _0x7b0430=_0x53bd4c;_0x23d83f[_0x7b0430(0xce)][_0x7b0430(0xc6)]='none';},0x1f4),clearInterval(statusInterval),_0x65ee72[_0x53bd4c(0xbf)]=_0x53bd4c(0xda);else _0x3b9442[_0x53bd4c(0xa0)]==='cancel'?(_0x57d337[_0x53bd4c(0xd8)]=_0x53bd4c(0xbe),_0x57d337['className']='status-badge\x20status-cancelled',_0x23d83f[_0x53bd4c(0xc9)][_0x53bd4c(0x97)]('fade-out'),setTimeout(()=>{const _0x21f106=_0x53bd4c;_0x23d83f['style'][_0x21f106(0xc6)]=_0x21f106(0xbd);},0x1f4),clearInterval(statusInterval),_0x7bf213[_0x53bd4c(0xd8)]=_0x53bd4c(0xf5),_0x7bf213[_0x53bd4c(0xaa)]='btn\x20btn-success',_0x7bf213['style'][_0x53bd4c(0xb5)]=_0x53bd4c(0xbd),_0x65ee72[_0x53bd4c(0xbf)]=_0x53bd4c(0xa1)):(_0x57d337[_0x53bd4c(0xd8)]=_0x53bd4c(0xcf)+_0x3b9442[_0x53bd4c(0xa0)],_0x57d337[_0x53bd4c(0xaa)]=_0x53bd4c(0xe5));}}document[_0x5d8f94(0x9c)](_0x5d8f94(0xf7))?.['addEventListener'](_0x5d8f94(0xd5),async function(){const _0x5a642f=_0x5d8f94;if(!confirm(_0x5a642f(0x96)))return;if(!currentTrxId){showResponseMessage('Tidak\x20ada\x20transaksi\x20yang\x20aktif','error');return;}const _0x130cab=document[_0x5a642f(0x9c)](_0x5a642f(0xf7));_0x130cab[_0x5a642f(0xb6)]=!![],_0x130cab['innerHTML']=_0x5a642f(0xef);const _0x16f4e3=await fetchAPI(_0x5a642f(0xa8),_0x5a642f(0xca),{'trxid':currentTrxId});if(_0x16f4e3[_0x5a642f(0x99)]&&_0x16f4e3[_0x5a642f(0xde)]){clearInterval(statusInterval),document['getElementById'](_0x5a642f(0xba))[_0x5a642f(0xd8)]=_0x5a642f(0xbe),document['getElementById']('statusText')['className']='status-badge\x20status-cancelled';const _0x3530cd=document[_0x5a642f(0x9c)](_0x5a642f(0xd3));_0x3530cd['classList']['add']('fade-out'),setTimeout(()=>{const _0x5c8a73=_0x5a642f;_0x3530cd[_0x5c8a73(0xce)][_0x5c8a73(0xc6)]=_0x5c8a73(0xbd);},0x1f4),document[_0x5a642f(0x9c)](_0x5a642f(0xea))[_0x5a642f(0xbf)]=_0x5a642f(0xa1),showResponseMessage(_0x5a642f(0xec),_0x5a642f(0x99));}else showResponseMessage(_0x16f4e3[_0x5a642f(0xe7)]||'Gagal\x20membatalkan\x20deposit',_0x5a642f(0xb4));_0x130cab[_0x5a642f(0xb6)]=![],_0x130cab[_0x5a642f(0xd8)]=_0x5a642f(0xeb);});function showResponseMessage(_0x1fed12,_0x1e3764){const _0x4ea6b6=_0x5d8f94,_0x38edb3=document[_0x4ea6b6(0x9c)](_0x4ea6b6(0xd7));if(!_0x38edb3)return;const _0x316d8d=_0x38edb3['querySelector'](_0x4ea6b6(0xa3)),_0x50721f=_0x38edb3[_0x4ea6b6(0xb8)](_0x4ea6b6(0xee));_0x38edb3['style'][_0x4ea6b6(0xc6)]=_0x4ea6b6(0xc8),_0x38edb3[_0x4ea6b6(0xaa)]=_0x4ea6b6(0xa6)+_0x1e3764,_0x50721f[_0x4ea6b6(0xaa)]=_0x4ea6b6(0xc7),_0x50721f[_0x4ea6b6(0xd8)]=_0x1e3764===_0x4ea6b6(0x99)?_0x4ea6b6(0x9f):'<i\x20class=\x22fas\x20fa-exclamation\x22></i>',_0x38edb3[_0x4ea6b6(0xb8)](_0x4ea6b6(0xc4))[_0x4ea6b6(0xbf)]=_0x1fed12,setTimeout(()=>{const _0x3ec86b=_0x4ea6b6;_0x38edb3[_0x3ec86b(0xce)][_0x3ec86b(0xc6)]=_0x3ec86b(0xbd);},0x1388);}function formatRupiah(_0x4abf0e){const _0x1b2008=_0x5d8f94;return'Rp'+_0x4abf0e[_0x1b2008(0xd2)]()[_0x1b2008(0x98)](/\B(?=(\d{3})+(?!\d))/g,'.');}
+   (() => {
+      const API_BASE = '/deposit';
+      const PROFILE_API = '/profile/users';
+
+      const depositForm = document.getElementById('depositForm');
+      const depositTypeSelect = document.getElementById('depositType');
+      const methodsList = document.getElementById('methodsList');
+      const nominalInput = document.getElementById('nominalInput');
+      const submitBtn = depositForm.querySelector('button[type="submit"]');
+      const depositResult = document.getElementById('depositResult');
+
+      const profileBtn = document.getElementById('profileBtn');
+      const profilePopup = document.getElementById('profilePopup');
+      const profileFullname = document.getElementById('profileFullname');
+      const profileUsernamePopup = document.getElementById('profileUsernamePopup');
+      const profileSaldo = document.getElementById('profileSaldo');
+      const profileCoin = document.getElementById('profileCoin');
+      const profileUsername = document.getElementById('profileUsername');
+
+      const pendingBtn = document.getElementById('pendingBtn');
+      const pendingPopup = document.getElementById('pendingPopup');
+      const pendingListContainer = document.getElementById('pendingListContainer');
+      const pendingCountSpan = document.getElementById('pendingCount');
+
+      const depositTimerOverlay = document.getElementById('depositTimerOverlay');
+      const closeTimerBtn = document.getElementById('closeTimerBtn');
+      const cancelDepositBtn = document.getElementById('cancelDepositBtn');
+      const closeDepositBtn = document.getElementById('closeDepositBtn');
+
+      const timerMethodName = document.getElementById('timerMethodName');
+      const timerAmount = document.getElementById('timerAmount');
+      const timerFee = document.getElementById('timerFee');
+      const timerGetBalance = document.getElementById('timerGetBalance');
+      const timerBankLabel = document.getElementById('timerBankLabel');
+      const timerBankValue = document.getElementById('timerBankValue');
+      const timerAccountLabel = document.getElementById('timerAccountLabel');
+      const timerAccountValue = document.getElementById('timerAccountValue');
+      const timerNameLabel = document.getElementById('timerNameLabel');
+      const timerNameValue = document.getElementById('timerNameValue');
+      const timerCreatedAt = document.getElementById('timerCreatedAt');
+      const timerExpiredAt = document.getElementById('timerExpiredAt');
+      const timerStatus = document.getElementById('timerStatus');
+      const timerCountdown = document.getElementById('timerCountdown');
+      const timerQrContainer = document.getElementById('timerQrContainer');
+
+      let methodsData = [];
+      let selectedMethod = null;
+      let profileData = null;
+      let depositTimerData = null;
+      let countdownInterval = null;
+
+      function createEl(tag, options = {}) {
+        const el = document.createElement(tag);
+        if (options.classes) el.className = options.classes;
+        if (options.attrs) {
+          for (const [k, v] of Object.entries(options.attrs)) {
+            if (v === false || v === null) continue;
+            if (v === true) el.setAttribute(k, '');
+            else el.setAttribute(k, v);
+          }
+        }
+        if (options.text) el.textContent = options.text;
+        if (options.html) el.innerHTML = options.html;
+        return el;
+      }
+
+      function formatIDR(num) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+      }
+
+      function showStatusMessage(message, type = 'info') {
+        depositResult.style.display = 'block';
+        depositResult.innerHTML = '';
+        const div = createEl('div', { classes: 'status-message' });
+        if (type === 'pending') div.classList.add('status-pending');
+        else if (type === 'success') div.classList.add('status-success');
+        else if (type === 'cancel') div.classList.add('status-cancel');
+        else if (type === 'error') div.classList.add('status-error');
+        else div.style.color = '#475569';
+        div.innerHTML = `<i class="fas fa-info-circle" aria-hidden="true"></i> ${message}`;
+        depositResult.appendChild(div);
+        depositResult.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      function clearStatusMessage() {
+        depositResult.style.display = 'none';
+        depositResult.innerHTML = '';
+      }
+
+      async function fetchDepositMethods(type) {
+        methodsList.innerHTML = '';
+        const loadingText = createEl('p', { text: 'Memuat metode deposit...', attrs: { style: 'color:#64748b; font-style:italic; text-align:center; marginTop: 12px; userSelect: "none"' } });
+        methodsList.appendChild(loadingText);
+        try {
+          const params = new URLSearchParams();
+          if (type) params.append('type', type);
+
+          const response = await fetch(`${API_BASE}/methode`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString(),
+          });
+          if (!response.ok) throw new Error('Gagal memuat metode deposit');
+          const data = await response.json();
+          if (!data.status || !data.data) throw new Error('Data metode deposit tidak valid');
+          methodsData = data.data;
+          renderMethodsList();
+        } catch (err) {
+          methodsList.innerHTML = '';
+          const errorText = createEl('p', { text: 'Gagal memuat metode deposit. Silakan coba lagi.', attrs: { style: 'color:#b91c1c; text-align:center; marginTop: 12px; userSelect: "none"' } });
+          methodsList.appendChild(errorText);
+          methodsData = [];
+          selectedMethod = null;
+          updateSubmitButtonState();
+        }
+      }
+
+      function renderMethodsList() {
+        methodsList.innerHTML = '';
+        if (methodsData.length === 0) {
+          const noMethods = createEl('p', { text: 'Tidak ada metode deposit tersedia untuk jenis ini.', attrs: { style: 'color:#64748b; font-style:italic; text-align:center; marginTop: 12px; userSelect: "none"' } });
+          methodsList.appendChild(noMethods);
+          selectedMethod = null;
+          updateSubmitButtonState();
+          return;
+        }
+        methodsData.forEach((method, idx) => {
+          const item = createEl('div', { classes: 'method-item', attrs: { role: 'listitem', tabindex: '0', 'data-index': idx, 'aria-label': `Metode deposit ${method.name}, tipe ${method.type}, biaya ${method.fee_persen}% plus Rp ${method.fee}` } });
+          if (selectedMethod && selectedMethod.metode === method.metode) {
+            item.classList.add('selected');
+          }
+          const img = createEl('img', {
+            classes: 'method-img',
+            attrs: { src: method.img_url || 'https://placehold.co/64x64?text=No+Image', alt: `Logo metode pembayaran ${method.name}` },
+          });
+          item.appendChild(img);
+
+          const info = createEl('div', { classes: 'method-info' });
+          const name = createEl('div', { classes: 'method-name', html: `${method.name} <i class="fas fa-check-circle" aria-hidden="true"></i>` });
+          const type = createEl('div', { classes: 'method-type', text: `Tipe: ${method.type}` });
+          const fee = createEl('div', { classes: 'method-fee', html: `<i class="fas fa-coins" aria-hidden="true"></i> Biaya: ${method.fee_persen}% + Rp ${method.fee}` });
+          const minmax = createEl('div', { classes: 'method-minmax', text: `Min: Rp ${method.min} - Max: Rp ${method.max}` });
+          info.appendChild(name);
+          info.appendChild(type);
+          info.appendChild(fee);
+          info.appendChild(minmax);
+          item.appendChild(info);
+
+          item.addEventListener('click', () => {
+            selectMethod(idx);
+          });
+          item.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              selectMethod(idx);
+            }
+          });
+
+          methodsList.appendChild(item);
+        });
+        if (!selectedMethod || !methodsData.find(m => m.metode === selectedMethod.metode)) {
+          selectMethod(0);
+        }
+      }
+
+      function selectMethod(idx) {
+        if (idx < 0 || idx >= methodsData.length) return;
+        selectedMethod = methodsData[idx];
+        const items = methodsList.querySelectorAll('.method-item');
+        items.forEach((item, i) => {
+          if (i === idx) item.classList.add('selected');
+          else item.classList.remove('selected');
+        });
+        updateSubmitButtonState();
+        clearStatusMessage();
+      }
+
+      function updateSubmitButtonState() {
+        const nominalVal = parseInt(nominalInput.value, 10);
+        const isNominalValid = !isNaN(nominalVal) && nominalVal >= 500;
+        const isMethodSelected = selectedMethod !== null;
+        submitBtn.disabled = !(isNominalValid && isMethodSelected);
+      }
+
+      depositForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearStatusMessage();
+        submitBtn.disabled = true;
+        submitBtn.setAttribute('aria-busy', 'true');
+        submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin btn-icon" aria-hidden="true"></i> Memproses...`;
+
+        const nominalVal = parseInt(nominalInput.value, 10);
+        if (isNaN(nominalVal) || nominalVal < 500) {
+          showStatusMessage('Nominal deposit minimal Rp 500.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.setAttribute('aria-busy', 'false');
+          submitBtn.innerHTML = `<i class="fas fa-paper-plane btn-icon" aria-hidden="true"></i> Buat Permintaan Deposit`;
+          return;
+        }
+        if (!selectedMethod) {
+          showStatusMessage('Silakan pilih metode deposit.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.setAttribute('aria-busy', 'false');
+          submitBtn.innerHTML = `<i class="fas fa-paper-plane btn-icon" aria-hidden="true"></i> Buat Permintaan Deposit`;
+          return;
+        }
+
+        try {
+          const params = new URLSearchParams();
+          params.append('nominal', nominalVal);
+          params.append('type', depositTypeSelect.value);
+          params.append('metode', selectedMethod.metode);
+
+          const response = await fetch(`${API_BASE}/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString(),
+          });
+          if (!response.ok) {
+            const errData = await response.json().catch(() => null);
+            throw new Error(errData?.message || 'Gagal membuat permintaan deposit');
+          }
+          const data = await response.json();
+          if (!data.success || !data.data) {
+            throw new Error(data.message || 'Gagal membuat permintaan deposit');
+          }
+          savePendingDeposit(data.data);
+          openDepositTimer(data.data);
+          updatePendingCount();
+          depositForm.reset();
+          selectedMethod = null;
+          renderMethodsList();
+          updateSubmitButtonState();
+          clearStatusMessage();
+        } catch (err) {
+          showStatusMessage(err.message || 'Terjadi kesalahan saat membuat deposit.', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.setAttribute('aria-busy', 'false');
+          submitBtn.innerHTML = `<i class="fas fa-paper-plane btn-icon" aria-hidden="true"></i> Buat Permintaan Deposit`;
+        }
+      });
+
+      nominalInput.addEventListener('input', updateSubmitButtonState);
+      depositTypeSelect.addEventListener('change', () => {
+        selectedMethod = null;
+        clearStatusMessage();
+        updateSubmitButtonState();
+        fetchDepositMethods(depositTypeSelect.value);
+      });
+
+      profileBtn.addEventListener('click', async () => {
+        const expanded = profileBtn.getAttribute('aria-expanded') === 'true';
+        if (expanded) {
+          closeProfilePopup();
+        } else {
+          await openProfilePopup();
+        }
+      });
+
+      pendingBtn.addEventListener('click', () => {
+        const expanded = pendingBtn.getAttribute('aria-expanded') === 'true';
+        if (expanded) {
+          closePendingPopup();
+        } else {
+          openPendingPopup();
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!profileBtn.contains(e.target) && !profilePopup.contains(e.target)) {
+          closeProfilePopup();
+        }
+        if (!pendingBtn.contains(e.target) && !pendingPopup.contains(e.target)) {
+          closePendingPopup();
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeProfilePopup();
+          closePendingPopup();
+          profileBtn.focus();
+          pendingBtn.focus();
+        }
+      });
+
+      async function openProfilePopup() {
+        profileBtn.setAttribute('aria-expanded', 'true');
+        profilePopup.classList.add('visible');
+        profilePopup.focus();
+
+        if (profileData) {
+          fillProfileData(profileData);
+          return;
+        }
+        try {
+          const response = await fetch(PROFILE_API, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+          });
+          if (!response.ok) throw new Error('Gagal memuat data profil');
+          const data = await response.json();
+          if (!data.success || !data.user) throw new Error('Data profil tidak valid');
+          profileData = data.user;
+          fillProfileData(profileData);
+        } catch (err) {
+          profileFullname.textContent = '-';
+          profileUsernamePopup.textContent = '-';
+          profileSaldo.textContent = '-';
+          profileCoin.textContent = '-';
+          profileUsername.textContent = 'User';
+          alert('Gagal memuat data profil. Silakan coba lagi.');
+          closeProfilePopup();
+        }
+      }
+
+      function closeProfilePopup() {
+        profileBtn.setAttribute('aria-expanded', 'false');
+        profilePopup.classList.remove('visible');
+      }
+
+      function fillProfileData(user) {
+        profileFullname.textContent = user.fullname || '-';
+        profileUsernamePopup.textContent = user.username || '-';
+        profileSaldo.textContent = formatIDR(user.saldo || 0);
+        profileCoin.textContent = (user.coin != null) ? user.coin : '-';
+        profileUsername.textContent = user.username || 'User';
+        if (user.profileUrl) {
+          const img = profileBtn.querySelector('img');
+          img.src = user.profileUrl;
+          img.alt = `Foto profil ${user.fullname || user.username || 'User'}`;
+        }
+      }
+
+      function openPendingPopup() {
+        pendingBtn.setAttribute('aria-expanded', 'true');
+        pendingPopup.classList.add('visible');
+        pendingPopup.focus();
+        renderPendingDeposits();
+      }
+
+      function closePendingPopup() {
+        pendingBtn.setAttribute('aria-expanded', 'false');
+        pendingPopup.classList.remove('visible');
+      }
+
+      const LS_PENDING_DEPOSITS = 'pendingDeposits';
+
+      function savePendingDeposit(deposit) {
+        let pending = JSON.parse(localStorage.getItem(LS_PENDING_DEPOSITS) || '[]');
+        pending = pending.filter(d => d.id !== deposit.id);
+        pending.push(deposit);
+        localStorage.setItem(LS_PENDING_DEPOSITS, JSON.stringify(pending));
+        updatePendingCount();
+      }
+
+      function removePendingDeposit(id) {
+        let pending = JSON.parse(localStorage.getItem(LS_PENDING_DEPOSITS) || '[]');
+        pending = pending.filter(d => d.id !== id);
+        localStorage.setItem(LS_PENDING_DEPOSITS, JSON.stringify(pending));
+        updatePendingCount();
+      }
+
+      function getPendingDeposits() {
+        return JSON.parse(localStorage.getItem(LS_PENDING_DEPOSITS) || '[]');
+      }
+
+      function updatePendingCount() {
+        const pending = getPendingDeposits();
+        pendingCountSpan.textContent = pending.length;
+        if (pending.length === 0) {
+          pendingCountSpan.style.display = 'none';
+        } else {
+          pendingCountSpan.style.display = 'inline-block';
+        }
+      }
+
+      function renderPendingDeposits() {
+        const pending = getPendingDeposits();
+        pendingListContainer.innerHTML = '';
+        if (pending.length === 0) {
+          const emptyMsg = createEl('p', { classes: 'empty-message', text: 'Tidak ada deposit pending saat ini.' });
+          pendingListContainer.appendChild(emptyMsg);
+          return;
+        }
+        pending.forEach(deposit => {
+          const row = createEl('div', { classes: 'deposit-row' });
+
+          const metaContainer = createEl('div', {classes: 'deposit-meta'});
+          const label = createEl('div', { classes: 'deposit-label', text: `ID: ${deposit.id}` });
+          const value = createEl('div', { classes: 'deposit-value', text: `${formatIDR(deposit.nominal)} - ${deposit.status.toUpperCase()}` });
+          metaContainer.appendChild(label);
+          metaContainer.appendChild(value);
+          row.appendChild(metaContainer);
+
+          const buttonContainer = createEl('div', { classes: 'deposit-buttons-container' });
+
+          const btnPayNow = createEl('button', { classes: 'pay-now-btn', text: 'Bayar Sekarang' });
+          btnPayNow.title = `Bayar deposit ${deposit.id}`;
+          btnPayNow.addEventListener('click', () => {
+            closePendingPopup();
+            openDepositTimer(deposit);
+          });
+
+          const btnCancel = createEl('button', { classes: 'cancel-btn', text: 'Batalkan' });
+          btnCancel.title = `Batalkan deposit ${deposit.id}`;
+          btnCancel.addEventListener('click', () => {
+            cancelDeposit(deposit.id);
+          });
+
+          buttonContainer.appendChild(btnPayNow);
+          buttonContainer.appendChild(btnCancel);
+          row.appendChild(buttonContainer);
+          pendingListContainer.appendChild(row);
+        });
+      }
+
+      async function cancelDeposit(id) {
+        if (!id) return;
+        if (!confirm(`Batalkan deposit dengan ID ${id}?`)) return;
+        try {
+          const params = new URLSearchParams();
+          params.append('trxid', id);
+          const response = await fetch(`${API_BASE}/cancel`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString(),
+          });
+          if (!response.ok) {
+            const errData = await response.json().catch(() => null);
+            throw new Error(errData?.message || 'Gagal membatalkan deposit');
+          }
+          const data = await response.json();
+          if (!data.success) throw new Error(data.message || 'Gagal membatalkan deposit');
+          alert('Deposit berhasil dibatalkan');
+          removePendingDeposit(id);
+          renderPendingDeposits();
+          if (depositTimerData && depositTimerData.id === id) {
+            closeDepositTimer();
+          }
+        } catch (err) {
+          alert(err.message || 'Terjadi kesalahan saat membatalkan deposit.');
+        }
+      }
+
+      function openDepositTimer(deposit) {
+        depositTimerData = deposit;
+        depositTimerOverlay.style.display = 'flex';
+        updateDepositTimerUI();
+        startCountdown();
+      }
+
+      function closeDepositTimer() {
+        depositTimerOverlay.style.display = 'none';
+        depositTimerData = null;
+        stopCountdown();
+      }
+
+      function updateDepositTimerUI() {
+        if (!depositTimerData) return;
+
+        timerMethodName.textContent = depositTimerData.metode || 'Tidak diketahui';
+        timerAmount.textContent = formatIDR(depositTimerData.nominal || 0);
+        timerFee.textContent = formatIDR((depositTimerData.fee || 0) + (depositTimerData.tambahan || 0));
+        timerGetBalance.textContent = formatIDR(depositTimerData.get_balance || 0);
+        timerCreatedAt.textContent = depositTimerData.created_at || '-';
+        timerExpiredAt.textContent = depositTimerData.expired_at || '-';
+
+        timerBankLabel.style.display = 'none'; timerBankValue.style.display = 'none';
+        timerAccountLabel.style.display = 'none'; timerAccountValue.style.display = 'none';
+        timerNameLabel.style.display = 'none'; timerNameValue.style.display = 'none';
+
+        if (depositTimerData.bank && depositTimerData.tujuan && depositTimerData.atas_nama) {
+            timerBankLabel.textContent = 'Bank Tujuan';
+            timerBankValue.textContent = depositTimerData.bank;
+            timerAccountLabel.textContent = 'Nomor Rekening';
+            timerAccountValue.textContent = depositTimerData.tujuan;
+            timerNameLabel.textContent = 'Atas Nama';
+            timerNameValue.textContent = depositTimerData.atas_nama;
+
+            timerBankLabel.style.display = 'block'; timerBankValue.style.display = 'block';
+            timerAccountLabel.style.display = 'block'; timerAccountValue.style.display = 'block';
+            timerNameLabel.style.display = 'block'; timerNameValue.style.display = 'block';
+        } else if (depositTimerData.bank && depositTimerData.nomor_va) {
+            timerBankLabel.textContent = 'Bank VA';
+            timerBankValue.textContent = depositTimerData.bank;
+            timerAccountLabel.textContent = 'Nomor Virtual Account';
+            timerAccountValue.textContent = depositTimerData.nomor_va;
+
+            timerBankLabel.style.display = 'block'; timerBankValue.style.display = 'block';
+            timerAccountLabel.style.display = 'block'; timerAccountValue.style.display = 'block';
+        }
+
+        timerStatus.textContent = `Status: ${depositTimerData.status.toUpperCase()}`;
+        timerStatus.className = 'deposit-timer-status';
+        if (['expired', 'cancel', 'cancell', 'failed'].includes(depositTimerData.status.toLowerCase())) {
+            timerStatus.classList.add('deposit-timer-expired');
+        }
+
+        timerQrContainer.innerHTML = '';
+        if (depositTimerData.qr_image) {
+            const img = createEl('img', { attrs: { src: depositTimerData.qr_image, alt: 'QR Code untuk pembayaran deposit' } });
+            timerQrContainer.appendChild(img);
+        } else if (depositTimerData.url) {
+            const link = createEl('a', { attrs: { href: depositTimerData.url, target: '_blank', rel: 'noopener noreferrer' }, html: `<i class="fas fa-external-link-alt" aria-hidden="true"></i> Link Pembayaran E-Wallet` });
+            timerQrContainer.appendChild(link);
+        }
+      }
+
+      function startCountdown() {
+        stopCountdown();
+        if (!depositTimerData || !depositTimerData.expired_at) {
+          timerCountdown.textContent = '';
+          return;
+        }
+        function updateCountdown() {
+          const now = new Date();
+          const expireDate = new Date(depositTimerData.expired_at.replace(' ', 'T'));
+          const diff = expireDate - now;
+          if (diff <= 0) {
+            timerCountdown.textContent = 'Waktu pembayaran telah habis';
+            timerStatus.textContent = 'Status: EXPIRED';
+            timerStatus.classList.add('deposit-timer-expired');
+            stopCountdown();
+            updateLocalStorageStatus(depositTimerData.id, 'expired');
+            return;
+          }
+          const minutes = Math.floor(diff / 60000);
+          const seconds = Math.floor((diff % 60000) / 1000);
+          timerCountdown.textContent = `Waktu tersisa: ${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        }
+        updateCountdown();
+        countdownInterval = setInterval(updateCountdown, 1000);
+      }
+
+      function stopCountdown() {
+        if (countdownInterval) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+        }
+      }
+
+      async function updateLocalStorageStatus(id, newStatus) {
+        let pending = getPendingDeposits();
+        let changed = false;
+
+        const updatedPending = [];
+        for (const d of pending) {
+            if (d.id === id) {
+                if (d.status.toLowerCase() !== newStatus.toLowerCase()) {
+                    d.status = newStatus.toLowerCase();
+                    changed = true;
+                }
+            }
+            updatedPending.push(d);
+        }
+        
+        if (changed) {
+            try {
+                const params = new URLSearchParams();
+                params.append('trxid', id);
+                const response = await fetch(`${API_BASE}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString(),
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        const latestData = data.data;
+                        const finalUpdatedPending = updatedPending.map(d => {
+                            if (d.id === id) {
+                                return {
+                                    ...d,
+                                    status: latestData.status.toLowerCase(),
+                                    nominal: latestData.nominal,
+                                    fee: latestData.fee_dari_api,
+                                    get_balance: latestData.saldo_masuk,
+                                    metode: latestData.metode,
+                                    bank: latestData.bank || d.bank || null,
+                                    tujuan: latestData.tujuan || d.tujuan || null,
+                                    atas_nama: latestData.atas_nama || d.atas_nama || null,
+                                    nomor_va: latestData.nomor_va || d.nomor_va || null,
+                                    expired_at: latestData.expired_at || d.expired_at || null,
+                                    created_at: latestData.created_at || d.created_at || null,
+                                };
+                            }
+                            return d;
+                        }).filter(d => !['success', 'cancel', 'cancell', 'expired', 'failed'].includes(d.status));
+                        localStorage.setItem(LS_PENDING_DEPOSITS, JSON.stringify(finalUpdatedPending));
+                        updatePendingCount();
+                        renderPendingDeposits();
+                        if (depositTimerData && depositTimerData.id === id) {
+                            depositTimerData = { ...depositTimerData, ...latestData, status: latestData.status.toLowerCase() };
+                            updateDepositTimerUI();
+                        }
+                    } else {
+                        const filtered = updatedPending.filter(d => !['success', 'cancel', 'cancell', 'expired', 'failed'].includes(d.status));
+                        localStorage.setItem(LS_PENDING_DEPOSITS, JSON.stringify(filtered));
+                        updatePendingCount();
+                        renderPendingDeposits();
+                    }
+                }
+            } catch (err) {
+                const filtered = updatedPending.filter(d => !['success', 'cancel', 'cancell', 'expired', 'failed'].includes(d.status));
+                localStorage.setItem(LS_PENDING_DEPOSITS, JSON.stringify(filtered));
+                updatePendingCount();
+                renderPendingDeposits();
+            }
+        }
+      }
+
+      async function pollDepositStatus() {
+        const pending = getPendingDeposits();
+        if (pending.length === 0) return;
+        for (const deposit of pending) {
+          try {
+            const params = new URLSearchParams();
+            params.append('trxid', deposit.id);
+            const response = await fetch(`${API_BASE}/status`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: params.toString(),
+            });
+            if (!response.ok) continue;
+            const data = await response.json();
+            if (!data.success || !data.data) continue;
+            const statusData = data.data;
+            if (statusData.status && statusData.status.toLowerCase() !== deposit.status.toLowerCase()) {
+              await updateLocalStorageStatus(deposit.id, statusData.status);
+              if (depositTimerData && depositTimerData.id === deposit.id) {
+                updateDepositTimerUI();
+                if (['success', 'cancel', 'cancell', 'expired', 'failed'].includes(depositTimerData.status)) {
+                  setTimeout(() => {
+                    closeDepositTimer();
+                  }, 3000);
+                }
+              }
+            }
+          } catch {
+          }
+        }
+      }
+
+      setInterval(pollDepositStatus, 3000);
+
+      closeTimerBtn.addEventListener('click', () => {
+        closeDepositTimer();
+      });
+      closeDepositBtn.addEventListener('click', () => {
+        closeDepositTimer();
+      });
+      cancelDepositBtn.addEventListener('click', () => {
+        if (!depositTimerData) return;
+        cancelDeposit(depositTimerData.id);
+      });
+
+      fetchDepositMethods(depositTypeSelect.value);
+      updatePendingCount();
+
+      (async () => {
+        try {
+          const response = await fetch(PROFILE_API, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+          });
+          if (!response.ok) return;
+          const data = await response.json();
+          if (!data.success || !data.user) return;
+          profileData = data.user;
+          fillProfileData(profileData);
+        } catch {}
+      })();
+    })();
