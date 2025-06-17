@@ -255,7 +255,7 @@ function generateApiKey() {
   const randomPart =
     Math.random().toString(36).substring(2, 10) +
     Math.random().toString(36).substring(2, 10);
-  return `VPedia-${randomPart}`;
+  return `Fupei-pedia-${randomPart}`;
 }
 
 function generateReferralCode(username) {
@@ -1548,6 +1548,16 @@ app.post("/order/create", requireLogin, async (req, res) => {
         message: "Saldo tidak mencukupi",
       });
     }
+    user.saldo -= totalPrice;
+    user.history.push({
+      aktivitas: "Order",
+      nominal: totalPrice,
+      status: "Pending",
+      code: generateReffId(),
+      notes: `Order ${code} target ${target}`,
+      tanggal: new Date(),
+    });
+    await user.save();
     const reff_id = generateReffId();
     const transactionParams = new URLSearchParams({
       api_key: ATLAN_API_KEY,
@@ -1560,19 +1570,22 @@ app.post("/order/create", requireLogin, async (req, res) => {
     });
     const trx = trxResponse.data?.data;
     if (!trx?.id || !trx?.price) {
+      user.saldo += totalPrice;
+      user.history.push({
+        aktivitas: "Order",
+        nominal: totalPrice,
+        status: "Gagal - Internal server error",
+        code: reff_id,
+        notes: `Order ${code} target ${target} - Refunded`,
+        tanggal: new Date(),
+      });
+      await user.save();
       return res.status(502).json({
         success: false,
         message: "Internal server error",
       });
     }
-    user.history.push({
-      aktivitas: `Order`,
-      nominal: totalPrice,
-      status: "Pending",
-      code: trx.id,
-      notes: `Order ${code} target ${target}`,
-      tanggal: new Date(),
-    });
+    user.history.find(h => h.code === reff_id).code = trx.id;
     await user.save();
     res.json({
       success: true,
@@ -1594,12 +1607,11 @@ app.post("/order/create", requireLogin, async (req, res) => {
         });
         const status = statusResponse.data.data?.status;
         if (status === "success") {
-          user.saldo -= totalPrice;
           if (user.role === "reseller") {
             user.coin += Math.floor(totalPrice * 0.01);
           }
           user.history.push({
-            aktivitas: `Order`,
+            aktivitas: "Order",
             nominal: totalPrice,
             status: "Sukses",
             code: trx.id,
@@ -1607,31 +1619,41 @@ app.post("/order/create", requireLogin, async (req, res) => {
             tanggal: new Date(),
           });
           await user.save();
-          console.log(`✅ Order ${trx.id} sukses. Saldo dipotong.`);
           return;
         }
         if (status === "failed") {
+          user.saldo += totalPrice;
           user.history.push({
-            aktivitas: `Order`,
+            aktivitas: "Order",
             nominal: totalPrice,
             status: "Gagal",
             code: trx.id,
-            notes: `Order ${code} target ${target}`,
+            notes: `Order ${code} target ${target} - Refunded`,
             tanggal: new Date(),
           });
           await user.save();
-          console.log(`❌ Order ${trx.id} gagal.`);
           return;
         }
         setTimeout(checkStatus, 1000);
       } catch (err) {
-        console.error("❌ Error saat cek status:", err.response?.data || err.message);
         setTimeout(checkStatus, 1000);
       }
     };
     checkStatus();
   } catch (error) {
-    console.error("❌ Error create order:", error.response?.data || error.message);
+    const user = await User.findById(req.session.userId);
+    if (user) {
+      user.saldo += totalPrice;
+      user.history.push({
+        aktivitas: "Order",
+        nominal: totalPrice,
+        status: "Gagal",
+        code: generateReffId(),
+        notes: `Order ${code} target ${target} - Refunded`,
+        tanggal: new Date(),
+      });
+      await user.save();
+    }
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -2001,9 +2023,8 @@ app.get("/h2h/products", validateApiKey, async (req, res) => {
         provider: i.provider,
         brand_status: i.brand_status,
         status: i.status,
-        img_url: i.img_url,
+        img_url: customImageUrl,
         final_price: finalPrice,
-        price: finalPrice,
         price_formatted: `Rp ${toRupiah(finalPrice)}`,
         status_emoji: i.status === "available" ? "✅" : "❎",
       };
@@ -2371,6 +2392,16 @@ app.get("/h2h/order/create", validateApiKey, async (req, res) => {
         message: "Saldo tidak mencukupi",
       });
     }
+    user.saldo -= totalPrice;
+    user.history.push({
+      aktivitas: "Order",
+      nominal: totalPrice,
+      status: "Pending",
+      code: generateReffId(),
+      notes: `Order ${code} target ${target}`,
+      tanggal: new Date(),
+    });
+    await user.save();
     const reff_id = generateReffId();
     const transactionParams = new URLSearchParams({
       api_key: ATLAN_API_KEY,
@@ -2383,19 +2414,22 @@ app.get("/h2h/order/create", validateApiKey, async (req, res) => {
     });
     const trx = trxResponse.data?.data;
     if (!trx?.id || !trx?.price) {
+      user.saldo += totalPrice;
+      user.history.push({
+        aktivitas: "Order",
+        nominal: totalPrice,
+        status: "Gagal - Internal server error",
+        code: reff_id,
+        notes: `Order ${code} target ${target} - Refunded`,
+        tanggal: new Date(),
+      });
+      await user.save();
       return res.status(502).json({
         success: false,
         message: "Internal server error",
       });
     }
-    user.history.push({
-      aktivitas: `Order`,
-      nominal: totalPrice,
-      status: "Pending",
-      code: trx.id,
-      notes: `Order ${code} target ${target}`,
-      tanggal: new Date(),
-    });
+    user.history.find(h => h.code === reff_id).code = trx.id;
     await user.save();
     res.json({
       success: true,
@@ -2417,12 +2451,11 @@ app.get("/h2h/order/create", validateApiKey, async (req, res) => {
         });
         const status = statusResponse.data.data?.status;
         if (status === "success") {
-          user.saldo -= totalPrice;
           if (user.role === "reseller") {
             user.coin += Math.floor(totalPrice * 0.01);
           }
           user.history.push({
-            aktivitas: `Order`,
+            aktivitas: "Order",
             nominal: totalPrice,
             status: "Sukses",
             code: trx.id,
@@ -2430,38 +2463,47 @@ app.get("/h2h/order/create", validateApiKey, async (req, res) => {
             tanggal: new Date(),
           });
           await user.save();
-          console.log(`✅ Order ${trx.id} sukses. Saldo dipotong.`);
           return;
         }
         if (status === "failed") {
+          user.saldo += totalPrice;
           user.history.push({
-            aktivitas: `Order`,
+            aktivitas: "Order",
             nominal: totalPrice,
             status: "Gagal",
             code: trx.id,
-            notes: `Order ${code} target ${target}`,
+            notes: `Order ${code} target ${target} - Refunded`,
             tanggal: new Date(),
           });
           await user.save();
-          console.log(`❌ Order ${trx.id} gagal.`);
           return;
         }
         setTimeout(checkStatus, 1000);
       } catch (err) {
-        console.error("❌ Error saat cek status:", err.response?.data || err.message);
         setTimeout(checkStatus, 1000);
       }
     };
     checkStatus();
   } catch (error) {
-    console.error("❌ Error create order:", error.response?.data || error.message);
+    const user = req.user;
+    if (user) {
+      user.saldo += totalPrice;
+      user.history.push({
+        aktivitas: "Order",
+        nominal: totalPrice,
+        status: "Gagal",
+        code: generateReffId(),
+        notes: `Order ${code} target ${target} - Refunded`,
+        tanggal: new Date(),
+      });
+      await user.save();
+    }
     return res.status(500).json({
       success: false,
       message: "Internal server error",
     });
   }
 });
-
 
 app.get("/h2h/order/check", validateApiKey, async (req, res) => {
   try {
