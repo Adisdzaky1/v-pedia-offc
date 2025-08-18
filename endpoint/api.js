@@ -1,6 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const qs = require("qs");
+const cloudscraper = require("cloudscraper");
 const router = express.Router();
 
 const domain = process.env.PTERO_DOMAIN;
@@ -521,37 +522,38 @@ router.get("/layanan/price-list", validateApiKey, async (req, res) => {
   try {
     const formDataToAtlantic = {
       api_key: process.env.ATLAN_API_KEY,
-      type: 'prabayar',
+      type: "prabayar",
       code: code,
     };
 
-    const atlanticResponse = await axios.post(
-      `${BASE_URL}/layanan/price_list`,
-      qs.stringify(formDataToAtlantic),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    const responseBody = await cloudscraper.post({
+      uri: `${BASE_URL}/layanan/price_list`,
+      form: formDataToAtlantic,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "MyCustomUserAgent/1.0 (compatible; RerezzBot/2025)",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": `${BASE_URL}/layanan/price_list`,
+      },
+      json: true,
+    });
 
-    const resultFromAtlantic = atlanticResponse.data;
-    if (!resultFromAtlantic || !resultFromAtlantic.status || !Array.isArray(resultFromAtlantic.data)) {
+    if (!responseBody || !responseBody.status || !Array.isArray(responseBody.data)) {
       return res.status(502).json({
         success: false,
-        message: resultFromAtlantic?.message || "Gagal mendapatkan daftar harga.",
-        error: resultFromAtlantic?.data || resultFromAtlantic,
+        message: responseBody?.message || "Gagal mendapatkan daftar harga.",
+        error: responseBody?.data || responseBody,
       });
     }
 
-    const modifiedData = resultFromAtlantic.data.map((item) => {
+    const modifiedData = responseBody.data.map((item) => {
       let originalPrice = parseInt(item.price) || 0;
       let modifiedPrice = originalPrice;
 
       if (user.role === "user") {
-        modifiedPrice = Math.ceil(originalPrice * 1.1); // Tambah 10% untuk user
+        modifiedPrice = Math.ceil(originalPrice * 1.1); // +10%
       } else if (user.role === "reseller") {
-        modifiedPrice = Math.ceil(originalPrice * 1.05); // Tambah 5% untuk reseller
+        modifiedPrice = Math.ceil(originalPrice * 1.05); // +5%
       }
 
       return {
@@ -572,11 +574,10 @@ router.get("/layanan/price-list", validateApiKey, async (req, res) => {
       data: modifiedData,
     });
   } catch (error) {
-    const apiError = error.response?.data;
     return res.status(500).json({
       success: false,
-      message: apiError?.message || "Terjadi kesalahan internal saat memproses permintaan.",
-      error: apiError || error.message,
+      message: error?.message || "Terjadi kesalahan internal saat memproses permintaan.",
+      error: error,
     });
   }
 });
