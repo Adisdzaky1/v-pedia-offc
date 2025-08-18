@@ -311,7 +311,6 @@ router.post("/deposit/create", requireLogin, async (req, res) => {
 });
 
 
-
 router.post("/deposit/status", requireLogin, async (req, res) => {
   const user = await User.findById(req.session.userId);
   if (!user) {
@@ -340,16 +339,14 @@ router.post("/deposit/status", requireLogin, async (req, res) => {
       api_key: process.env.ATLAN_API_KEY,
       id,
     };
-    const atlanticResponse = await axios.post(
-      `${BASE_URL}/deposit/status`,
-      qs.stringify(formDataToAtlantic),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+    const response = await cloudscraper.post(`${BASE_URL}/deposit/status`, {
+      body: qs.stringify(formDataToAtlantic),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
       }
-    );
-    const resultFromAtlantic = atlanticResponse.data;
+    });
+    const resultFromAtlantic = JSON.parse(response);
     if (!resultFromAtlantic || !resultFromAtlantic.status || !resultFromAtlantic.data) {
       return res.status(502).json({
         success: false,
@@ -417,16 +414,14 @@ router.post("/deposit/cancel", requireLogin, async (req, res) => {
       api_key: process.env.ATLAN_API_KEY,
       id,
     };
-    const atlanticResponse = await axios.post(
-      `${BASE_URL}/deposit/cancel`,
-      qs.stringify(formDataToAtlantic),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+    const response = await cloudscraper.post(`${BASE_URL}/deposit/cancel`, {
+      body: qs.stringify(formDataToAtlantic),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
       }
-    );
-    const resultFromAtlantic = atlanticResponse.data;
+    });
+    const resultFromAtlantic = JSON.parse(response);
     if (!resultFromAtlantic || !resultFromAtlantic.status || !resultFromAtlantic.data) {
       return res.status(502).json({
         success: false,
@@ -452,6 +447,7 @@ router.post("/deposit/cancel", requireLogin, async (req, res) => {
     });
   }
 });
+
 
 router.post("/layanan/price-list", requireLogin, async (req, res) => {
   const user = await User.findById(req.session.userId);
