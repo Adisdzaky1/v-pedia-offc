@@ -25,26 +25,23 @@ const {
 
 router.get("/profile", async (req, res) => {
   try {
-    const body = qs.stringify({ api_key: process.env.ATLAN_API_KEY })
     const response = await cloudscraper.post("https://atlantich2h.com/get_profile", {
+      formData: {
+        api_key: process.env.ATLAN_API_KEY
+      },
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Accept": "application/json, text/javascript, */*; q=0.01",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Origin": "https://atlantich2h.com",
-        "Referer": "https://atlantich2h.com/",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "X-Requested-With": "XMLHttpRequest",
-        "Connection": "keep-alive"
+        "Referer": "https://atlantich2h.com/"
       },
-      body,
       gzip: true,
-      resolveWithFullResponse: false,
-      simple: true
-    })
-    const extData = JSON.parse(response)
-    const result = {
+      simple: true,
+      resolveWithFullResponse: false
+    });
+
+    const extData = JSON.parse(response);
+
+    return res.json({
       success: extData.status === "true",
       info: extData.message,
       profile: {
@@ -55,16 +52,16 @@ router.get("/profile", async (req, res) => {
         saldo: extData.data?.balance,
         status: extData.data?.status
       }
-    }
-    return res.json(result)
+    });
   } catch (error) {
+    console.error("❌ Error ambil profile:", error.message);
     return res.status(500).json({
       success: false,
       message: "Gagal mengambil data dari API eksternal",
       error: error.message
-    })
+    });
   }
-})
+});
 
 router.get("/data/users", requireAdmin, async (req, res) => {
   try {
