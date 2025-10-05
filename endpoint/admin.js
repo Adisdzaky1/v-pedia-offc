@@ -25,30 +25,45 @@ const {
 
 router.get("/profile", async (req, res) => {
   try {
-    const response = await cloudscraper({
-      method: "POST",
-      url: "https://atlantich2h.com/get_profile",
-      form: { api_key: process.env.ATLAN_API_KEY },
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Referer": "https://atlantich2h.com/"
-      },
-      jar: true,   // simpan cookie
-      simple: true
-    });
+    const formData = {
+      api_key: process.env.ATLAN_API_KEY, // ambil dari .env
+    };
 
-    const extData = JSON.parse(response);
-    return res.json({
-      success: extData.status === "true",
-      message: extData.message,
-      profile: extData.data || null
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    };
+
+    const response = await cloudscraper.post(
+      "https://atlantich2h.com/get_profile",
+      {
+        body: qs.stringify(formData),
+        headers,
+      }
+    );
+
+    const result = JSON.parse(response);
+
+    if (!result || result.status !== "true") {
+      return res.status(400).json({
+        success: false,
+        message: result?.message || "Gagal mengambil data profil",
+      });
+    }
+
+    // ✅ kirim data hasil API ke client
+    return res.status(200).json({
+      success: true,
+      message: "Berhasil mengambil data profil",
+      data: result.data,
     });
   } catch (error) {
-    console.error("❌ Gagal ambil profile:", error.message);
+    console.error("Error get_profile:", error?.message);
     return res.status(500).json({
       success: false,
-      message: "Masih ke-block Cloudflare",
-      error: error.message
+      message: "Terjadi kesalahan internal saat mengambil profil",
+      error: error?.message,
     });
   }
 });
