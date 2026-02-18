@@ -65,7 +65,7 @@ router.post("/deposit/metode", requireLogin, async (req, res) => {
     if (role === "user") tambahanPersen = 0.2;
     if (role === "reseller") tambahanPersen = 0.1;
 
-    const blacklist = ['OVO', 'QRIS', 'DANA', 'ovo', 'MANDIRI', 'PERMATA'];
+    const blacklist = ['MANDIRI', 'PERMATA'];
 
     const metodeFormatted = atlanticMethods
       .filter((item) => !blacklist.includes(item.metode?.toUpperCase()))
